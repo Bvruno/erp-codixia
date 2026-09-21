@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "next/link": ["./src/next/link.tsx"],
+      "next/navigation": ["./src/next/navigation.ts"],
+      "@/lib/supabase/*": ["./src/lib/supabase/*"],
+      "@/lib/auth/*": ["./src/lib/auth/*"],
+      "@/lib/errors": ["./src/lib/errors.ts"],
+      "@/lib/realtime": ["./src/lib/realtime.ts"],
+      "@/lib/realtime-cache": ["./src/lib/realtime-cache.ts"],
+      "@/lib/utils": ["./src/lib/utils.ts"],
+      "@/lib/pipeline-filtros": ["./src/lib/pipeline-filtros.ts"],
+      "@/lib/rutas-tareas": ["./src/lib/rutas-tareas.ts"],
+      "@/lib/cache": ["./src/lib/cache.ts"],
+      "@/lib/cache-claves": ["./src/lib/cache-claves.ts"],
+      "@/lib/query-client": ["./src/lib/query-client.ts"],
+      "@/lib/use-perfil": ["./src/lib/use-perfil.ts"],
+      "@/lib/use-autoguardado": ["./src/lib/use-autoguardado.ts"],
+      "@/lib/use-formato-hora": ["./src/lib/use-formato-hora.ts"],
+      "@/lib/use-preferencias-trabajo": [
+        "./src/lib/use-preferencias-trabajo.ts"
+      ],
+      "@/lib/tema": ["./src/lib/tema.ts"],
+      "@/lib/vista-inicial": ["./src/lib/vista-inicial.ts"],
+      "@/lib/use-cache-hidratacion": ["./src/lib/use-cache-hidratacion.ts"],
+      "@/lib/nav-bus": ["./src/lib/nav-bus.ts"],
+      "@/lib/captura-errores": ["./src/lib/captura-errores.ts"],
+      "@/lib/api/*": ["./src/lib/api/*"],
+      "@/lib/*": ["../../packages/shared/src/logica/*"],
+      "@/types": ["../../packages/shared/src/types.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
+

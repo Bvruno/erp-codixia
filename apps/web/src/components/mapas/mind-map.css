@@ -1,0 +1,35 @@
+/* Estilos para edges del mapa mental (encima de los default de @xyflow/react) */
+
+.react-flow__edge .react-flow__edge-path {
+  stroke: #94a3b8;
+  stroke-width: 2;
+}
+
+.react-flow__edge-path {
+  transition:
+    stroke 0.2s ease,
+    stroke-width 0.2s ease,
+    filter 0.2s ease;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: #6366f1;
+  stroke-width: 2.5;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #6366f1;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.45));
+}
+
+.react-flow__edge-text {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.react-flow__edge-textbg {
+  fill: var(--color-background, #ffffff);
+  stroke: var(--color-border, #e2e8f0);
+  stroke-width: 0.5;
+}

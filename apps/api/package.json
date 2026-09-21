@@ -1,0 +1,31 @@
+{
+  "name": "@erp/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=../../.env.local src/index.ts",
+    "start": "tsx src/index.ts",
+    "start:local": "tsx --env-file=../../.env.local src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@erp/shared": "*",
+    "@hono/node-server": "^1.19.0",
+    "@hono/node-ws": "^1.1.1",
+    "@supabase/supabase-js": "^2.111.0",
+    "exceljs": "^4.4.0",
+    "hono": "^4.9.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsx": "^4.19.0",
+    "typescript": "^5",
+    "vitest": "^4.1.10"
+  }
+}

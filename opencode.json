@@ -1,0 +1,29 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    ".opencode/plugins/graphify.js"
+  ],
+  "mcp": {
+    "trivy": {
+      "type": "local",
+      "command": ["trivy", "mcp"],
+      "enabled": true
+    },
+    "graphify": {
+      "type": "local",
+      "command": [
+        "C:\\Users\\bruno\\AppData\\Roaming\\uv\\tools\\graphifyy\\Scripts\\python.exe",
+        "-m",
+        "graphify.serve",
+        "--graph",
+        "F:\\proyectos\\caroline-salas\\graphify-out\\graph.json"
+      ],
+      "enabled": true
+    },
+    "dependency-health": {
+      "type": "local",
+      "command": ["node", "F:\\proyectos\\caroline-salas\\.mcp\\dependency-health\\server.mjs", "F:\\proyectos\\caroline-salas"],
+      "enabled": true
+    }
+  }
+}

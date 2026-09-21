@@ -1,0 +1,1 @@
+export { translateAuthError } from '@erp/shared';

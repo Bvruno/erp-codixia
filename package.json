@@ -1,0 +1,51 @@
+{
+    "name":  "caroline-salas",
+    "version":  "0.1.0",
+    "private":  true,
+    "engines":  {
+                    "node":  ">=22.12.0"
+                },
+    "workspaces":  [
+                       "apps/*",
+                       "packages/*"
+                   ],
+    "scripts":  {
+                    "lint":  "eslint apps packages",
+                    "typecheck":  "npm run typecheck --workspaces --if-present",
+                    "test":  "npm run test --workspaces --if-present",
+                    "seed":  "node scripts/seed.mjs",
+                    "seed:mindmap-bucket":  "node scripts/create-mindmap-bucket.mjs",
+                    "format":  "prettier --write .",
+                    "format:check":  "prettier --check .",
+                    "dev:api":  "npm run dev -w @erp/api",
+                    "dev:web":  "npm run dev -w @erp/web",
+                    "test:shared":  "npm run test -w @erp/shared",
+                    "test:api":  "npm run test -w @erp/api",
+                    "test:web":  "npm run test -w @erp/web",
+                    "typecheck:shared":  "npm run typecheck -w @erp/shared",
+                    "typecheck:api":  "npm run typecheck -w @erp/api",
+                    "typecheck:web":  "npm run typecheck -w @erp/web"
+                },
+    "dependencies":  {
+                         "@supabase/supabase-js":  "^2.111.0"
+                     },
+    "devDependencies":  {
+                            "@eslint/js":  "^9.39.5",
+                            "eslint":  "^9",
+                            "eslint-plugin-react-hooks":  "^7.1.1",
+                            "prettier":  "^3.9.6",
+                            "typescript":  "^5",
+                            "typescript-eslint":  "^8.70.0"
+                        },
+    "allowScripts":  {
+                         "esbuild@0.25.4":  true,
+                         "esbuild@0.28.1":  true,
+                         "sharp@0.34.5":  true,
+                         "unrs-resolver@1.12.2":  true
+                     },
+    "overrides":  {
+                      "@tiptap/core":  "3.31.3",
+                      "@tiptap/extension-bubble-menu":  "3.31.3",
+                      "@tiptap/pm":  "3.31.3"
+                  }
+}
