@@ -1,5 +1,5 @@
 {
-    "name":  "caroline-salas",
+    "name":  "erp-codixia",
     "version":  "0.1.0",
     "private":  true,
     "engines":  {
@@ -13,22 +13,22 @@
                     "lint":  "eslint apps packages",
                     "typecheck":  "npm run typecheck --workspaces --if-present",
                     "test":  "npm run test --workspaces --if-present",
-                    "seed":  "node scripts/seed.mjs",
-                    "seed:mindmap-bucket":  "node scripts/create-mindmap-bucket.mjs",
+                    "seed":  "npm run seed -w @erp/api",
+                    "seed:mindmap-bucket":  "npm run seed:mindmap-bucket -w @erp/api",
                     "format":  "prettier --write .",
                     "format:check":  "prettier --check .",
                     "dev:api":  "npm run dev -w @erp/api",
                     "dev:web":  "npm run dev -w @erp/web",
+                    "dev:plataforma":  "npm run dev -w @erp/plataforma",
                     "test:shared":  "npm run test -w @erp/shared",
                     "test:api":  "npm run test -w @erp/api",
                     "test:web":  "npm run test -w @erp/web",
+                    "test:plataforma":  "npm run test -w @erp/plataforma",
                     "typecheck:shared":  "npm run typecheck -w @erp/shared",
                     "typecheck:api":  "npm run typecheck -w @erp/api",
-                    "typecheck:web":  "npm run typecheck -w @erp/web"
+                    "typecheck:web":  "npm run typecheck -w @erp/web",
+                    "typecheck:plataforma":  "npm run typecheck -w @erp/plataforma"
                 },
-    "dependencies":  {
-                         "@supabase/supabase-js":  "^2.111.0"
-                     },
     "devDependencies":  {
                             "@eslint/js":  "^9.39.5",
                             "eslint":  "^9",

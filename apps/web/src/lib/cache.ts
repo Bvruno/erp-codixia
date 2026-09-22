@@ -19,7 +19,7 @@ export type CacheBackend = {
   clear: () => Promise<void>;
 };
 
-const DB_NAME = 'caroline-salas-cache';
+const DB_NAME = 'erp-codixia-cache';
 const DB_VERSION = 1;
 const STORE = 'kv';
 

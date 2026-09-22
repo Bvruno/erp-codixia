@@ -39,6 +39,25 @@ vi.mock('../supabase/verificar-token', () => ({
   verificarJwt: vi.fn(async () => ({ id: 'u1', email: 'a@b.c' })),
 }));
 
+const mocks = vi.hoisted(() => {
+  const estado = {
+    perfil: { blocked: false, organizations: { status: 'activa' } } as Record<string, unknown> | null,
+    maybeSingle: vi.fn(),
+  };
+  estado.maybeSingle = vi.fn(async () => ({ data: estado.perfil, error: null }));
+  return estado;
+});
+
+vi.mock('@/lib/supabase/admin', () => ({
+  getAdminClient: () => ({
+    from: () => ({
+      select: () => ({
+        eq: () => ({ maybeSingle: mocks.maybeSingle }),
+      }),
+    }),
+  }),
+}));
+
 import { crearPasarelaRealtime } from './pasarela-ws';
 
 function wsFake() {
@@ -51,6 +70,8 @@ beforeEach(() => {
   canalFake.subscribe.mockClear();
   canalFake.unsubscribe.mockClear();
   handlerFactory = null;
+  mocks.perfil = { blocked: false, organizations: { status: 'activa' } };
+  mocks.maybeSingle.mockImplementation(async () => ({ data: mocks.perfil, error: null }));
 });
 
 describe('pasarela realtime', () => {
@@ -112,6 +133,19 @@ describe('pasarela realtime', () => {
     getSessionMock.mockResolvedValueOnce({ data: { session: null } } as never);
     const { ws } = await autenticar();
     expect(ws.send).toHaveBeenCalledWith(JSON.stringify({ type: 'auth_error' }));
+  });
+
+  it('cierra el socket si la empresa está suspendida', async () => {
+    mocks.perfil = { blocked: false, organizations: { status: 'suspendida' } };
+    const { ws } = await autenticar();
+    expect(ws.close).toHaveBeenCalledWith(1008, 'Cuenta sin acceso');
+    expect(ws.send).not.toHaveBeenCalledWith(JSON.stringify({ type: 'auth_ok' }));
+  });
+
+  it('cierra el socket si la cuenta está bloqueada', async () => {
+    mocks.perfil = { blocked: true, organizations: null };
+    const { ws } = await autenticar();
+    expect(ws.close).toHaveBeenCalledWith(1008, 'Cuenta sin acceso');
   });
 
   it('envía heartbeats periódicos y los detiene al cerrar', async () => {

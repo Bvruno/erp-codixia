@@ -22,4 +22,5 @@ export * from './logica/shift-utils';
 export * from './logica/formato-hora';
 export * from './logica/invites';
 export * from './logica/logger';
+export * from './logica/plataforma';
 

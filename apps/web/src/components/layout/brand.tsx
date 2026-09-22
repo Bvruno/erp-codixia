@@ -94,7 +94,7 @@ export function BrandWordmark({
       <BrandMark />
       <span className="flex min-w-0 flex-col leading-tight">
         <span className="font-display truncate text-[15px] font-bold tracking-tight text-foreground">
-          Caroline Salas
+          ERP Codixia
         </span>
         {showTagline && (
           <span className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">

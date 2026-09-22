@@ -2,7 +2,7 @@
 // que invoca el endpoint protegido por CRON_SECRET.
 //
 // Env requeridas: API_URL (base de la API, sin /api final) y CRON_SECRET.
-// Uso local: node apps/api/scripts/disparar-recordatorios.mjs
+// Uso local: node --env-file=apps/api/.env.local apps/api/scripts/disparar-recordatorios.mjs
 
 const apiUrl = process.env.API_URL;
 const secreto = process.env.CRON_SECRET;

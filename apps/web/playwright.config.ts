@@ -16,8 +16,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command:
-        'node --env-file=../../.env.local --import tsx src/index.ts',
+      command: 'node --env-file=.env.local --import tsx src/index.ts',
       cwd: '../api',
       url: 'http://localhost:8787/salud',
       reuseExistingServer: true,

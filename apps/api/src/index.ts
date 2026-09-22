@@ -4,7 +4,7 @@ import { crearApp } from './app';
 import { crearPasarelaRealtime, inyectarSocketServer } from './realtime/pasarela-ws';
 
 const entorno = cargarEntorno();
-const app = crearApp(entorno.WEB_ORIGIN);
+const app = crearApp(entorno.WEB_ORIGIN, entorno.PLATFORM_ORIGIN);
 const injectWebSocket = crearPasarelaRealtime(app);
 
 const server = serve({ fetch: app.fetch, port: entorno.PORT }, (info) => {

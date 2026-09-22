@@ -111,7 +111,7 @@ rutasTelegram.post('/probar', async (c) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: owner.telegram_chat_id,
-        text: `Prueba de Telegram — ${org.name ?? 'ERP Empresarial'}`,
+        text: `Prueba de Telegram — ${org.name ?? 'ERP Codixia'}`,
       }),
     }
   );

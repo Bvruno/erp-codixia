@@ -197,8 +197,8 @@ describe("jsonCell", () => {
 describe("exportFileName", () => {
   it("genera slug con fecha", () => {
     const date = new Date("2026-09-12T10:00:00Z");
-    expect(exportFileName("Caroline Salas S.A.", "xlsx", date)).toBe(
-      "org-caroline-salas-s-a-2026-09-12.xlsx",
+    expect(exportFileName("ERP Codixia S.A.", "xlsx", date)).toBe(
+      "org-erp-codixia-s-a-2026-09-12.xlsx",
     );
   });
 

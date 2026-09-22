@@ -46,7 +46,7 @@ rutasOrganizacion.get('/exportar.xlsx', requerirAdmin, async (c) => {
 
   const { Workbook } = await import('exceljs');
   const workbook = new Workbook();
-  workbook.creator = 'ERP Empresarial';
+  workbook.creator = 'ERP Codixia';
 
   for (const [tabla, filas] of Object.entries(datos.tables ?? {})) {
     if (!Array.isArray(filas) || filas.length === 0) continue;

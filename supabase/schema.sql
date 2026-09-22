@@ -1,5 +1,5 @@
 -- ============================================================
--- SCHEMA CANÓNICO — Caroline Salas (estado final consolidado)
+-- SCHEMA CANÓNICO — ERP Codixia (estado final consolidado)
 -- Fuente: migraciones 0001–0032 (aplicado + corregido).
 -- Idempotente: se puede correr varias veces sin error.
 --
@@ -34,7 +34,14 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE IF NOT EXISTS organizations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
-  owner_id UUID REFERENCES auth.users NOT NULL,
+  -- Nullable a propósito: la plataforma crea la empresa y el primer
+  -- admin la reclama con claim_organization() durante el onboarding.
+  owner_id UUID REFERENCES auth.users,
+  status TEXT NOT NULL DEFAULT 'activa'
+    CHECK (status IN ('activa','suspendida')),
+  suspended_at TIMESTAMPTZ,
+  suspended_reason TEXT,
+  plan_id TEXT,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
@@ -60,6 +67,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   -- 'grants_only': invitado por link scoped; ve solo sus grants
   access_mode TEXT NOT NULL DEFAULT 'org'
     CHECK (access_mode IN ('org', 'grants_only')),
+  last_active_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
@@ -2113,3 +2121,135 @@ BEGIN
 EXCEPTION WHEN others THEN
   NULL;
 END $$;
+
+-- ---- Plataforma de owners (0067–0070) ----
+-- Todo vive fuera del modelo de organizaciones: solo la API con
+-- service role accede. RLS ON sin policies + REVOKE.
+
+CREATE TABLE IF NOT EXISTS platform_admins (
+  user_id UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by UUID REFERENCES auth.users ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS owner_applications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre_contacto TEXT NOT NULL,
+  email TEXT NOT NULL,
+  telefono TEXT,
+  empresa TEXT NOT NULL,
+  sitio_web TEXT,
+  pais TEXT,
+  sector TEXT,
+  tamano_equipo TEXT,
+  motivacion TEXT,
+  referido_por TEXT,
+  estado TEXT NOT NULL DEFAULT 'pendiente'
+    CHECK (estado IN ('pendiente', 'en_revision', 'aprobada', 'rechazada', 'invitada', 'activada')),
+  notas_admin TEXT,
+  organization_id UUID REFERENCES organizations ON DELETE SET NULL,
+  invitation_id UUID REFERENCES invitations ON DELETE SET NULL,
+  reviewed_by UUID REFERENCES auth.users ON DELETE SET NULL,
+  reviewed_at TIMESTAMPTZ,
+  ip_hash TEXT,
+  consentimiento_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS plans (
+  id TEXT PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  precio_mensual NUMERIC(12, 2) NOT NULL DEFAULT 0,
+  moneda TEXT NOT NULL DEFAULT 'USD',
+  limites JSONB NOT NULL DEFAULT '{}',
+  orden INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+INSERT INTO plans (id, nombre, precio_mensual, moneda, limites, orden) VALUES
+  ('base', 'Base', 0, 'USD', '{"miembros": 10, "almacenamiento_mb": 1024}', 1),
+  ('pro', 'Pro', 49, 'USD', '{"miembros": 50, "almacenamiento_mb": 10240}', 2),
+  ('empresa', 'Empresa', 149, 'USD', '{"miembros": 500, "almacenamiento_mb": 102400}', 3)
+ON CONFLICT (id) DO NOTHING;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'organizations_plan_id_fkey'
+  ) THEN
+    ALTER TABLE organizations
+      ADD CONSTRAINT organizations_plan_id_fkey
+      FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE SET NULL;
+  END IF;
+END;
+$$;
+
+CREATE TABLE IF NOT EXISTS org_subscriptions (
+  organization_id UUID PRIMARY KEY REFERENCES organizations ON DELETE CASCADE,
+  plan_id TEXT NOT NULL REFERENCES plans(id) ON DELETE RESTRICT,
+  estado TEXT NOT NULL DEFAULT 'activa'
+    CHECK (estado IN ('prueba', 'activa', 'mora', 'cancelada')),
+  periodo_inicio DATE,
+  periodo_fin DATE,
+  precio_acordado NUMERIC(12, 2),
+  notas TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS billing_records (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID NOT NULL REFERENCES organizations ON DELETE CASCADE,
+  periodo DATE NOT NULL,
+  monto NUMERIC(12, 2) NOT NULL,
+  moneda TEXT NOT NULL DEFAULT 'USD',
+  estado TEXT NOT NULL DEFAULT 'pendiente'
+    CHECK (estado IN ('pendiente', 'pagada', 'anulada')),
+  pagado_at TIMESTAMPTZ,
+  metodo TEXT,
+  notas TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS platform_audit_logs (
+  id BIGSERIAL PRIMARY KEY,
+  actor_id UUID REFERENCES auth.users ON DELETE SET NULL,
+  accion TEXT NOT NULL,
+  entidad_tipo TEXT,
+  entidad_id TEXT,
+  payload JSONB NOT NULL DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS platform_admins_created_at_idx
+  ON platform_admins (created_at DESC);
+CREATE INDEX IF NOT EXISTS owner_applications_estado_idx
+  ON owner_applications (estado, created_at DESC);
+CREATE INDEX IF NOT EXISTS owner_applications_email_idx
+  ON owner_applications (lower(email));
+CREATE INDEX IF NOT EXISTS org_subscriptions_plan_idx
+  ON org_subscriptions (plan_id);
+CREATE INDEX IF NOT EXISTS billing_records_org_idx
+  ON billing_records (organization_id, periodo DESC);
+CREATE INDEX IF NOT EXISTS organizations_status_idx
+  ON organizations (status);
+CREATE INDEX IF NOT EXISTS profiles_last_active_idx
+  ON profiles (last_active_at DESC);
+CREATE INDEX IF NOT EXISTS platform_audit_logs_created_idx
+  ON platform_audit_logs (created_at DESC);
+CREATE INDEX IF NOT EXISTS platform_audit_logs_entidad_idx
+  ON platform_audit_logs (entidad_tipo, entidad_id);
+
+ALTER TABLE platform_admins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE owner_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE org_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE billing_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform_audit_logs ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE platform_admins FROM anon, authenticated;
+REVOKE ALL ON TABLE owner_applications FROM anon, authenticated;
+REVOKE ALL ON TABLE plans FROM anon, authenticated;
+REVOKE ALL ON TABLE org_subscriptions FROM anon, authenticated;
+REVOKE ALL ON TABLE billing_records FROM anon, authenticated;
+REVOKE ALL ON TABLE platform_audit_logs FROM anon, authenticated;

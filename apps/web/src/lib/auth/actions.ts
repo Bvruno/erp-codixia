@@ -29,8 +29,11 @@ export async function login(formData: FormData) {
 
   const res = await fetch(`${API_URL}/auth/estado`, { headers: await jwtHeaders() });
   if (res.status === 403) {
+    const cuerpo = (await res.json().catch(() => ({}))) as { error?: string };
     await createClient().auth.signOut();
-    return { error: 'Tu cuenta está bloqueada. Contacta al administrador.' };
+    return {
+      error: cuerpo.error ?? 'Tu cuenta está bloqueada. Contacta al administrador.',
+    };
   }
   if (!res.ok) {
     await createClient().auth.signOut();

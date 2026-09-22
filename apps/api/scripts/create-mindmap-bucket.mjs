@@ -28,12 +28,12 @@ function loadEnv() {
 }
 
 const env = loadEnv();
-const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_URL = env.SUPABASE_URL;
 const SERVICE_ROLE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
   console.error(
-    'ERROR: faltan NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (en .env.local o entorno).'
+    'ERROR: faltan SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (en apps/api/.env.local o entorno).'
   );
   process.exit(1);
 }

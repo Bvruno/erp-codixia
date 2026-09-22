@@ -24,19 +24,25 @@ import { rutasNotificaciones } from './rutas/notificaciones';
 import { rutasCron } from './rutas/cron';
 import { rutasFormularios } from './rutas/formularios';
 import { rutasFormulariosPublicos } from './rutas/formularios-publicos';
+import { rutasPlataformaPublica } from './rutas/plataforma-publica';
+import { rutasPlataforma } from './rutas/plataforma';
 import { captureErrorServer } from './lib/captura-errores';
 import { conRequestId, logApi, logsActivos, siguienteId } from './lib/log';
 
 const comprimirRespuestas = compress();
 const etiquetarRespuestas = etag();
 
-export function crearApp(webOrigin: string) {
+export function crearApp(webOrigin: string, platformOrigin?: string) {
   const app = new Hono();
+
+  const origenes = [webOrigin, platformOrigin].filter(
+    (origen): origen is string => Boolean(origen)
+  );
 
   app.use(
     '*',
     cors({
-      origin: webOrigin,
+      origin: origenes,
       allowHeaders: ['Content-Type', 'Authorization', 'X-Refresh-Token'],
       allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       maxAge: 86400,
@@ -85,7 +91,7 @@ export function crearApp(webOrigin: string) {
   });
 
   app.get('/salud', (c) =>
-    c.json({ estado: 'ok', servicio: 'erp-empresarial-api', version: '0.1.0' })
+    c.json({ estado: 'ok', servicio: 'erp-codixia-api', version: '0.1.0' })
   );
 
   app.route('/auth', rutasAuth);
@@ -109,6 +115,8 @@ export function crearApp(webOrigin: string) {
   app.route('/notificaciones', rutasNotificaciones);
   app.route('/formularios', rutasFormularios);
   app.route('/publico/formularios', rutasFormulariosPublicos);
+  app.route('/plataforma', rutasPlataformaPublica);
+  app.route('/plataforma', rutasPlataforma);
   app.route('/cron', rutasCron);
 
   app.notFound((c) => c.json({ error: 'No encontrado' }, 404));

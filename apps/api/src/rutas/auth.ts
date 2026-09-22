@@ -4,6 +4,7 @@ import { crearClienteJwt } from '../supabase/verificar-token';
 import { getAdminClient } from '../lib/supabase/admin';
 import { hashInviteToken } from '@erp/shared';
 import { verificarJwtMiddleware } from '../middleware/verificar-jwt';
+import { esPlatformAdmin } from '../middleware/requerir-plataforma';
 import { resolveOAuthNewUser, updateOAuthProfile } from '../lib/auth/oauth';
 
 export const rutasAuth = new Hono();
@@ -61,23 +62,47 @@ rutasAuth.post('/login', async (c) => {
     );
   }
 
-  if (!perfil?.organization_id) {
-    if (invite) {
-      const { data: invitacion } = await supabase.rpc('get_invitation', {
-        p_token: await hashInviteToken(invite),
-      });
-      if (invitacion && invitacion.length > 0) {
-        return c.json({
-          session: data.session,
-          redirect: `/invitacion/${invite}`,
-        });
-      }
+  if (perfil?.organization_id) {
+    const { data: org } = await getAdminClient()
+      .from('organizations')
+      .select('status')
+      .eq('id', perfil.organization_id)
+      .maybeSingle();
+    if (org?.status === 'suspendida') {
+      await supabase.auth.signOut();
+      return c.json(
+        {
+          error: 'La empresa está suspendida. Contacta al soporte de la plataforma.',
+          code: 'empresa_suspendida',
+        },
+        403
+      );
     }
-    await supabase.auth.signOut();
-    return c.json({ error: 'no-access' }, 403);
+    return c.json({ session: data.session, redirect: '/' });
   }
 
-  return c.json({ session: data.session, redirect: '/' });
+  const { data: esPlataforma } = await getAdminClient()
+    .from('platform_admins')
+    .select('user_id')
+    .eq('user_id', data.user.id)
+    .maybeSingle();
+  if (esPlataforma) {
+    return c.json({ session: data.session, redirect: '/', plataforma: true });
+  }
+
+  if (invite) {
+    const { data: invitacion } = await supabase.rpc('get_invitation', {
+      p_token: await hashInviteToken(invite),
+    });
+    if (invitacion && invitacion.length > 0) {
+      return c.json({
+        session: data.session,
+        redirect: `/invitacion/${invite}`,
+      });
+    }
+  }
+  await supabase.auth.signOut();
+  return c.json({ error: 'no-access' }, 403);
 });
 
 // POST /auth/signup — registro solo por invitación (sin registro público).
@@ -246,12 +271,20 @@ rutasAuth.post('/onboarding', verificarJwtMiddleware, async (c) => {
     .eq('id', usuario.id);
   if (flagErr) return c.json({ error: 'Error finalizando la configuración' }, 500);
 
+  // La solicitud de owner queda activada cuando la empresa ya tiene dueño.
+  await admin
+    .from('owner_applications')
+    .update({ estado: 'activada', updated_at: new Date().toISOString() })
+    .eq('organization_id', perfil.organization_id)
+    .in('estado', ['pendiente', 'en_revision', 'aprobada', 'invitada']);
+
   return c.json({ success: true, redirect: '/' });
 });
 
 // GET /auth/estado — usuario actual + perfil (para guards del SPA).
 rutasAuth.get('/estado', verificarJwtMiddleware, async (c) => {
   const usuario = c.get('usuario');
-  return c.json(usuario);
+  const esPlataforma = await esPlatformAdmin(usuario.id);
+  return c.json({ ...usuario, es_plataforma: esPlataforma });
 });
 

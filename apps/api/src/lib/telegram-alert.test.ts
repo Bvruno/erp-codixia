@@ -67,12 +67,12 @@ function makeSupabase(opts: {
   } as unknown as SupabaseClient;
 }
 
-const ORG = { name: 'CAROLINE SALAS', owner_id: 'owner-1' };
+const ORG = { name: 'ERP CODIXIA', owner_id: 'owner-1' };
 
 describe('telegramAlertText', () => {
   it('incluye organización, ruta y veces', () => {
-    const text = telegramAlertText(ROW, 'CAROLINE SALAS');
-    expect(text).toContain('CAROLINE SALAS');
+    const text = telegramAlertText(ROW, 'ERP CODIXIA');
+    expect(text).toContain('ERP CODIXIA');
     expect(text).toContain('Ruta: /api/org/export');
     expect(text).toContain('Veces: 3');
     expect(text).toContain('TypeError: Fallo en la base de datos');
@@ -121,7 +121,7 @@ describe('sendTelegramAlert', () => {
     expect(url).toBe('https://api.telegram.org/botglobal-token/sendMessage');
     const body = JSON.parse(init!.body as string);
     expect(body.chat_id).toBe('chat-global');
-    expect(body.text).toContain('CAROLINE SALAS');
+    expect(body.text).toContain('ERP CODIXIA');
   });
 
   it('fallback por-org: usa telegram_config y chat del owner', async () => {

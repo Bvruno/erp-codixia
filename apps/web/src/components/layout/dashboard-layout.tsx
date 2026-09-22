@@ -421,7 +421,7 @@ export default function DashboardLayout({
               </SheetTrigger>
               <SheetContent side="left" className="w-72 p-0">
                 <SheetHeader className="border-sidebar-border flex h-16 flex-row items-center gap-2 border-b px-4 pr-12">
-                  <SheetTitle className="sr-only">Caroline Salas</SheetTitle>
+                  <SheetTitle className="sr-only">ERP Codixia</SheetTitle>
                   <BrandWordmark showTagline={false} />
                 </SheetHeader>
                 <div className="bg-sidebar text-sidebar-foreground flex h-full flex-col">

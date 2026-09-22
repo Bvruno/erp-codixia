@@ -396,7 +396,7 @@ export default function PerfilPage() {
                         autoguardadoPersonal.guardarYa();
                       }}
                       aria-invalid={nombreTocado && nombreInvalido}
-                      placeholder="Caroline Salas"
+                      placeholder="ERP Codixia"
                     />
                     {nombreTocado && nombreInvalido && (
                       <p className="text-destructive text-xs">

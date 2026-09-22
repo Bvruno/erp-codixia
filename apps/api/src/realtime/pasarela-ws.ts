@@ -3,6 +3,7 @@ import { createNodeWebSocket } from '@hono/node-ws';
 import type { Server } from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import { verificarJwt } from '../supabase/verificar-token';
+import { getAdminClient } from '../lib/supabase/admin';
 import { fetchConLog, logsActivos } from '../lib/log';
 
 interface EventoCliente {
@@ -59,6 +60,18 @@ export function crearPasarelaRealtime(app: Hono) {
             const usuario = msg.token ? await verificarJwt(msg.token) : null;
             if (!usuario) {
               ws.close(1008, 'Token inválido');
+              return;
+            }
+            // Mismo corte que la API: cuenta bloqueada o empresa suspendida
+            // no abre realtime (RLS por sí solo no lo impide).
+            const { data: perfil } = await getAdminClient()
+              .from('profiles')
+              .select('blocked, organizations(status)')
+              .eq('id', usuario.id)
+              .maybeSingle();
+            const organizacion = perfil?.organizations as { status?: string } | null;
+            if (!perfil || perfil.blocked || organizacion?.status === 'suspendida') {
+              ws.close(1008, 'Cuenta sin acceso');
               return;
             }
             token = msg.token ?? null;

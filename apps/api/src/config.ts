@@ -5,6 +5,9 @@ export const esquemaEntorno = z.object({
   SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   WEB_ORIGIN: z.string().url().default('http://localhost:5173'),
+  // Origen del panel de plataforma (segundo SPA). Opcional: sin él,
+  // solo el WEB_ORIGIN pasa CORS.
+  PLATFORM_ORIGIN: z.string().url().optional(),
   PORT: z.coerce.number().int().positive().default(8787),
 });
 

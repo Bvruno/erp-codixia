@@ -127,7 +127,7 @@ export function TelegramTab({ orgId }: Props) {
         body: JSON.stringify({
           bot_token: botToken.trim(),
           chat_id: chatId,
-          text: "­ƒöö Notificación de prueba desde Caroline Salas",
+          text: "Notificación de prueba desde ERP Codixia",
         }),
       });
       const data = await res.json();

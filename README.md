@@ -1,13 +1,13 @@
-# ERP Empresarial — plataforma de gestión de tareas, turnos y proyectos
+# ERP Codixia — plataforma de gestión de tareas, turnos y proyectos
 
 Monorepo con separación total front/back:
 
 ```
 apps/web/          → SPA (Vite + React 19 + TanStack Router)
-apps/api/          → API (Hono + Zod + WebSocket realtime)
+apps/api/          → API (Hono + Zod + WebSocket realtime) + scripts admin (seed, invitaciones, bucket)
 packages/shared/   → tipos, Zod schemas y lógica pura (contrato único)
 supabase/          → migraciones y schema de la base (Supabase + RLS)
-scripts/           → utilidades (seed, creación de invitaciones, bucket)
+scripts/           → tooling de desarrollo (OCR local, graphify)
 ```
 
 ## Stack
@@ -18,20 +18,52 @@ scripts/           → utilidades (seed, creación de invitaciones, bucket)
 - **Realtime**: pasarela WebSocket en la API (`/cws`) → canales Supabase con el JWT del usuario (RLS aplica)
 - **Tests**: Vitest (shared/api/web) + Playwright e2e (Edge/Chrome del sistema)
 
+## Capas y paquete compartido
+
+`packages/shared` es el contrato único (tipos + Zod + lógica pura; sin BD,
+Hono ni React). Se ejecuta en runtime en ambas capas: `tsx` lo transpila al
+vuelo en la API y Vite lo bundlea en el SPA.
+
+```
+                ┌─────────────────────────────────────────────┐
+                │        packages/shared (@erp/shared)        │
+                │  types.ts · logica/* · esquemas Zod         │
+                │  puro: sin BD, sin Hono, sin React          │
+                └──────────┬───────────────────┬──────────────┘
+                           │                   │
+              import @erp/shared       import @erp/shared
+              alias @/lib/*            alias @/lib/*
+                           │                   │
+                ┌──────────▼───────┐   ┌───────▼────────────┐
+                │    apps/api      │   │     apps/web       │
+                │  Hono + Zod      │   │  React + Vite      │
+                │  tsx src/index   │   │  build → dist/     │
+                └──────────┬───────┘   └───────┬────────────┘
+                           │                   │
+                      runtime Node        navegador
+                      (Render)            (bundle JS)
+                           │                   │
+                           └──────► Supabase ◄─┘ (RLS)
+```
+
+Detalle (dev vs prod, reglas de import): `docs/ARQUITECTURA-CAPAS.md`.
+
 ## Desarrollo local
 
 ```bash
 npm install
-# .env.local (raíz) para la API y apps/web/.env.local para el SPA:
+# Cada capa lee su propio .env.local (copiar el .env.example de cada una):
+# apps/api/.env.local (API + scripts):
 #   SUPABASE_URL=           https://<ref>.supabase.co
 #   SUPABASE_ANON_KEY=      anon key (pública)
 #   SUPABASE_SERVICE_ROLE_KEY=  service role (SOLO server/scripts — nunca al navegador)
 #   WEB_ORIGIN=             http://localhost:5173
 #   PORT=                   8787
-#   VITE_SUPABASE_URL=      (apps/web/.env.local, mismo valor)
-#   VITE_SUPABASE_ANON_KEY= (apps/web/.env.local, mismo valor)
 #   LOG_SUPABASE=1          traza de llamadas API → Supabase en consola (default: on fuera de prod)
 #   CRON_SECRET=            secreto para POST /cron/recordatorios (Render Cron)
+# apps/web/.env.local (SPA):
+#   VITE_SUPABASE_URL=      mismo valor que SUPABASE_URL
+#   VITE_SUPABASE_ANON_KEY= mismo valor que SUPABASE_ANON_KEY
 npm run dev:api   # API en http://localhost:8787 (salud: /salud)
 npm run dev:web   # SPA en http://localhost:5173 (proxy /api y /cws a la API)
 ```
@@ -44,7 +76,7 @@ tareas próximas y crea notificaciones según `reminder_before` del destinatario
 `dockerfilePath=apps/api/scripts/Dockerfile.cron` y env `API_URL` + `CRON_SECRET`
 (`API_URL` es la base donde viven las rutas: `http://localhost:8787` en local o
 `https://<host>/api` si la API va detrás de ese prefijo).
-Prueba manual: `node apps/api/scripts/disparar-recordatorios.mjs`.
+Prueba manual: `node --env-file=apps/api/.env.local apps/api/scripts/disparar-recordatorios.mjs`.
 
 ### Traza de flujo (dev)
 
@@ -71,7 +103,9 @@ Sin tokens ni emails en los logs (se redactan). Se apaga con `LOG_SUPABASE=0`.
 | `npm run lint` | ESLint (apps + packages) |
 | `npm run typecheck` | tsc en los tres paquetes |
 | `npm run build -w @erp/web` | build de producción del SPA |
-| `npm run seed` | seed demo en la BD configurada (service role) |
+| `npm run seed` | seed demo en la BD configurada (lee `apps/api/.env.local`, service role) |
+| `npm run seed:mindmap-bucket -w @erp/api` | crea el bucket `mindmap-images` (idempotente) |
+| `npm run invitar-empresa -w @erp/api -- --name "..."` | crea empresa + link de invitación del dueño |
 
 ## Base de datos
 
