@@ -26,22 +26,21 @@ export function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 p-4 pb-safe print:hidden">
-      <div className="bg-background border shadow-lg rounded-lg p-4 mx-auto max-w-lg flex flex-col gap-3 sm:flex-row sm:items-center">
-        <p className="text-sm text-muted-foreground flex-1">
+    <div className="fixed bottom-4 left-4 right-4 z-50 sm:right-auto sm:w-96 print:hidden">
+      <div className="bg-card border shadow-popover rounded-xl p-4">
+        <p className="text-sm text-muted-foreground">
           Usamos cookies para el funcionamiento de la plataforma. No recopilamos
           datos personales sin tu consentimiento.
         </p>
-        <div className="flex flex-col-reverse gap-2 shrink-0 sm:flex-row">
+        <div className="mt-3 flex items-center justify-end gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="w-full sm:w-auto"
             onClick={() => decide("rejected")}
           >
             Rechazar
           </Button>
-          <Button size="sm" className="w-full sm:w-auto" onClick={() => decide("accepted")}>
+          <Button size="sm" onClick={() => decide("accepted")}>
             Aceptar
           </Button>
         </div>

@@ -59,7 +59,10 @@ const MONTHS = [
 const MONTHS_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const PRIORITY_COLOR: Record<string, string> = {
-  high: '#ef4444', medium: '#f59e0b', low: '#3b82f6', urgent: '#8b5cf6',
+  high: 'var(--destructive)',
+  medium: 'var(--warning)',
+  low: 'var(--info)',
+  urgent: 'var(--primary)',
 };
 const STATUS_LABEL: Record<string, string> = {
   todo: 'Por hacer', in_progress: 'En curso', done: 'Completada', cancelled: 'Cancelada', backlog: 'Backlog',
@@ -307,8 +310,10 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
         }))
         .filter((g) => g.notes.length > 0);
     }
-    return monthNotes.map((n) => ({ day: Number(n.note_date.slice(8, 10)), notes: [n] }));
-  }, [monthNotes, range]);
+    return Object.entries(notesByDay)
+      .map(([day, notes]) => ({ day: Number(day), notes }))
+      .sort((a, b) => a.day - b.day);
+  }, [notesByDay, monthNotes, range]);
 
   const visibleTasks = useMemo(() => {
     if (range) {
@@ -321,11 +326,10 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
         }))
         .filter((g) => g.tasks.length > 0);
     }
-    return monthTasks.map((t) => ({
-      day: Number(t.due_date!.slice(8, 10)),
-      tasks: [t],
-    }));
-  }, [monthTasks, tasksByDay, range]);
+    return Object.entries(tasksByDay)
+      .map(([day, tasks]) => ({ day: Number(day), tasks }))
+      .sort((a, b) => a.day - b.day);
+  }, [tasksByDay, range]);
 
   const taskPath = (t: Task): string | null => {
     if (!t.list_id) return null;
@@ -770,15 +774,10 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                         title={t.title}
                         className="rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-card"
                       >
-                        <div className="flex items-center gap-1.5">
-                          <span
-                            className="size-2 shrink-0 rounded-full"
-                            style={{ backgroundColor: PRIORITY_COLOR[t.priority] || 'var(--muted-foreground)' }}
-                          />
-                          <span className="ml-auto text-xs font-medium text-muted-foreground">
-                            {MONTHS_SHORT[month]} {group.day}
-                          </span>
-                        </div>
+                        <span
+                          className="size-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: PRIORITY_COLOR[t.priority] || 'var(--muted-foreground)' }}
+                        />
                         <div className="mt-1 truncate text-sm font-semibold">{t.title}</div>
                         <div className="mt-1 flex items-center gap-1.5">
                           <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
@@ -838,12 +837,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                         selectedNoteId === n.id && 'border-primary ring-2 ring-primary-soft',
                       )}
                     >
-                      <div className="flex items-center gap-1.5">
-                        <span className="size-2 rounded-full bg-primary" />
-                        <span className="ml-auto text-xs font-medium text-muted-foreground">
-                          {MONTHS_SHORT[month]} {group.day}
-                        </span>
-                      </div>
+                      <span className="size-2 rounded-full bg-primary inline-block" />
                       <div className="mt-1 truncate text-sm font-semibold">{n.title}</div>
                       {n.image ? (
                         <img src={n.image} alt={n.title} loading="lazy" className="mt-1.5 w-full rounded-lg border bg-card" />

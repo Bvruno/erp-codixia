@@ -54,7 +54,7 @@ import type {
 
 // Capa 3: dashboard de respuestas (resumen con gráficas + individuales).
 
-const COLOR_BARRA = '#6366f1';
+const COLOR_BARRA = 'var(--primary)';
 
 function preguntasDe(esquema: FormularioEsquema): PreguntaFormulario[] {
   return esquema.secciones.flatMap((s) => s.preguntas);
