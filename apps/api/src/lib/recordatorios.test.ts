@@ -7,10 +7,10 @@ import {
 
 describe('instanteEnZona', () => {
   it('convierte hora local de la zona a UTC', () => {
-    // Ciudad de México (UTC-6 sin DST): 14:30 local = 20:30 UTC.
+    // Lima (UTC-5 sin DST): 14:30 local = 19:30 UTC.
     expect(
-      instanteEnZona('2026-09-18', '14:30', 'America/Mexico_City').toISOString(),
-    ).toBe('2026-09-18T20:30:00.000Z');
+      instanteEnZona('2026-09-18', '14:30', 'America/Lima').toISOString(),
+    ).toBe('2026-09-18T19:30:00.000Z');
   });
 
   it('UTC se mantiene igual', () => {

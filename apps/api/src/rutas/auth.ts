@@ -28,7 +28,7 @@ const esquemaReset = z.object({ email: z.string().email() });
 const esquemaNuevaPassword = z.object({ password: z.string().min(6) });
 const esquemaOnboarding = z.object({
   org_name: z.string().min(1),
-  timezone: z.string().default('America/Mexico_City'),
+  timezone: z.string().default('America/Lima'),
   daily_hours: z.coerce.number().min(1).max(24).default(8),
   weekly_hours: z.coerce.number().min(1).max(168).default(40),
 });

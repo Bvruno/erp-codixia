@@ -273,7 +273,7 @@ CREATE TABLE IF NOT EXISTS org_settings (
   organization_id UUID PRIMARY KEY REFERENCES organizations ON DELETE CASCADE,
   daily_hours INT DEFAULT 8 NOT NULL,
   weekly_hours INT DEFAULT 40 NOT NULL,
-  timezone TEXT DEFAULT 'America/Mexico_City' NOT NULL,
+  timezone TEXT DEFAULT 'America/Lima' NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 

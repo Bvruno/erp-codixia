@@ -230,7 +230,7 @@ export function OrganizacionTab({ orgId }: Props) {
               <div className="space-y-2">
                 <Label>Zona horaria</Label>
                 <TimezonePicker
-                  value={settings?.timezone ?? "America/Mexico_City"}
+                  value={settings?.timezone ?? "America/Lima"}
                   onChange={(timezone) => actualizarSettings({ timezone })}
                 />
               </div>

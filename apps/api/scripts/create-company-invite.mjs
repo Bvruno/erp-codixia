@@ -121,7 +121,7 @@ async function main() {
       organization_id: org.id,
       daily_hours: 8,
       weekly_hours: 40,
-      timezone: 'America/Mexico_City',
+      timezone: 'America/Lima',
     },
     { onConflict: 'organization_id' }
   );

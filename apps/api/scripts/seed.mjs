@@ -129,7 +129,7 @@ async function ensureOwnerAndOrg() {
       organization_id: orgId,
       daily_hours: 8,
       weekly_hours: 40,
-      timezone: 'America/Mexico_City',
+      timezone: 'America/Lima',
     },
     { onConflict: 'organization_id' }
   );

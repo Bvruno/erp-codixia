@@ -16,7 +16,7 @@ export async function completeOnboarding(formData: FormData) {
     headers: await jwtHeaders(),
     body: JSON.stringify({
       org_name: (formData.get('org_name') as string) ?? '',
-      timezone: (formData.get('timezone') as string) || 'America/Mexico_City',
+      timezone: (formData.get('timezone') as string) || 'America/Lima',
       daily_hours: Number(formData.get('daily_hours')) || 8,
       weekly_hours: Number(formData.get('weekly_hours')) || 40,
     }),

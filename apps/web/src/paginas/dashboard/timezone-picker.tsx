@@ -12,11 +12,10 @@ import { Globe, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const FALLBACK_ZONES = [
-  "America/Mexico_City",
-  "America/Argentina/Buenos_Aires",
-  "America/Bogota",
   "America/Lima",
+  "America/Bogota",
   "America/Santiago",
+  "America/Argentina/Buenos_Aires",
   "America/Caracas",
   "America/Guatemala",
   "America/Havana",

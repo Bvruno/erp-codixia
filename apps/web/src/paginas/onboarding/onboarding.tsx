@@ -6,7 +6,7 @@ export default function OnboardingPage() {
       orgName=""
       dailyHours={8}
       weeklyHours={40}
-      timezone="America/Mexico_City"
+      timezone="America/Lima"
     />
   );
 }
