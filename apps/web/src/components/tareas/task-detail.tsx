@@ -9,6 +9,7 @@ import { usePerfil } from '@/lib/use-perfil';
 import { aplicarEventoLista, leerEvento, parchearQuery } from '@/lib/realtime-cache';
 import { api, apiFetch } from '@/lib/api/cliente';
 import { entitySlug, findEntityByParam, isFullUuid, shortUid } from '@/lib/slugs';
+import { copiarTexto } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -491,8 +492,12 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
         return;
       }
       const link = res.link || `${window.location.origin}/invite/${res.token}`;
-      await navigator.clipboard.writeText(link);
-      toast.success('Link copiado — acceso aislado a la lista de esta tarea');
+      const copiado = await copiarTexto(link);
+      if (copiado) {
+        toast.success('Link copiado — acceso aislado a la lista de esta tarea');
+      } else {
+        toast.success('Invitación creada', { description: link, duration: 12000 });
+      }
     } catch {
       toast.error('No se pudo generar la invitación');
     } finally {
@@ -548,7 +553,11 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
       <EstadoEntidad
         icono={SquareCheckBig}
         titulo="Tarea no encontrada"
-        accion={{ label: 'Volver a Proyectos', onClick: () => navigate({ to: '/proyectos' }) }}
+        accion={
+          onClose
+            ? { label: 'Cerrar', onClick: onClose }
+            : { label: 'Volver a Proyectos', onClick: () => navigate({ to: '/proyectos' }) }
+        }
       />
     );
   }
@@ -604,9 +613,10 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left: Task Info + Sub-tasks */}
-        <div className="lg:col-span-1 space-y-4">
+      <div className="@container">
+        <div className="grid gap-6 @4xl:grid-cols-3">
+          {/* Left: Task Info + Sub-tasks */}
+          <div className="@4xl:col-span-1 space-y-4">
           <PanelEntidad contenidoClassName="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">Descripción</label>
@@ -767,7 +777,7 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
         </div>
 
         {/* Right: Notes / Timeline */}
-        <div className="lg:col-span-2">
+        <div className="@4xl:col-span-2">
           <Card className="flex flex-col h-[50vh] lg:h-[65vh]">
             <CardHeader className="border-b pb-2">
               <div className="flex items-center justify-between">
@@ -871,6 +881,7 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
               )}
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
       {assignAccessDialog}

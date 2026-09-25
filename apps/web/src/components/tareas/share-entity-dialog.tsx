@@ -16,7 +16,7 @@ import {
 import { Share2, Link2, Loader2, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { createInvitation } from '@/lib/auth/actions';
-import { cn } from '@/lib/utils';
+import { cn, copiarTexto } from '@/lib/utils';
 import { AccionEntidad } from '@/components/entidad/accion-entidad';
 import type { EntityPermission, EntityType } from '@/types';
 
@@ -98,8 +98,12 @@ function ShareDialogInner({ target, ctx }: { target: ShareTarget; ctx: ReturnTyp
         return;
       }
       const link = res.link || `${window.location.origin}/invite/${res.token}`;
-      await navigator.clipboard.writeText(link);
-      toast.success('Link copiado — el invitado verá solo lo compartido');
+      const copiado = await copiarTexto(link);
+      if (copiado) {
+        toast.success('Link copiado — el invitado verá solo lo compartido');
+      } else {
+        toast.success('Invitación creada', { description: link, duration: 12000 });
+      }
     } catch {
       toast.error('No se pudo generar la invitación');
     } finally {

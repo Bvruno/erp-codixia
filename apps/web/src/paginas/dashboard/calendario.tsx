@@ -12,5 +12,12 @@ export default function CalendarioPage() {
     tipo: tipo === 'tareas' || tipo === 'notas' ? tipo : 'todas',
     estado: params.get('estado') || 'all',
   };
-  return <CalendarioView initialView={initialView} initialFilters={initialFilters} />;
+  return (
+    <CalendarioView
+      initialView={initialView}
+      initialFilters={initialFilters}
+      initialTaskId={params.get('tarea')}
+      initialNoteId={params.get('nota')}
+    />
+  );
 }

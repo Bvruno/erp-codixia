@@ -1,6 +1,7 @@
 import { toast } from 'sonner';
 import { api } from '@/lib/api/cliente';
 import { createInvitation } from '@/lib/auth/actions';
+import { copiarTexto } from '@/lib/utils';
 import type { EntityPermission } from '@/types';
 import type { ScopeSelection } from '@/components/colaboradores/entity-scope-picker';
 
@@ -47,8 +48,12 @@ export function useAccionesColaboradores({
       }
 
       const link = res.link || `${window.location.origin}/invite/${res.token}`;
-      await navigator.clipboard.writeText(link);
-      toast.success('Link copiado al portapapeles');
+      const copiado = await copiarTexto(link);
+      if (copiado) {
+        toast.success('Link copiado al portapapeles');
+      } else {
+        toast.success('Invitación creada', { description: link, duration: 12000 });
+      }
       resetInvitar();
       refetch();
     } catch {

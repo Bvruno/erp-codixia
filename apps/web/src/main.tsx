@@ -1,7 +1,9 @@
 import { StrictMode } from 'react';
+import type { CSSProperties } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 import { routeTree } from './rutas/route-tree.gen';
 import { alCambiarCache, cacheDel, cacheSet } from './lib/cache';
 import { claveCalendario, clavePerfil } from './lib/cache-claves';
@@ -45,10 +47,30 @@ declare module '@tanstack/react-router' {
 const raiz = document.getElementById('raiz');
 if (!raiz) throw new Error('Nodo raíz no encontrado');
 
+// Toaster único de la app: colores por tokens para seguir data-mode/acento.
+const toasterStyle = {
+  '--normal-bg': 'var(--card)',
+  '--normal-text': 'var(--card-foreground)',
+  '--normal-border': 'var(--border)',
+  '--success-bg': 'var(--card)',
+  '--success-text': 'var(--foreground)',
+  '--success-border': 'var(--border)',
+  '--error-bg': 'var(--card)',
+  '--error-text': 'var(--destructive)',
+  '--error-border': 'var(--border)',
+} as CSSProperties;
+
 createRoot(raiz).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <Toaster
+        position="bottom-right"
+        closeButton
+        offset={16}
+        style={toasterStyle}
+        toastOptions={{ classNames: { toast: 'font-sans text-sm shadow-popover' } }}
+      />
     </QueryClientProvider>
   </StrictMode>
 );

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, apiFetch } from '@/lib/api/cliente';
+import { copiarTexto } from '@/lib/utils';
 import { construirEnlaceInvitado, construirEnlacePublico } from './utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -116,11 +117,11 @@ export function ConfigCompartirDialog({
   const base = typeof window !== 'undefined' ? window.location.origin : '';
 
   const copiar = async (link: string) => {
-    try {
-      await navigator.clipboard.writeText(link);
+    const copiado = await copiarTexto(link);
+    if (copiado) {
       toast.success('Link copiado');
-    } catch {
-      toast.error('No se pudo copiar el link');
+    } else {
+      toast.success('Link generado', { description: link, duration: 12000 });
     }
   };
 

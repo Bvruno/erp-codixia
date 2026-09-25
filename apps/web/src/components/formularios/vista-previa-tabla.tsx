@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check, Copy, Table2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { copiarTexto } from '@/lib/utils';
 import { valorColumna, type ColumnaRespuestas, type FilaTablaRespuestas } from '@erp/shared';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -37,12 +38,12 @@ export function VistaPreviaTabla({
   const vacia = columnas.length === 0 || filas.length === 0;
 
   const copiar = async () => {
-    try {
-      await navigator.clipboard.writeText(markdown);
+    const copiado = await copiarTexto(markdown);
+    if (copiado) {
       setCopiado(true);
       toast.success('Markdown copiado');
       window.setTimeout(() => setCopiado(false), 1500);
-    } catch {
+    } else {
       toast.error('No se pudo copiar el markdown');
     }
   };

@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, MailPlus, Search, User, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { cn, copiarTexto } from '@/lib/utils';
 import type { Profile } from '@/types';
 
 function hashHue(str: string): number {
@@ -122,12 +122,16 @@ export function AssigneeSelect({
         return;
       }
       const link = res.link || `${window.location.origin}/invite/${res.token}`;
-      await navigator.clipboard.writeText(link);
-      toast.success(
-        label
-          ? `Invitación enviada a ${label} — acceso aislado a la lista`
-          : 'Link copiado — acceso aislado a la lista'
-      );
+      const copiado = await copiarTexto(link);
+      if (copiado) {
+        toast.success(
+          label
+            ? `Invitación enviada a ${label} — acceso aislado a la lista`
+            : 'Link copiado — acceso aislado a la lista'
+        );
+      } else {
+        toast.success('Invitación creada', { description: link, duration: 12000 });
+      }
       setOpenInternal(false);
     } catch {
       toast.error('No se pudo generar la invitación');

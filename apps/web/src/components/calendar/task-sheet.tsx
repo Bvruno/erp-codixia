@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import {
   Select,
   SelectContent,
@@ -31,7 +32,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ListTodo } from 'lucide-react';
 
-export function TaskModal({
+export function TaskSheet({
   open,
   onClose,
   onSaved,
@@ -146,15 +147,21 @@ export function TaskModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && !saving && onClose()}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+    <Sheet open={open} onOpenChange={(next) => !next && !saving && onClose()}>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-lg"
+      >
+        <SheetHeader className="shrink-0 flex-row items-center gap-2 border-b px-5 py-4 pr-14">
+          <SheetTitle className="flex items-center gap-2">
             <ListTodo className="size-4" />
             Nueva tarea
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
+          </SheetTitle>
+          <SheetDescription className="sr-only">
+            Crea una tarea con lista, persona asignada, fecha y prioridad.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="task-title" className="text-xs font-semibold text-muted-foreground">
               Título
@@ -269,16 +276,16 @@ export function TaskModal({
             </div>
           </div>
         </div>
-        <DialogFooter>
+        <SheetFooter className="shrink-0 flex-row justify-end gap-2 border-t px-5 py-3.5">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancelar
           </Button>
           <Button onClick={() => void save()} disabled={saving || !title.trim() || !listId}>
             {saving ? 'Creando…' : 'Crear tarea'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-      {assignAccessDialog}
-    </Dialog>
+        </SheetFooter>
+        {assignAccessDialog}
+      </SheetContent>
+    </Sheet>
   );
 }

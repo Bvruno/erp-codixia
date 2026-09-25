@@ -1,18 +1,24 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api/cliente';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { CalendarDays, Pencil, Pen, Highlighter, Undo2, Eraser, Trash2, X, Loader2 } from 'lucide-react';
+import { CalendarDays, Pencil, Pen, Highlighter, Undo2, Eraser, Trash2, Loader2 } from 'lucide-react';
 
 export type NotePayload = {
   id?: string;
@@ -51,7 +57,7 @@ const INK_COLORS = [
   '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#a16207',
 ];
 
-export function NoteModal({
+export function NoteSheet({
   open,
   note,
   defaultDate,
@@ -145,7 +151,10 @@ export function NoteModal({
 
   useEffect(() => {
     if (open && mode === 'draw') {
-      requestAnimationFrame(fitCanvas);
+      // Doble rAF: el ancho del Sheet ya está definido pero la animación de
+      // entrada puede no haber pintado el canvas todavía.
+      const id = requestAnimationFrame(() => requestAnimationFrame(fitCanvas));
+      return () => cancelAnimationFrame(id);
     }
   }, [open, mode, fitCanvas]);
 
@@ -249,32 +258,35 @@ export function NoteModal({
     }
   };
 
-  // Portal a <body>: si se monta dentro de <main>, cualquier transform de un
-  // ancestro lo ancla a ese contenedor en vez del viewport (mismo destino que
-  // los diálogos Radix).
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 sm:p-6" onClick={(e) => { if (e.target === e.currentTarget && !guardando) onClose(); }}>
-      <div className="flex h-[min(92vh,860px)] max-h-[92vh] w-full max-w-[780px] flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl sm:h-[min(92vh,860px)]">
-        <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
-          <h3 className="font-display text-base font-bold tracking-tight">
+  return (
+    <Sheet
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && !guardando) onClose();
+      }}
+    >
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl"
+      >
+        <SheetHeader className="shrink-0 flex-row items-center justify-between gap-1.5 border-b px-5 py-4 pr-14">
+          <SheetTitle className="font-display text-base font-bold tracking-tight">
             {note ? 'Editar nota' : 'Nueva nota'}
-          </h3>
-          <div className="flex items-center gap-1.5">
-            {note && onDelete && (
-              <button
-                onClick={onDelete}
-                className="flex size-8 items-center justify-center rounded-md text-destructive transition-colors hover:bg-destructive/10"
-                aria-label="Eliminar nota"
-                title="Eliminar nota"
-              >
-                <Trash2 className="size-4" />
-              </button>
-            )}
-            <button onClick={() => { if (!guardando) onClose(); }} disabled={guardando} className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50" aria-label="Cerrar">
-              <X className="size-4" />
+          </SheetTitle>
+          <SheetDescription className="sr-only">
+            Editor de notas del calendario con texto o dibujo a mano alzada.
+          </SheetDescription>
+          {note && onDelete && (
+            <button
+              onClick={onDelete}
+              className="flex size-8 items-center justify-center rounded-md text-destructive transition-colors hover:bg-destructive/10"
+              aria-label="Eliminar nota"
+              title="Eliminar nota"
+            >
+              <Trash2 className="size-4" />
             </button>
-          </div>
-        </div>
+          )}
+        </SheetHeader>
 
         <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-auto px-5 py-4">
           <div className="flex w-full gap-1 rounded-lg bg-muted p-1">
@@ -407,8 +419,7 @@ export function NoteModal({
             )}
           </Button>
         </div>
-      </div>
-    </div>,
-    document.body
+      </SheetContent>
+    </Sheet>
   );
 }

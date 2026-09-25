@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TaskModal } from '@/components/calendar/task-modal';
+import { TaskSheet } from '@/components/calendar/task-sheet';
 import type { AccessTree } from '@/lib/access';
 import type { TaskList } from '@/types';
 
@@ -30,7 +30,7 @@ function modal(key: string, defaultDate: Date) {
     <QueryClientProvider
       client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
     >
-      <TaskModal
+      <TaskSheet
         key={key}
         open
         onClose={() => {}}
@@ -50,7 +50,7 @@ function modal(key: string, defaultDate: Date) {
 const inputFecha = () =>
   document.querySelector('input[type="date"]') as HTMLInputElement;
 
-describe('TaskModal — fecha límite por defecto', () => {
+describe('TaskSheet — fecha límite por defecto', () => {
   it('inicializa la fecha límite con el día seleccionado', () => {
     render(modal('2026-8-17', new Date(2026, 8, 17)));
     expect(inputFecha().value).toBe('2026-09-17');

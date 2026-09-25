@@ -1,7 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import { TaskDetail } from '@/components/tareas/task-detail';
@@ -9,11 +15,11 @@ import type { AccessTree } from '@/lib/access';
 import type { Profile } from '@/types';
 
 /**
- * Detalle de tarea en modal (layout tipo dashboard, reutilizado de la
+ * Detalle de tarea en offcanvas (layout tipo dashboard, reutilizado de la
  * página `/tareas/:id`). Se usa fuera de `/proyectos`, donde no existe
  * `TareasProvider`: el árbol y los permisos llegan por props.
  */
-export function TaskDetailModal({
+export function TaskDetailSheet({
   taskId,
   open,
   onClose,
@@ -37,17 +43,23 @@ export function TaskDetailModal({
   const router = useRouter();
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="max-h-[92dvh] overflow-y-auto p-4 sm:max-w-6xl sm:p-6">
-        <DialogHeader className="flex-row items-center justify-between gap-2 text-left">
-          <DialogTitle className="text-sm font-semibold text-muted-foreground">
+    <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-2xl lg:max-w-5xl"
+      >
+        <SheetHeader className="shrink-0 flex-row items-center justify-between gap-2 border-b px-4 py-3 pr-14 text-left">
+          <SheetTitle className="text-sm font-semibold text-muted-foreground">
             Detalle de tarea
-          </DialogTitle>
+          </SheetTitle>
+          <SheetDescription className="sr-only">
+            Detalle completo de la tarea seleccionada.
+          </SheetDescription>
           {rutaCompleta && (
             <Button
               variant="ghost"
               size="sm"
-              className="mr-8 px-2"
+              className="px-2"
               onClick={() => {
                 onClose();
                 router.push(rutaCompleta);
@@ -58,21 +70,23 @@ export function TaskDetailModal({
               <span className="hidden sm:inline">Página completa</span>
             </Button>
           )}
-        </DialogHeader>
-        {taskId && (
-          <TaskDetail
-            key={taskId}
-            taskId={taskId}
-            onClose={onClose}
-            onDeleted={onClose}
-            onChanged={onChanged}
-            arbol={arbol}
-            colaboradores={colaboradores}
-            esAdmin={esAdmin}
-            listasEscribibles={listasEscribibles}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+        </SheetHeader>
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+          {taskId && (
+            <TaskDetail
+              key={taskId}
+              taskId={taskId}
+              onClose={onClose}
+              onDeleted={onClose}
+              onChanged={onChanged}
+              arbol={arbol}
+              colaboradores={colaboradores}
+              esAdmin={esAdmin}
+              listasEscribibles={listasEscribibles}
+            />
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

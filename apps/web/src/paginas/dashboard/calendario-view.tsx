@@ -17,9 +17,9 @@ import { format, getDay } from 'date-fns';
 import { shortUid } from '@/lib/slugs';
 import type { Task, Profile, TaskList, Workspace, WorkspaceFolder, TaskDocument, MindMap, Todo, TaskStatus } from '@/types';
 import type { AccessTree } from '@/lib/access';
-import { NoteModal, type Note } from '@/components/calendar/note-modal';
-import { TaskModal } from '@/components/calendar/task-modal';
-import { TaskDetailModal } from '@/components/calendar/task-detail-modal';
+import { NoteSheet, type Note } from '@/components/calendar/note-sheet';
+import { TaskSheet } from '@/components/calendar/task-sheet';
+import { TaskDetailSheet } from '@/components/calendar/task-detail-sheet';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { cacheDel, notificarCambioCache } from '@/lib/cache';
 import { INDICE_CALENDARIO, claveCalendario, TTL_CACHE } from '@/lib/cache-claves';
@@ -68,7 +68,7 @@ const STATUS_LABEL: Record<string, string> = {
   todo: 'Por hacer', in_progress: 'En curso', done: 'Completada', cancelled: 'Cancelada', backlog: 'Backlog',
 };
 
-export default function CalendarioView({ initialView: _initialView, initialFilters }: { initialView?: ViewMode; initialFilters?: FiltrosCalendario }) {
+export default function CalendarioView({ initialView: _initialView, initialFilters, initialTaskId, initialNoteId }: { initialView?: ViewMode; initialFilters?: FiltrosCalendario; initialTaskId?: string | null; initialNoteId?: string | null }) {
   const now = new Date();
   const todayYear = now.getFullYear();
   const todayMonth = now.getMonth();
@@ -96,8 +96,12 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
   const [loading, setLoading] = useState(true);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [modal, setModal] = useState<Note | 'new' | null>(null);
-  const [taskDetailId, setTaskDetailId] = useState<string | null>(null);
+  const [notaPendienteId, setNotaPendienteId] = useState<string | null>(initialNoteId ?? null);
+  const [taskDetailId, setTaskDetailId] = useState<string | null>(initialTaskId ?? null);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const notasRef = useRef<Note[]>([]);
+  const pushedTareaRef = useRef(false);
+  const pushedNotaRef = useRef(false);
   const stripRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<{ start: number | null; toggling: boolean; moved: boolean }>({ start: null, toggling: false, moved: false });
 
@@ -229,6 +233,111 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
     const qs = p.toString();
     window.history.replaceState(null, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`);
   }, [filters, canVerAsignado]);
+
+  useEffect(() => {
+    notasRef.current = notes;
+  }, [notes]);
+
+  const pushParam = (key: string, value: string) => {
+    const p = new URLSearchParams(window.location.search);
+    p.set(key, value);
+    const qs = p.toString();
+    window.history.pushState(null, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`);
+  };
+
+  const replaceParam = (key: string, value: string | null) => {
+    const p = new URLSearchParams(window.location.search);
+    if (value === null) p.delete(key);
+    else p.set(key, value);
+    const qs = p.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${qs ? `?${qs}` : ''}`);
+  };
+
+  const abrirTarea = (id: string) => {
+    setTaskDetailId(id);
+    pushedTareaRef.current = true;
+    pushParam('tarea', id);
+  };
+
+  const cerrarTarea = () => {
+    setTaskDetailId(null);
+    if (pushedTareaRef.current) {
+      pushedTareaRef.current = false;
+      window.history.back();
+    } else {
+      replaceParam('tarea', null);
+    }
+  };
+
+  const abrirNota = (nota: Note) => {
+    setSelectedNoteId(nota.id);
+    setModal(nota);
+    pushedNotaRef.current = true;
+    pushParam('nota', nota.id);
+  };
+
+  const cerrarNota = () => {
+    setModal(null);
+    setSelectedNoteId(null);
+    if (pushedNotaRef.current) {
+      pushedNotaRef.current = false;
+      window.history.back();
+    } else {
+      replaceParam('nota', null);
+    }
+  };
+
+  // Deep link `?nota=<id>`: abre la nota al cargar, desde la lista si está
+  // en memoria o pidiendo el detalle al API.
+  useEffect(() => {
+    if (!notaPendienteId) return;
+    const enLista = notasRef.current.find((n) => n.id === notaPendienteId);
+    if (enLista) {
+      setModal(enLista);
+      setSelectedNoteId(enLista.id);
+      setNotaPendienteId(null);
+      return;
+    }
+    let activo = true;
+    void apiFetch<{ nota: Note }>(`/calendario/notas/${notaPendienteId}`)
+      .then((res) => {
+        if (activo && res?.nota) {
+          setModal(res.nota);
+          setSelectedNoteId(res.nota.id);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (activo) setNotaPendienteId(null);
+      });
+    return () => {
+      activo = false;
+    };
+  }, [notaPendienteId]);
+
+  // Back/forward del navegador: el drawer sigue a la URL.
+  useEffect(() => {
+    const onPop = () => {
+      const p = new URLSearchParams(window.location.search);
+      setTaskDetailId(p.get('tarea'));
+      const notaId = p.get('nota');
+      if (!notaId) {
+        setModal(null);
+        setSelectedNoteId(null);
+        return;
+      }
+      const enLista = notasRef.current.find((n) => n.id === notaId);
+      if (enLista) {
+        setModal(enLista);
+        setSelectedNoteId(enLista.id);
+      } else {
+        setModal(null);
+        setNotaPendienteId(notaId);
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
   const activeFilterCount =
     (filters.ws !== 'all' ? 1 : 0) +
@@ -445,7 +554,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
       toast.error(e instanceof Error ? e.message : 'No se pudo guardar la nota');
       return;
     }
-    setModal(null);
+    cerrarNota();
     invalidarCalendario();
   };
 
@@ -463,7 +572,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
       toast.error(e instanceof Error ? e.message : 'No se pudo eliminar la nota');
     }
     setDeleteOpen(false);
-    setModal(null);
+    cerrarNota();
     invalidarCalendario();
   };
 
@@ -691,7 +800,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setTaskDetailId(t.id);
+                        abrirTarea(t.id);
                       }}
                       onPointerDown={(e) => e.stopPropagation()}
                       className={cn(
@@ -710,8 +819,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedNoteId(n.id);
-                        setModal(n);
+                        abrirNota(n);
                       }}
                       onPointerDown={(e) => e.stopPropagation()}
                       className="flex items-center gap-1 truncate rounded border border-primary/30 bg-primary-soft px-1.5 py-0.5 text-left text-xs leading-tight transition-colors hover:bg-primary-soft-2"
@@ -770,9 +878,12 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                   {group.tasks.map((t) => (
                       <button
                         key={t.id}
-                        onClick={() => setTaskDetailId(t.id)}
+                        onClick={() => abrirTarea(t.id)}
                         title={t.title}
-                        className="rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-card"
+                        className={cn(
+                          'rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-card',
+                          taskDetailId === t.id && 'border-primary ring-2 ring-primary-soft',
+                        )}
                       >
                         <span
                           className="size-2 shrink-0 rounded-full"
@@ -828,10 +939,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                   {group.notes.map((n) => (
                     <button
                       key={n.id}
-                      onClick={() => {
-                        setSelectedNoteId(n.id);
-                        setModal(n);
-                      }}
+                      onClick={() => abrirNota(n)}
                       className={cn(
                         'rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-card',
                         selectedNoteId === n.id && 'border-primary ring-2 ring-primary-soft',
@@ -853,11 +961,11 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
         </section>
       </div>
 
-      <NoteModal
+      <NoteSheet
         open={modal !== null}
         note={modal === 'new' ? null : modal}
         defaultDate={defaultDate}
-        onClose={() => setModal(null)}
+        onClose={cerrarNota}
         onSave={saveNote}
         onDelete={() => setDeleteOpen(true)}
       />
@@ -869,7 +977,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
         confirmLabel="Eliminar"
         onConfirm={() => modal !== 'new' && modal !== null && deleteNote(modal)}
       />
-      <TaskModal
+      <TaskSheet
         // Remonta al abrir con la selección vigente: el estado interno
         // (fecha límite incluida) se inicializa con `defaultDate`.
         key={range ? `${year}-${month}-${range.a}` : 'hoy'}
@@ -885,10 +993,10 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
         defaultDate={defaultDate}
         tree={tree}
       />
-      <TaskDetailModal
+      <TaskDetailSheet
         taskId={taskDetailId}
         open={!!taskDetailId}
-        onClose={() => setTaskDetailId(null)}
+        onClose={cerrarTarea}
         rutaCompleta={rutaDetalle}
         arbol={tree}
         colaboradores={collaborators}
