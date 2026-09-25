@@ -99,7 +99,7 @@ export function RailNav({
                   onOpenDashboard({ type: 'workspace', wsId: ws.id });
                 }}
               >
-                <Folder className="size-4 text-blue-500" />
+                <Folder className="size-4 text-muted-foreground" />
               </RailBtn>
               {wsAllFolders.map((f) => (
                 <RailBtn
@@ -110,7 +110,7 @@ export function RailNav({
                     onOpenDashboard({ type: 'folder', wsId: ws.id, folderId: f.id });
                   }}
                 >
-                  <Folder className="size-4 text-yellow-500" />
+                  <Folder className="size-4 text-muted-foreground" />
                 </RailBtn>
               ))}
               {wsAllLists.map((l) => (

@@ -75,11 +75,8 @@ export function DayDialog({
                 <button
                   key={task.id}
                   onClick={() => onOpenTask(task)}
-                  className="w-full text-left rounded border px-2 py-1.5 text-sm transition-colors hover:opacity-80"
-                  style={{
-                    backgroundColor: `${status?.color ?? "#94a3b8"}22`,
-                    borderColor: `${status?.color ?? "#94a3b8"}44`,
-                  }}
+                  className="w-full text-left rounded border bg-card px-2 py-1.5 text-sm transition-colors hover:bg-accent"
+                  style={status?.color ? { borderLeftWidth: 2, borderLeftColor: status.color } : undefined}
                 >
                   <span className="flex items-center gap-1.5">
                     <span

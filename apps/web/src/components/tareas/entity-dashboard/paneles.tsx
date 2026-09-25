@@ -161,7 +161,7 @@ export function PanelVencidasPorAsignado({ overdueTop }: { overdueTop: { id: str
           overdueTop.map((a) => (
             <div key={a.id} className="flex items-center gap-2 text-sm">
               <span className="min-w-0 flex-1 truncate">{a.name || 'Sin asignar'}</span>
-              <span className="font-bold tabular-nums text-red-500">{a.count}</span>
+              <span className="font-bold tabular-nums text-destructive">{a.count}</span>
             </div>
           ))
         )}
@@ -186,7 +186,7 @@ export function PanelAntiguedad({
             key={b.key}
             label={b.label}
             count={b.count}
-            color={b.key === '16+' ? '#ef4444' : '#f59e0b'}
+            color={b.key === '16+' ? 'var(--destructive)' : 'var(--warning)'}
             value={
               b.count > 0 && total > 0
                 ? (b.count / Math.max(1, agingCounts.reduce((acc, x) => acc + x.count, 0))) * 100
@@ -332,7 +332,7 @@ export function PanelRecientes({
                   />
                   <span className="truncate">{list?.name || '—'}</span>
                   {t.due_date && (
-                    <span className={cn(isOverdue(t.due_date) ? 'text-red-500' : '')}>
+                    <span className={cn(isOverdue(t.due_date) ? 'text-destructive' : '')}>
                       {formatDate(t.due_date)}
                     </span>
                   )}

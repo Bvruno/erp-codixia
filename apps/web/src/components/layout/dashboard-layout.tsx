@@ -253,7 +253,7 @@ export default function DashboardLayout({
         <div
           className={cn(
             "flex items-center border-b border-sidebar-border",
-            collapsed ? "h-14 justify-center px-0" : "h-16 gap-2 px-3",
+            collapsed ? "h-14 justify-center px-0" : "h-14 gap-2 px-3",
           )}
         >
           {collapsed ? (

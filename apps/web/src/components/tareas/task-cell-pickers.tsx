@@ -24,7 +24,6 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { statusStyle } from '@/lib/task-config';
 import { useFormatoHora } from '@/lib/use-formato-hora';
 import { usePreferenciasTrabajo } from '@/lib/use-preferencias-trabajo';
 import type { StatusDef, PriorityDef, TaskNote } from '@/types';
@@ -78,7 +77,7 @@ export function DueDatePicker({
           type="button"
           className={cn(
             'inline-flex cursor-pointer items-center gap-1 rounded-md px-1 text-xs transition-colors hover:bg-muted/60',
-            overdue ? 'text-red-600' : 'text-muted-foreground'
+            overdue ? 'text-destructive' : 'text-muted-foreground'
           )}
           title="Editar fecha límite"
         >
@@ -183,9 +182,13 @@ export function StatusPicker({
           className="cursor-pointer rounded-md transition-colors hover:opacity-80"
           title="Cambiar estado"
         >
-          <Badge className="gap-1.5 border px-2 py-1 text-xs font-medium" style={statusStyle(current.color)}>
-            <StatusIconFor status={value} className="size-3.5" />
-            {current.label}
+          <Badge variant="outline" className="gap-1.5 px-2 py-1 text-xs font-medium">
+            <span
+              className="size-1.5 shrink-0 rounded-full"
+              style={{ backgroundColor: current.color }}
+              aria-hidden
+            />
+            <span className="text-muted-foreground">{current.label}</span>
           </Badge>
         </button>
       </PopoverTrigger>
@@ -241,12 +244,15 @@ export function PriorityPicker({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="inline-flex cursor-pointer items-center gap-1 rounded-md px-1 text-xs font-medium transition-colors hover:bg-muted/60"
-          style={{ color: current.color }}
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-1 text-xs font-medium transition-colors hover:bg-muted/60"
           title="Cambiar prioridad"
         >
-          <Flag className="size-3.5 fill-current" />
-          {current.label}
+          <span
+            className="size-1.5 shrink-0 rounded-full"
+            style={{ backgroundColor: current.color }}
+            aria-hidden
+          />
+          <span className="text-muted-foreground">{current.label}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1.5" align="start">

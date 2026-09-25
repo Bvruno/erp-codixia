@@ -202,7 +202,7 @@ export function MemberDetailCard({
               )}
               {isOwner && (
                 <Badge variant="outline" className="text-xs gap-1">
-                  <Crown className="size-3 text-yellow-500" />
+                  <Crown className="size-3 text-muted-foreground" />
                   Dueño
                 </Badge>
               )}
@@ -358,7 +358,7 @@ export function MemberDetailCard({
                 </div>
                 <div className="bg-muted/40 rounded-md p-2 text-center">
                   <p className="text-muted-foreground text-xs">Semana real</p>
-                  <p className={`mt-1.5 font-semibold text-sm ${userSchedules.length === 0 ? 'text-red-400' : ''}`}>
+                  <p className={`mt-1.5 font-semibold text-sm ${userSchedules.length === 0 ? 'text-warning' : ''}`}>
                     {isOwner ? '—' : `${weeklyRealHours}h`}
                   </p>
                 </div>
@@ -398,7 +398,7 @@ export function MemberDetailCard({
                         {s?.shift ? (
                           <div
                             className="rounded border border-l-4 p-1 text-center text-xs font-medium truncate"
-                            style={{ borderColor: `${s.shift.color}88`, borderLeftColor: s.shift.color }}
+                            style={{ borderLeftColor: s.shift.color }}
                             title={`${s.shift.name} · ${formatHora(s.shift.start_time)}–${formatHora(s.shift.end_time)}`}
                           >
                             {s.shift.name}

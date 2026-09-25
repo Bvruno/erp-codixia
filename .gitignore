@@ -67,6 +67,7 @@ server.log
 /apps/web/test-results
 /apps/web/playwright-report
 /apps/web/e2e/.auth
+/apps/web/.impeccable/live
 /apps/plataforma/node_modules
 /apps/plataforma/dist
 /apps/plataforma/.tanstack

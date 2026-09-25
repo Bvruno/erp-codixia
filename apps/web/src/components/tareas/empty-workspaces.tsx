@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { LayoutGrid, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { VisibilityFields } from './workspace-nav';
@@ -82,27 +83,16 @@ export function EmptyWorkspaces({
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
-      <div className="flex max-w-sm flex-col items-center gap-4 px-4 text-center">
-        <div className="flex size-14 items-center justify-center rounded-xl border bg-muted/40">
-          <LayoutGrid className="size-7 text-blue-500" />
-        </div>
-        <div className="space-y-1.5">
-          <h2 className="text-lg font-semibold">
-            {canManage ? 'Crea tu primer área de trabajo' : 'Sin áreas de trabajo'}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {canManage
-              ? 'Primero debes crear un área de trabajo. Dentro de ella podrás crear carpetas, listas y documentos.'
-              : 'Aún no tienes áreas de trabajo disponibles. Solicita acceso al administrador.'}
-          </p>
-        </div>
-        {canManage && (
-          <Button onClick={() => setOpen(true)}>
-            <LayoutGrid className="size-4" />
-            Crear área de trabajo
-          </Button>
-        )}
-      </div>
+      <EmptyState
+        icon={LayoutGrid}
+        title={canManage ? 'Crea tu primer área de trabajo' : 'Sin áreas de trabajo'}
+        description={
+          canManage
+            ? 'Primero debes crear un área de trabajo. Dentro de ella podrás crear carpetas, listas y documentos.'
+            : 'Aún no tienes áreas de trabajo disponibles. Solicita acceso al administrador.'
+        }
+        action={canManage ? { label: 'Crear área de trabajo', onClick: () => setOpen(true) } : undefined}
+      />
 
       <Dialog open={open} onOpenChange={(o) => { if (!o && creando) return; setOpen(o); if (!o) reset(); }}>
         <DialogContent className="sm:max-w-md">

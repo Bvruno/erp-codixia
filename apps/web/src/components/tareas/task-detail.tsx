@@ -25,14 +25,14 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import {
   Send, Circle, Flag, User, Clock,
-  Calendar, Hash, Trash2, Loader2, UserPlus, SquareCheckBig,
+  Calendar, Hash, Trash2, Loader2, UserPlus, SquareCheckBig, MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import { format, isToday, isYesterday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import type { Task, TaskNote, Profile, Shift, TaskActivityLog, StatusDef, PriorityDef } from '@/types';
-import { resolveStatuses, resolvePriorities, statusLabel, statusStyle } from '@/lib/task-config';
+import { resolveStatuses, resolvePriorities, statusLabel } from '@/lib/task-config';
 import { useTareasOpcional } from '@/components/tareas/tareas-context';
 import { useFormatoHora } from '@/lib/use-formato-hora';
 import { saveAssignmentGrants, createInvitation } from '@/lib/auth/actions';
@@ -509,14 +509,14 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
 
   const activityIcon = (action: string) => {
     switch (action) {
-      case 'created': return <Circle className="size-3 text-emerald-400" />;
-      case 'status_changed': return <Flag className="size-3 text-blue-400" />;
-      case 'assigned': return <User className="size-3 text-purple-400" />;
-      case 'priority_changed': return <Flag className="size-3 text-orange-400" />;
-      case 'due_date_changed': return <Calendar className="size-3 text-yellow-400" />;
-      case 'hours_changed': return <Clock className="size-3 text-cyan-400" />;
+      case 'created': return <Circle className="size-3 text-muted-foreground" />;
+      case 'status_changed': return <Flag className="size-3 text-muted-foreground" />;
+      case 'assigned': return <User className="size-3 text-muted-foreground" />;
+      case 'priority_changed': return <Flag className="size-3 text-muted-foreground" />;
+      case 'due_date_changed': return <Calendar className="size-3 text-muted-foreground" />;
+      case 'hours_changed': return <Clock className="size-3 text-muted-foreground" />;
       case 'title_changed': return <Hash className="size-3 text-muted-foreground" />;
-      default: return <Circle className="size-3" />;
+      default: return <Circle className="size-3 text-muted-foreground" />;
     }
   };
 
@@ -623,11 +623,15 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">Estado</label>
                 <Select defaultValue={task.status} onValueChange={(v) => updateField('status', v)} disabled={!canEdit}>
-                  <SelectTrigger
-                    className="h-8 text-xs"
-                    style={statusStyle(statuses.find((s) => s.key === task.status)?.color ?? '#6b7280')}
-                  >
-                    <SelectValue />
+                  <SelectTrigger className="h-8 text-xs">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span
+                        className="size-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: statuses.find((s) => s.key === task.status)?.color ?? 'var(--muted-foreground)' }}
+                        aria-hidden
+                      />
+                      <SelectValue />
+                    </span>
                   </SelectTrigger>
                   <SelectContent>
                     {statuses.map((s) => (<SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>))}
@@ -746,7 +750,6 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                       key={st.id}
                       href={taskLink(st.id)}
                       className="flex items-center gap-2 rounded px-2 py-1.5 text-xs transition-colors hover:bg-accent"
-                      style={stDef ? statusStyle(stDef.color) : undefined}
                     >
                       <div
                         className="size-2 rounded-full"
@@ -792,7 +795,11 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                 {tab === 'notes' && (
                   <>
                     {notes.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8 text-xs">Sin comentarios</p>
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <MessageSquare className="size-8 text-muted-foreground/40 mb-2" aria-hidden />
+                        <p className="text-sm font-medium">Sin comentarios</p>
+                        <p className="text-xs text-muted-foreground">Sé el primero en comentar.</p>
+                      </div>
                     ) : (
                       <div className="space-y-4">
                         {notes.map((note) => (

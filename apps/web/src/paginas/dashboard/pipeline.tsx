@@ -938,17 +938,23 @@ export default function PipelinePage() {
               return (
                 <div
                   key={status}
-                  className={`w-full lg:w-auto lg:flex-1 flex flex-col min-h-0 space-y-2 rounded-lg p-2 transition-colors ${
+                  className={`w-full lg:w-auto lg:flex-1 flex flex-col min-h-0 space-y-2 rounded-lg p-2 transition-colors border border-border/60 bg-muted/30 ${
                     dragOverColumn === status ? 'ring-2 ring-primary/50' : ''
                   }`}
-                  style={{ backgroundColor: `${statusDef.color}14` }}
                   onDragEnter={(e) => handleDragEnter(e, status)}
                   onDragLeave={handleDragLeave}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => handleColumnDrop(e, status)}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium">{statusDef.label}</h3>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: statusDef.color }}
+                        aria-hidden
+                      />
+                      <h3 className="text-sm font-medium">{statusDef.label}</h3>
+                    </div>
                     <div className="flex items-center gap-1">
                       <Badge variant="secondary" className="text-xs">
                         {columnTasks.length}
@@ -1049,8 +1055,8 @@ export default function PipelinePage() {
                             <Card
                               className="cursor-grab active:cursor-grabbing"
                               style={{
-                                borderColor: `${statusDef.color}80`,
-                                backgroundColor: `${statusDef.color}14`,
+                                borderLeftWidth: 3,
+                                borderLeftColor: statusDef.color,
                               }}
                               draggable
                               onDragStart={(e) => {
@@ -1177,18 +1183,19 @@ export default function PipelinePage() {
                                     </span>
                                   )}
                                   <Badge
-                                    className="text-xs py-0"
-                                    style={
-                                      prioridad
-                                        ? {
-                                            backgroundColor: `${prioridad.color}1A`,
-                                            color: prioridad.color,
-                                            borderColor: `${prioridad.color}40`,
-                                          }
-                                        : undefined
-                                    }
+                                    variant="outline"
+                                    className="gap-1.5 text-xs py-0"
                                   >
-                                    {priorityLabel(priorities, task.priority)}
+                                    {prioridad && (
+                                      <span
+                                        className="size-1.5 shrink-0 rounded-full"
+                                        style={{ backgroundColor: prioridad.color }}
+                                        aria-hidden
+                                      />
+                                    )}
+                                    <span className="text-muted-foreground">
+                                      {priorityLabel(priorities, task.priority)}
+                                    </span>
                                   </Badge>
                                 </div>
                               </CardContent>
@@ -1203,9 +1210,9 @@ export default function PipelinePage() {
                         <div className="border-2 border-dashed border-primary/50 rounded-lg h-20 my-1 animate-pulse" />
                       )}
                       {columnTasks.length === 0 && dragOverColumn !== status && (
-                        <p className="text-xs text-muted-foreground text-center py-4">
+                        <div className="text-xs text-muted-foreground/70 text-center py-6 border border-dashed border-border/60 rounded-md">
                           Sin tareas
-                        </p>
+                        </div>
                       )}
                     </div>
                   </ScrollArea>

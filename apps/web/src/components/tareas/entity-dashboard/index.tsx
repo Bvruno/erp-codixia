@@ -291,8 +291,8 @@ export function EntityDashboard({ scope }: { scope: Scope }) {
     { label: 'Completadas', value: done, icon: <CheckCircle2 className="size-4" />, color: 'text-success' },
     { label: 'En progreso', value: inProgress, icon: <Clock className="size-4" />, color: 'text-warning' },
     { label: 'Pendientes', value: pending, icon: <AlertCircle className="size-4" />, color: 'text-info' },
-    { label: 'Vencidas', value: overdue, icon: <CalendarClock className="size-4" />, color: overdue > 0 ? 'text-red-500' : 'text-muted-foreground' },
-    { label: 'Sub-tareas', value: subTasks, icon: <ListTodo className="size-4" />, color: 'text-purple-500' },
+    { label: 'Vencidas', value: overdue, icon: <CalendarClock className="size-4" />, color: overdue > 0 ? 'text-destructive' : 'text-muted-foreground' },
+    { label: 'Sub-tareas', value: subTasks, icon: <ListTodo className="size-4" />, color: 'text-muted-foreground' },
   ];
 
   return (

@@ -113,7 +113,7 @@ export function FolderNode({
           )}
           title={folder.name}
         >
-          <Folder className="size-3.5 shrink-0 text-yellow-500" />
+          <Folder className="size-3.5 shrink-0 text-muted-foreground" />
           <span className="truncate">{folder.name}</span>
           <VisibilityIcon visibility={folder.visibility} />
         </button>

@@ -109,10 +109,10 @@ export function EntityScopePicker({
   }, [tree, type, search]);
 
   const iconFor = (t: EntityType) =>
-    t === 'workspace' ? <LayoutGrid className="size-3.5 text-blue-500" />
-      : t === 'folder' ? <Folder className="size-3.5 text-yellow-500" />
+    t === 'workspace' ? <LayoutGrid className="size-3.5 text-muted-foreground" />
+      : t === 'folder' ? <Folder className="size-3.5 text-muted-foreground" />
       : t === 'list' ? <ListTodo className="size-3.5 text-muted-foreground" />
-      : <BookOpen className="size-3.5 text-indigo-500" />;
+      : <BookOpen className="size-3.5 text-muted-foreground" />;
 
   const selected = value && value.type === type ? value : null;
 

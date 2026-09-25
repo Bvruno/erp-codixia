@@ -6,6 +6,7 @@ import { canalRealtime, removerCanal } from '@/lib/realtime';
 import { sesionActual } from '@/lib/auth/sesion';
 import { api, apiFetch } from '@/lib/api/cliente';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Plus, CalendarDays, ListTodo, StickyNote, LayoutGrid } from 'lucide-react';
@@ -750,10 +751,12 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
           </div>
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2.5">
             {visibleTasks.length === 0 ? (
-              <div className="flex flex-col items-center gap-1 py-10 text-center text-xs text-muted-foreground">
-                <ListTodo className="size-6 opacity-40" />
-                {range ? 'Sin tareas en este rango' : 'Sin tareas este mes'}
-              </div>
+              <EmptyState
+                icon={ListTodo}
+                title={range ? 'Sin tareas en este rango' : 'Sin tareas este mes'}
+                description="Crea una tarea para verla aquí."
+                className="py-8"
+              />
             ) : (
               visibleTasks.map((group, gi) => (
                 <div key={gi} className="flex flex-col gap-1.5">

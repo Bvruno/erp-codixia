@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CardSkeleton, TableSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Clock,
   Plus,
@@ -644,7 +645,7 @@ export default function HorariosPage() {
                             ? "bg-success"
                             : weeklyPct >= 70
                               ? "bg-info"
-                              : "bg-orange-500"
+                              : "bg-warning"
                         }`}
                         style={{ width: `${weeklyPct}%` }}
                       />
@@ -655,7 +656,7 @@ export default function HorariosPage() {
                       </p>
                     )}
                     {weeklyPct > 110 && (
-                      <p className="text-purple-500 mt-1 text-xs">
+                      <p className="text-info mt-1 text-xs">
                         Sobre la meta semanal
                       </p>
                     )}
@@ -676,7 +677,7 @@ export default function HorariosPage() {
                     <span>Diario: {user.daily_hours || 8}h</span>
                   </div>
                   {s.overtime > 0 && (
-                    <div className="text-purple-400 text-xs flex items-center gap-1">
+                    <div className="text-info text-xs flex items-center gap-1">
                       <Plus className="size-3" />
                       Extra: {s.overtime.toFixed(1)}h
                     </div>
@@ -693,7 +694,7 @@ export default function HorariosPage() {
                     </div>
                   )}
                   {s.owed > 0 ? (
-                    <div className="text-orange-400 text-xs flex items-center gap-1">
+                    <div className="text-warning text-xs flex items-center gap-1">
                       <AlertTriangle className="size-3" />
                       Debe {s.owed.toFixed(1)}h en el período
                     </div>
@@ -761,7 +762,7 @@ export default function HorariosPage() {
                         {Math.round(h)}
                       </span>
                       <div
-                        className="w-full rounded-sm bg-info/70"
+                        className={`w-full rounded-sm ${i === bars.length - 1 ? 'bg-primary' : 'bg-primary/60'}`}
                         style={{ height: `${Math.max(3, (h / trendMax) * 48)}px` }}
                       />
                     </div>
@@ -835,10 +836,12 @@ export default function HorariosPage() {
         </CardHeader>
         <CardContent>
           {permissions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Clock className="size-8 mb-2 opacity-50" />
-              <p className="text-sm">No hay solicitudes de permiso</p>
-            </div>
+            <EmptyState
+              icon={Clock}
+              title="No hay solicitudes de permiso"
+              description="Cuando alguien solicite un permiso aparecerá aquí."
+              className="py-8"
+            />
           ) : (
             <Table>
               <TableHeader>

@@ -247,7 +247,7 @@ export function AssigneeSelect({
                 </Avatar>
                 <span className="flex-1 truncate text-left">{c.full_name}</span>
                 {blocked ? (
-                  <span className="text-red-400 text-xs">Sin horario</span>
+                  <span className="text-warning text-xs">Sin horario</span>
                 ) : (
                   isSelected && <Check className="size-4" />
                 )}

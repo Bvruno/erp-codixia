@@ -139,7 +139,7 @@ export function ScheduleEditor({
             {userSchedules.length} día(s)
           </span>
         ) : (
-          <span className="flex items-center gap-1.5 text-xs text-red-400">
+          <span className="flex items-center gap-1.5 text-xs text-warning">
             <AlertTriangle className="size-3.5" />
             Sin horario
           </span>
@@ -187,14 +187,20 @@ export function ScheduleEditor({
                       <div className="flex items-center gap-1">
                         <Badge
                           variant="outline"
-                          className="text-xs"
-                          style={{ borderColor: `${s.shift?.color}55` }}
+                          className="gap-1.5 text-xs"
                           title={
                             s.shift?.break_start_time && s.shift?.break_end_time
                               ? `Descanso ${formatHora(s.shift.break_start_time)}–${formatHora(s.shift.break_end_time)}`
                               : undefined
                           }
                         >
+                          {s.shift?.color && (
+                            <span
+                              className="size-1.5 shrink-0 rounded-full"
+                              style={{ backgroundColor: s.shift.color }}
+                              aria-hidden
+                            />
+                          )}
                           {s.shift?.name ?? "Turno"}
                         </Badge>
                         <Button

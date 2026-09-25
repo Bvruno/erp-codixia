@@ -89,7 +89,9 @@ export function GrillaSemanal({
                           "text-xs font-normal",
                           planned > 0
                             ? "text-muted-foreground"
-                            : "text-red-400",
+                            : esLaborable(d.getDay())
+                              ? "text-warning"
+                              : "text-muted-foreground/60",
                         )}
                       >
                         {planned > 0 ? `plan ${planned}h` : "sin turno"}

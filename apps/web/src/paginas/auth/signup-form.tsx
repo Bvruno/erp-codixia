@@ -85,7 +85,7 @@ export function SignupForm({
               <GoogleButton label="Registrarse con Google" invite={inviteToken} />
               <div className="relative">
                 <Separator />
-                <span className="text-muted-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs uppercase">
+                <span className="text-muted-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs uppercase">
                   o
                 </span>
               </div>

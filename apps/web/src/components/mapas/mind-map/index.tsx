@@ -1729,7 +1729,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
           <div className="space-y-5 py-1 text-sm">
             <section>
               <h3 className="mb-1.5 flex items-center gap-2 font-semibold">
-                <Lightbulb className="size-4 text-amber-500" />
+                <Lightbulb className="size-4 text-muted-foreground" />
                 Empieza con una idea
               </h3>
               <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
@@ -1751,7 +1751,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
             </section>
             <section>
               <h3 className="mb-1.5 flex items-center gap-2 font-semibold">
-                <Shapes className="size-4 text-indigo-500" />
+                <Shapes className="size-4 text-muted-foreground" />
                 Usa figuras
               </h3>
               <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
@@ -1799,7 +1799,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
             </section>
             <section>
               <h3 className="mb-1.5 flex items-center gap-2 font-semibold">
-                <Waypoints className="size-4 text-emerald-500" />
+                <Waypoints className="size-4 text-muted-foreground" />
                 Desarrolla tus ideas
               </h3>
               <ul className="list-disc space-y-1 pl-5 text-muted-foreground">

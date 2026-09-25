@@ -52,7 +52,7 @@ import {
 } from '@/components/tareas/task-cell-pickers';
 import { cn } from '@/lib/utils';
 import type { Task, Profile, TaskStatus, TaskPriority, StatusDef, PriorityDef } from '@/types';
-import { hiddenStatuses, statusStyle } from '@/lib/task-config';
+import { hiddenStatuses } from '@/lib/task-config';
 import type { GrantDraft } from '@/components/tareas/assign-access-dialog';
 
 export type AssignRequestHandler = (
@@ -526,7 +526,7 @@ function TaskNode({
                     className="justify-between"
                   >
                     <span className="flex items-center gap-2">
-                      <span className="size-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                      <span className="size-2 rounded-full" style={{ backgroundColor: s.color }} />
                       {s.label}
                     </span>
                     {task.status === s.key && <Check className="size-4 text-primary" />}
@@ -547,7 +547,7 @@ function TaskNode({
                     className="justify-between"
                   >
                     <span className="flex items-center gap-2">
-                      <span className="size-2.5 rounded-full" style={{ backgroundColor: p.color }} />
+                      <span className="size-2 rounded-full" style={{ backgroundColor: p.color }} />
                       {p.label}
                     </span>
                     {task.priority === p.key && <Check className="size-4 text-primary" />}
@@ -1385,7 +1385,6 @@ export function TaskList({
         const statusDef = mode === 'status' && status
           ? statuses.find((s) => s.key === status) || { key: status, label: status, color: '#6b7280' }
           : null;
-        const statusDefStyle = statusDef ? statusStyle(statusDef.color) : undefined;
 
         const groupHeader = (
           <button
@@ -1401,12 +1400,17 @@ export function TaskList({
             />
             {statusDef ? (
               <Badge
-                className="gap-1.5 border px-2 py-1 text-sm font-medium"
-                style={statusDefStyle}
+                variant="outline"
+                className="gap-1.5 px-2 py-1 text-sm font-medium"
               >
-                {statusDef && <StatusIcon status={statusDef.key} className="size-4" />}
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: statusDef.color }}
+                  aria-hidden
+                />
+                <StatusIcon status={statusDef.key} className="size-4 text-muted-foreground" />
                 {statusDef.label}
-                <span className="ml-1 rounded-full bg-background px-1.5 py-0 text-xs font-medium tabular-nums">
+                <span className="ml-1 rounded-full bg-muted px-1.5 py-0 text-xs font-medium tabular-nums">
                   {count}
                 </span>
               </Badge>

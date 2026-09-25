@@ -129,8 +129,8 @@ function Handles() {
   // los edges (paths y flechas). En lectura se mantienen invisibles
   // e inertes; en edición se muestran como puntos de conexión.
   const handleClass = visible
-    ? '!size-2 !border-0 !bg-slate-400'
-    : '!size-2 !border-0 !bg-slate-400 !opacity-0 !pointer-events-none';
+    ? '!size-2 !border-0 !bg-muted-foreground'
+    : '!size-2 !border-0 !bg-muted-foreground !opacity-0 !pointer-events-none';
   return (
     <>
       {(['source', 'target'] as const).flatMap((type) =>

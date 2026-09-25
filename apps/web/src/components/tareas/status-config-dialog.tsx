@@ -245,7 +245,7 @@ export function StatusConfigDialog({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-1.5 text-red-600 hover:text-red-700"
+                  className="h-7 px-1.5 text-destructive hover:text-destructive/80"
                   disabled={statuses.length <= 1 || inUseStatuses.has(s.key)}
                   onClick={() => removeStatus(i)}
                   title={
@@ -282,7 +282,7 @@ export function StatusConfigDialog({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-1.5 text-red-600 hover:text-red-700"
+                  className="h-7 px-1.5 text-destructive hover:text-destructive/80"
                   disabled={priorities.length <= 1 || inUsePriorities.has(p.key)}
                   onClick={() => removePriority(i)}
                   title={
@@ -302,7 +302,7 @@ export function StatusConfigDialog({
             </Button>
           </TabsContent>
         </Tabs>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-destructive">{error}</p>}
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button onClick={save} disabled={saving}>{saving ? 'Guardando...' : 'Guardar'}</Button>

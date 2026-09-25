@@ -642,9 +642,9 @@ export function WorkspaceNav({
                     title={ws.name}
                   >
                     {isWsOpen ? (
-                      <FolderOpen className="size-4 shrink-0 text-blue-500" />
+                      <FolderOpen className="size-4 shrink-0 text-muted-foreground" />
                     ) : (
-                      <Folder className="size-4 shrink-0 text-blue-500" />
+                      <Folder className="size-4 shrink-0 text-muted-foreground" />
                     )}
                     <span className="truncate">{ws.name}</span>
                     <VisibilityIcon visibility={ws.visibility} />

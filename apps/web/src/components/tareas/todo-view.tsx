@@ -986,7 +986,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
               variant="outline"
               className={cn(
                 'gap-1 px-1.5 py-0 text-xs font-normal',
-                timePast && 'border-red-500/40 text-red-500'
+                timePast && 'border-destructive/40 text-destructive'
               )}
             >
               <Clock className="size-3" />
@@ -1017,7 +1017,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
               variant="outline"
               className={cn(
                 'gap-1 px-1.5 py-0 text-xs font-normal',
-                timePast && 'border-red-500/40 text-red-500'
+                timePast && 'border-destructive/40 text-destructive'
               )}
             >
               <Clock className="size-3" />

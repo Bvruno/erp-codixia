@@ -114,7 +114,7 @@ export function TablaMiembros({
                         <p className="font-medium text-sm">{c.full_name}</p>
                         {isOwner && (
                           <Badge variant="outline" className="text-xs gap-1">
-                            <Crown className="size-3 text-yellow-500" />
+                            <Crown className="size-3 text-muted-foreground" />
                             Dueño
                           </Badge>
                         )}

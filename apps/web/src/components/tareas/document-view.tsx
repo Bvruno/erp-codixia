@@ -862,7 +862,7 @@ export function DocumentView({ docId: paramDocId }: { docId: string }) {
 
       {/* Encabezado solo para impresión */}
       <div className="mb-4 hidden print:block">
-        <p className="text-xs uppercase tracking-wide text-neutral-600">{doc.name}</p>
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">{doc.name}</p>
         <h1 className="text-base font-bold text-black">{title || 'Documento'}</h1>
       </div>
 
