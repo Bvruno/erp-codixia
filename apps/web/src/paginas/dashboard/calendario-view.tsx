@@ -738,7 +738,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
         {/* Month pane */}
         <section className="flex min-h-0 flex-col bg-background">
           {/* Months strip in pane-header */}
-          <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
+          <div className="flex shrink-0 items-center gap-1 border-b px-2 py-2">
             <div ref={stripRef} className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {MONTHS.map((name, i) => {
                 const active = i === month;
