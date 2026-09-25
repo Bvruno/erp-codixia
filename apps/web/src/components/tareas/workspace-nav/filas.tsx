@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  ListTodo,
   Plus,
   GripVertical,
   Pencil,
@@ -9,10 +8,6 @@ import {
   Move,
   Trash2,
   MoreHorizontal,
-  BookOpen,
-  Network,
-  ListChecks,
-  ClipboardList,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -23,11 +18,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { ENTIDADES_META } from '@/lib/entidades-meta';
 import type { TaskList, TaskDocument, MindMap, Todo, Formulario } from '@/types';
 import type { ReorderKind, RowActionItem, SharedProps } from './tipos';
 import { VisibilityIcon } from './visibilidad';
 
 // Filas del árbol (listas, documentos, mapas, TO-DOs) + primitivas de fila.
+
+const ICONO_LISTA = ENTIDADES_META.list.icono;
+const ICONO_DOCUMENTO = ENTIDADES_META.document.icono;
+const ICONO_MAPA = ENTIDADES_META.mindmap.icono;
+const ICONO_FORMULARIO = ENTIDADES_META.formulario.icono;
+const ICONO_TODO = ENTIDADES_META.todo.icono;
 
 export const DRAG_PLACEHOLDER = 'opacity-25';
 export const DROP_TARGET = 'ring-2 ring-primary/70 bg-primary/5';
@@ -181,7 +183,7 @@ export function ListRow({ list, shared }: { list: TaskList; shared: SharedProps 
           )}
           title={list.name}
         >
-          <ListTodo className={cn('size-3.5 shrink-0', isSelected ? 'text-sidebar-foreground' : 'text-muted-foreground/70')} />
+          <ICONO_LISTA className={cn('size-3.5 shrink-0', isSelected ? 'text-sidebar-foreground' : 'text-muted-foreground/70')} />
           <span className="flex-1 truncate">{list.name}</span>
           <VisibilityIcon visibility={list.visibility} />
           <span className={cn('text-xs tabular-nums', isSelected ? 'text-sidebar-foreground/80' : 'text-muted-foreground/70')}>
@@ -259,7 +261,7 @@ export function DocRow({ doc, shared }: { doc: TaskDocument; shared: SharedProps
           )}
           title={doc.name}
         >
-          <BookOpen className="size-3.5 shrink-0 text-indigo-500" />
+          <ICONO_DOCUMENTO className={cn('size-3.5 shrink-0', ENTIDADES_META.document.color)} />
           <span className="flex-1 truncate">{doc.name}</span>
           <VisibilityIcon visibility={doc.visibility} />
         </button>
@@ -334,7 +336,7 @@ export function MindMapRow({ map, shared }: { map: MindMap; shared: SharedProps 
           )}
           title={map.name}
         >
-          <Network className="size-3.5 shrink-0 text-emerald-500" />
+          <ICONO_MAPA className={cn('size-3.5 shrink-0', ENTIDADES_META.mindmap.color)} />
           <span className="flex-1 truncate">{map.name}</span>
           <VisibilityIcon visibility={map.visibility} />
         </button>
@@ -409,7 +411,7 @@ export function FormularioRow({ formulario, shared }: { formulario: Formulario; 
           )}
           title={formulario.name}
         >
-          <ClipboardList className="size-3.5 shrink-0 text-amber-500" />
+          <ICONO_FORMULARIO className={cn('size-3.5 shrink-0', ENTIDADES_META.formulario.color)} />
           <span className="flex-1 truncate">{formulario.name}</span>
           {formulario.estado === 'publicado' && (
             <span className="size-1.5 shrink-0 rounded-full bg-emerald-500" title="Publicado" />
@@ -490,7 +492,7 @@ export function TodoRow({ todo, shared }: { todo: Todo; shared: SharedProps }) {
           )}
           title={todo.name}
         >
-          <ListChecks className="size-3.5 shrink-0 text-rose-500" />
+          <ICONO_TODO className={cn('size-3.5 shrink-0', ENTIDADES_META.todo.color)} />
           <span className="flex-1 truncate">{todo.name}</span>
           <VisibilityIcon visibility={todo.visibility} />
           <span className="text-xs text-muted-foreground/70 tabular-nums">

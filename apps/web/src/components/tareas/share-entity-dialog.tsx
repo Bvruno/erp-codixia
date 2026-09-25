@@ -17,6 +17,7 @@ import { Share2, Link2, Loader2, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { createInvitation } from '@/lib/auth/actions';
 import { cn } from '@/lib/utils';
+import { AccionEntidad } from '@/components/entidad/accion-entidad';
 import type { EntityPermission, EntityType } from '@/types';
 
 const INHERIT_TYPES: ReadonlySet<EntityType> = new Set(['workspace', 'folder', 'list']);
@@ -30,14 +31,13 @@ const PERMISSION_OPTIONS: { value: EntityPermission; label: string }[] = [
 /** Botón estándar de Compartir (mismo estilo y posición en todas las vistas). */
 export function ShareButton({ onClick }: { onClick: () => void }) {
   return (
-    <button
+    <AccionEntidad
+      icono={Share2}
       onClick={onClick}
-      className="ml-auto inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       title="Compartir: generar link o asignar personal"
     >
-      <Share2 className="size-3.5" />
       Compartir
-    </button>
+    </AccionEntidad>
   );
 }
 
@@ -202,7 +202,7 @@ function ShareDialogInner({ target, ctx }: { target: ShareTarget; ctx: ReturnTyp
                         />
                         <span className="flex-1 truncate">{c.full_name}</span>
                         {c.role === 'admin' && (
-                          <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                          <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
                             Admin
                           </span>
                         )}
@@ -233,7 +233,7 @@ function ShareDialogInner({ target, ctx }: { target: ShareTarget; ctx: ReturnTyp
                                 onCheckedChange={(val) => setGrant(c.id, { inherit: val === true })}
                                 className="size-3.5"
                               />
-                              Heredar al contenido público
+                              Heredar al contenido interno
                             </label>
                           )}
                         </div>
@@ -249,7 +249,7 @@ function ShareDialogInner({ target, ctx }: { target: ShareTarget; ctx: ReturnTyp
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                El heredar alcanza solo el contenido público y nunca permite eliminar.
+                El heredar alcanza el contenido interno salvo lo privado y nunca permite eliminar.
               </p>
             )}
           </div>

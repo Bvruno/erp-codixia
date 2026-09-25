@@ -2,29 +2,67 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export type FilterOption = {
+export type OpcionFiltro = {
   key: string;
   label: string;
   color?: string;
   avatar?: { initials: string; bg: string; text: string };
 };
 
-export function FilterPopover({
+// Contenedor estándar de filtros de entidad (búsqueda + popovers).
+export function BarraFiltrosEntidad({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <div className={cn('flex flex-wrap gap-3', className)}>{children}</div>;
+}
+
+export function BuscadorEntidad({
+  valor,
+  onCambio,
+  placeholder = 'Buscar…',
+  className,
+}: {
+  valor: string;
+  onCambio: (valor: string) => void;
+  placeholder?: string;
+  className?: string;
+}) {
+  return (
+    <div className={cn('relative max-w-xs flex-1', className)}>
+      <Search className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
+      <Input
+        placeholder={placeholder}
+        className="pl-8"
+        value={valor}
+        onChange={(e) => onCambio(e.target.value)}
+      />
+    </div>
+  );
+}
+
+export function FiltroPopover({
   label,
   options,
   value,
   onSelect,
   allLabel,
+  className,
 }: {
   label: string;
-  options: FilterOption[];
+  options: OpcionFiltro[];
   value: string;
   onSelect: (key: string) => void;
   allLabel: string;
+  className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.key === value) || null;
@@ -40,7 +78,7 @@ export function FilterPopover({
         <Button
           variant="outline"
           size="sm"
-          className={cn('gap-1.5', selected && 'border-primary/40 bg-primary/5')}
+          className={cn('gap-1.5', selected && 'border-primary/40 bg-primary/5', className)}
           title={selected ? `Filtrar por ${selected.label}` : `Filtrar por ${label.toLowerCase()}`}
         >
           {selected ? (
@@ -50,7 +88,7 @@ export function FilterPopover({
               )}
               {selected.avatar && (
                 <span
-                  className="inline-flex size-4 shrink-0 items-center justify-center rounded-full text-[8px] font-semibold"
+                  className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
                   style={{ backgroundColor: selected.avatar.bg, color: selected.avatar.text }}
                 >
                   {selected.avatar.initials}
@@ -67,7 +105,7 @@ export function FilterPopover({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1.5" align="start">
-        <p className="px-2 pt-1.5 pb-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="px-2 pt-1.5 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {label}
         </p>
         <button
@@ -98,7 +136,7 @@ export function FilterPopover({
               )}
               {o.avatar && (
                 <span
-                  className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold"
+                  className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
                   style={{ backgroundColor: o.avatar.bg, color: o.avatar.text }}
                 >
                   {o.avatar.initials}

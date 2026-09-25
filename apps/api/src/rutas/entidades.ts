@@ -1,7 +1,9 @@
 import { randomUUID } from 'crypto';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { clienteUsuarioMiddleware, type VariablesDatos } from '../lib/supabase/usuario';
+import { ejecutarEscritura, sinPermisoEscritura } from '../lib/escrituras';
 
 export const rutasEntidades = new Hono<{ Variables: VariablesDatos }>();
 
@@ -27,8 +29,32 @@ export function mapearError(
   fallback = 'Error del servidor'
 ): Response {
   const code = error.code;
-  const status = code === '23505' ? 409 : code?.startsWith('42501') ? 403 : 400;
-  return c.json({ error: error.message ?? fallback, code: code ?? undefined }, status);
+  // RLS / privilegios: el mensaje crudo de Postgres no le dice nada al
+  // usuario; se traduce a una acción concreta.
+  if (code?.startsWith('42501')) {
+    return c.json(
+      {
+        error:
+          'No tienes permiso para realizar esta acción. Pide acceso a un administrador.',
+        code,
+      },
+      403
+    );
+  }
+  if (code === '23505') {
+    return c.json(
+      { error: 'Ya existe un elemento con ese nombre en este lugar', code },
+      409
+    );
+  }
+  // FK del contenedor: el destino ya no existe (o no es visible).
+  if (code === '23503' && error.message?.includes('entities_parent_id_fkey')) {
+    return c.json(
+      { error: 'El destino ya no existe o no tienes acceso a él', code },
+      400
+    );
+  }
+  return c.json({ error: error.message ?? fallback, code: code ?? undefined }, 400);
 }
 
 // GET /entidades/arbol — estructura completa de la org (mismo shape que
@@ -152,6 +178,46 @@ const esquemaGrants = z.object({
   replace: z.boolean().optional(),
 });
 
+// Valida el destino ANTES de insertar: sin esto, un contenedor sin
+// permiso llega al INSERT y RLS responde un 42501 críptico; un contenedor
+// inexistente revienta en el trigger de proyección con un FK de `entities`.
+async function validarDestino(
+  supabase: SupabaseClient,
+  usuarioId: string,
+  input: z.infer<typeof esquemaCrear>
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (input.type === 'workspace') {
+    const { data: perfil } = await supabase
+      .from('profiles')
+      .select('role, organization_id')
+      .eq('id', usuarioId)
+      .maybeSingle();
+    if (perfil?.role !== 'admin' || perfil.organization_id !== input.organization_id) {
+      return {
+        ok: false,
+        error: 'Solo un administrador puede crear áreas de trabajo',
+      };
+    }
+    return { ok: true };
+  }
+
+  const contenedor =
+    input.type === 'folder'
+      ? input.parent_folder_id ?? input.workspace_id
+      : input.folder_id ?? input.workspace_id;
+  const { data, error } = await supabase.rpc('entity_writable', {
+    e_id: contenedor,
+  });
+  if (error || data !== true) {
+    return {
+      ok: false,
+      error:
+        'No tienes permiso para crear aquí. El destino no existe o no tienes acceso.',
+    };
+  }
+  return { ok: true };
+}
+
 // POST /entidades — crea entidad (trigger grant_creator_access da manage).
 rutasEntidades.post('/', async (c) => {
   const supabase = c.get('supabase');
@@ -159,22 +225,30 @@ rutasEntidades.post('/', async (c) => {
   if (!body.success) return c.json({ error: 'Datos inválidos' }, 400);
   const input = body.data;
 
+  const permiso = await validarDestino(supabase, c.get('usuarioId'), input);
+  if (!permiso.ok) return c.json({ error: permiso.error, code: '42501' }, 403);
+
+  // Los INSERT no usan `.select()`/RETURNING a propósito: las policies de
+  // SELECT de estas tablas dependen de la proyección en `entities`, que el
+  // trigger BEFORE INSERT de la misma sentencia no hace visible al chequeo
+  // RLS del RETURNING (mismo command id) → 42501 "new row violates
+  // row-level security policy". El id se genera aquí y se devuelve directo.
+  const id = randomUUID();
+
   if (input.type === 'workspace') {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('workspaces')
-      .insert({ organization_id: input.organization_id, name: input.name, position: input.position, visibility: input.visibility })
-      .select('id').single();
+      .insert({ id, organization_id: input.organization_id, name: input.name, position: input.position, visibility: input.visibility });
     if (error) return mapearError(c, error, 'No se pudo crear el área de trabajo');
-    return c.json({ id: data?.id });
+    return c.json({ id });
   }
 
   if (input.type === 'folder') {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('workspace_folders')
-      .insert({ workspace_id: input.workspace_id, parent_folder_id: input.parent_folder_id, name: input.name, position: input.position, visibility: input.visibility })
-      .select('id').single();
+      .insert({ id, workspace_id: input.workspace_id, parent_folder_id: input.parent_folder_id, name: input.name, position: input.position, visibility: input.visibility });
     if (error) return mapearError(c, error, 'No se pudo crear la carpeta');
-    return c.json({ id: data?.id });
+    return c.json({ id });
   }
 
   if (input.type === 'list') {
@@ -183,9 +257,10 @@ rutasEntidades.post('/', async (c) => {
       .select('default_statuses, default_priorities')
       .eq('id', input.workspace_id)
       .single();
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('task_lists')
       .insert({
+        id,
         folder_id: input.folder_id,
         workspace_id: input.workspace_id,
         organization_id: input.organization_id,
@@ -194,54 +269,47 @@ rutasEntidades.post('/', async (c) => {
         priorities: ws?.default_priorities ?? null,
         position: input.position,
         visibility: input.visibility,
-      })
-      .select('id').single();
+      });
     if (error) return mapearError(c, error, 'No se pudo crear la lista');
-    return c.json({ id: data?.id });
+    return c.json({ id });
   }
 
   if (input.type === 'document') {
-    const { data: doc, error } = await supabase
+    const { error } = await supabase
       .from('documents')
-      .insert({ folder_id: input.folder_id, workspace_id: input.workspace_id, name: input.name, organization_id: input.organization_id, position: input.position, visibility: input.visibility })
-      .select('id').single();
+      .insert({ id, folder_id: input.folder_id, workspace_id: input.workspace_id, name: input.name, organization_id: input.organization_id, position: input.position, visibility: input.visibility });
     if (error) return mapearError(c, error, 'No se pudo crear el documento');
-    if (doc) {
-      await supabase.from('document_pages').insert({
-        document_id: doc.id,
-        title: 'Hoja principal',
-        content: '',
-        is_main: true,
-        position: 0,
-      });
-    }
-    return c.json({ id: doc?.id });
+    await supabase.from('document_pages').insert({
+      document_id: id,
+      title: 'Hoja principal',
+      content: '',
+      is_main: true,
+      position: 0,
+    });
+    return c.json({ id });
   }
 
   if (input.type === 'mindmap') {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('mind_maps')
-      .insert({ folder_id: input.folder_id, workspace_id: input.workspace_id, organization_id: input.organization_id, name: input.name, content: input.content, position: input.position, visibility: input.visibility })
-      .select('id').single();
+      .insert({ id, folder_id: input.folder_id, workspace_id: input.workspace_id, organization_id: input.organization_id, name: input.name, content: input.content, position: input.position, visibility: input.visibility });
     if (error) return mapearError(c, error, 'No se pudo crear el mapa mental');
-    return c.json({ id: data?.id });
+    return c.json({ id });
   }
 
   if (input.type === 'todo') {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('todos')
-      .insert({ folder_id: input.folder_id, workspace_id: input.workspace_id, organization_id: input.organization_id, name: input.name, position: input.position, visibility: input.visibility })
-      .select('id').single();
+      .insert({ id, folder_id: input.folder_id, workspace_id: input.workspace_id, organization_id: input.organization_id, name: input.name, position: input.position, visibility: input.visibility });
     if (error) return mapearError(c, error, 'No se pudo crear el TO-DO');
-    return c.json({ id: data?.id });
+    return c.json({ id });
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('formularios')
-    .insert({ folder_id: input.folder_id, workspace_id: input.workspace_id, organization_id: input.organization_id, name: input.name, position: input.position, visibility: input.visibility })
-    .select('id').single();
+    .insert({ id, folder_id: input.folder_id, workspace_id: input.workspace_id, organization_id: input.organization_id, name: input.name, position: input.position, visibility: input.visibility });
   if (error) return mapearError(c, error, 'No se pudo crear el formulario');
-  return c.json({ id: data?.id });
+  return c.json({ id });
 });
 
 const esquemaPatch = z.object({
@@ -275,8 +343,11 @@ rutasEntidades.patch('/:type/:id', async (c) => {
   }
   if (Object.keys(patch).length === 0) return c.json({ success: true });
 
-  const { error } = await supabase.from(tablaDeTipo(tipo.data)).update(patch).eq('id', id);
+  const { error, filas } = await ejecutarEscritura(
+    supabase.from(tablaDeTipo(tipo.data)).update(patch).eq('id', id).select('id')
+  );
   if (error) return mapearError(c, error, 'No se pudo actualizar');
+  if (filas === 0) return sinPermisoEscritura(c);
   return c.json({ success: true });
 });
 
@@ -304,8 +375,11 @@ rutasEntidades.post('/:type/:id/mover', async (c) => {
   }
   if (body.data.position !== undefined) patch.position = body.data.position;
 
-  const { error } = await supabase.from(tablaDeTipo(tipo.data)).update(patch).eq('id', id);
+  const { error, filas } = await ejecutarEscritura(
+    supabase.from(tablaDeTipo(tipo.data)).update(patch).eq('id', id).select('id')
+  );
   if (error) return mapearError(c, error, 'No se pudo mover');
+  if (filas === 0) return sinPermisoEscritura(c);
   return c.json({ success: true });
 });
 
@@ -355,13 +429,17 @@ rutasEntidades.post('/:type/:id/clonar', async (c) => {
     visibility: origen.visibility,
   };
 
+  // Sin RETURNING por el mismo motivo que POST /entidades: la proyección
+  // en `entities` no es visible al chequeo SELECT del RETURNING.
+  const nuevoId = randomUUID();
   let fila: Record<string, unknown>;
   if (tipo.data === 'list') {
-    fila = { ...comun, statuses: origen.statuses ?? null, priorities: origen.priorities ?? null };
+    fila = { id: nuevoId, ...comun, statuses: origen.statuses ?? null, priorities: origen.priorities ?? null };
   } else if (tipo.data === 'mindmap') {
-    fila = { ...comun, content: origen.content, created_by: usuarioId };
+    fila = { id: nuevoId, ...comun, content: origen.content, created_by: usuarioId };
   } else if (tipo.data === 'formulario') {
     fila = {
+      id: nuevoId,
       ...comun,
       description: origen.description ?? null,
       esquema: origen.esquema,
@@ -373,17 +451,13 @@ rutasEntidades.post('/:type/:id/clonar', async (c) => {
       created_by: usuarioId,
     };
   } else {
-    fila = comun;
+    fila = { id: nuevoId, ...comun };
   }
 
-  const { data: clon, error: insertError } = await supabase
+  const { error: insertError } = await supabase
     .from(tabla)
-    .insert(fila as never)
-    .select('id')
-    .single();
+    .insert(fila as never);
   if (insertError) return mapearError(c, insertError, 'No se pudo clonar');
-  const nuevoId = clon?.id as string | undefined;
-  if (!nuevoId) return c.json({ error: 'No se pudo clonar' }, 400);
 
   const fallo = async (
     error: { message?: string; code?: string },
@@ -527,11 +601,14 @@ rutasEntidades.post('/reordenar', async (c) => {
   const tabla = tablaDeTipo(body.data.type);
   const resultados = await Promise.all(
     body.data.items.map((item) =>
-      supabase.from(tabla).update({ position: item.position }).eq('id', item.id)
+      ejecutarEscritura(
+        supabase.from(tabla).update({ position: item.position }).eq('id', item.id).select('id')
+      )
     )
   );
   const fallo = resultados.find((r) => r.error)?.error;
   if (fallo) return mapearError(c, fallo);
+  if (resultados.some((r) => r.filas === 0)) return sinPermisoEscritura(c);
   return c.json({ success: true });
 });
 
@@ -541,8 +618,11 @@ rutasEntidades.delete('/:type/:id', async (c) => {
   const tipo = TIPO_ENTIDAD.safeParse(c.req.param('type'));
   const id = c.req.param('id');
   if (!tipo.success || !id) return c.json({ error: 'Entidad inválida' }, 400);
-  const { error } = await supabase.from(tablaDeTipo(tipo.data)).delete().eq('id', id);
+  const { error, filas } = await ejecutarEscritura(
+    supabase.from(tablaDeTipo(tipo.data)).delete().eq('id', id).select('id')
+  );
   if (error) return mapearError(c, error, 'No se pudo eliminar');
+  if (filas === 0) return sinPermisoEscritura(c);
   return c.json({ success: true });
 });
 
@@ -589,23 +669,3 @@ rutasEntidades.post('/:type/:id/grants', async (c) => {
   return c.json({ success: true });
 });
 
-// POST /entidades/grants/propagar — upsert bulk a descendientes.
-rutasEntidades.post('/grants/propagar', async (c) => {
-  const supabase = c.get('supabase');
-  const body = z.object({
-    grants: z.array(z.object({
-      entity_type: TIPO_ENTIDAD,
-      entity_id: z.string().uuid(),
-      profile_id: z.string().uuid(),
-      permission: z.enum(['read', 'write', 'manage']),
-      inherit: z.boolean(),
-    })),
-  }).safeParse(await c.req.json());
-  if (!body.success) return c.json({ error: 'Datos inválidos' }, 400);
-  const { error } = await supabase.from('entity_visibility').upsert(
-    body.data.grants,
-    { onConflict: 'entity_type,entity_id,profile_id' }
-  );
-  if (error) return mapearError(c, error);
-  return c.json({ success: true });
-});

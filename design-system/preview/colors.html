@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ERP Codixia colors</title>
+    <link rel="stylesheet" href="../tokens.css" />
+    <style>
+      body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+      main { max-width: var(--container-max); margin: 0 auto; padding: var(--space-12) var(--space-6); display: grid; gap: var(--space-8); }
+      h1 { margin: 0; font-family: var(--font-display); font-size: var(--text-2xl); line-height: var(--leading-tight); letter-spacing: var(--tracking-display); }
+      h2 { margin: 0; font-size: var(--text-lg); }
+      p { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+      .panel { display: grid; gap: var(--space-4); padding: var(--space-6); border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--bg); color: var(--fg); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4); }
+      .swatch { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); overflow: hidden; box-shadow: var(--elev-ring); }
+      .color { height: 88px; background: var(--value); }
+      .meta { padding: var(--space-3); color: var(--muted); font-size: var(--text-sm); }
+      strong { display: block; margin-bottom: var(--space-1); color: var(--fg); font-size: var(--text-sm); }
+      .accent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); }
+      .accent-card { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
+      .accent-chip { display: flex; align-items: center; justify-content: center; height: 40px; border-radius: var(--radius-md); background: var(--accent); color: var(--accent-on); font-weight: 600; font-size: var(--text-sm); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Roles de color</h1>
+        <p>Dark es el modo por defecto; light y acentos se activan con atributos en un contenedor o en &lt;html&gt;.</p>
+      </header>
+
+      <section class="panel">
+        <h2>Dark (default)</h2>
+        <div class="grid">
+          <article class="swatch" style="--value: var(--bg)"><div class="color"></div><div class="meta"><strong>--bg</strong>lienzo</div></article>
+          <article class="swatch" style="--value: var(--surface)"><div class="color"></div><div class="meta"><strong>--surface</strong>cards</div></article>
+          <article class="swatch" style="--value: var(--surface-warm)"><div class="color"></div><div class="meta"><strong>--surface-warm</strong>hover</div></article>
+          <article class="swatch" style="--value: var(--fg)"><div class="color"></div><div class="meta"><strong>--fg</strong>texto</div></article>
+          <article class="swatch" style="--value: var(--muted)"><div class="color"></div><div class="meta"><strong>--muted</strong>secundario</div></article>
+          <article class="swatch" style="--value: var(--border)"><div class="color"></div><div class="meta"><strong>--border</strong>bordes</div></article>
+          <article class="swatch" style="--value: var(--success)"><div class="color"></div><div class="meta"><strong>--success</strong>éxito</div></article>
+          <article class="swatch" style="--value: var(--warn)"><div class="color"></div><div class="meta"><strong>--warn</strong>precaución</div></article>
+          <article class="swatch" style="--value: var(--danger)"><div class="color"></div><div class="meta"><strong>--danger</strong>peligro</div></article>
+        </div>
+      </section>
+
+      <section class="panel" data-mode="light">
+        <h2>Light</h2>
+        <div class="grid">
+          <article class="swatch" style="--value: var(--bg)"><div class="color"></div><div class="meta"><strong>--bg</strong>lienzo</div></article>
+          <article class="swatch" style="--value: var(--surface)"><div class="color"></div><div class="meta"><strong>--surface</strong>cards</div></article>
+          <article class="swatch" style="--value: var(--surface-warm)"><div class="color"></div><div class="meta"><strong>--surface-warm</strong>hover</div></article>
+          <article class="swatch" style="--value: var(--fg)"><div class="color"></div><div class="meta"><strong>--fg</strong>texto</div></article>
+          <article class="swatch" style="--value: var(--muted)"><div class="color"></div><div class="meta"><strong>--muted</strong>secundario</div></article>
+          <article class="swatch" style="--value: var(--border)"><div class="color"></div><div class="meta"><strong>--border</strong>bordes</div></article>
+        </div>
+      </section>
+
+      <section>
+        <h2>Acentos</h2>
+        <div class="accent-grid">
+          <div class="accent-card" data-accent="violet"><div class="accent-chip">violet</div><span class="meta">oklch(0.526 0.247 293)</span></div>
+          <div class="accent-card" data-accent="rose"><div class="accent-chip">rose</div><span class="meta">oklch(0.645 0.22 16)</span></div>
+          <div class="accent-card" data-accent="emerald"><div class="accent-chip">emerald</div><span class="meta">oklch(0.62 0.16 162)</span></div>
+          <div class="accent-card" data-accent="cobalt"><div class="accent-chip">cobalt</div><span class="meta">oklch(0.585 0.2 254)</span></div>
+          <div class="accent-card" data-accent="amber"><div class="accent-chip">amber</div><span class="meta">oklch(0.745 0.16 65)</span></div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -19,8 +19,8 @@ import type { EntityType } from './tipos';
 
 const VISIBILITY_OPTIONS: { value: Visibility; label: string; description: string; icon: React.ReactNode }[] = [
   { value: 'public', label: 'Público', description: 'Visible para toda la organización', icon: <Globe className="size-3.5" /> },
-  { value: 'private', label: 'Privado', description: 'Visible solo para administradores', icon: <Lock className="size-3.5" /> },
-  { value: 'restricted', label: 'Restringido', description: 'Visible solo para personal asignado', icon: <Users className="size-3.5" /> },
+  { value: 'private', label: 'Privado', description: 'Visible solo para ti y administradores', icon: <Lock className="size-3.5" /> },
+  { value: 'restricted', label: 'Restringido', description: 'Visible para el personal asignado; hereda desde la carpeta o el espacio', icon: <Users className="size-3.5" /> },
 ];
 
 export function VisibilityIcon({ visibility }: { visibility: Visibility }) {
@@ -128,7 +128,7 @@ export function VisibilityFields({
                                 onCheckedChange={(val) => onGrantChange(c.id, { inherit: val === true })}
                                 className="size-3.5"
                               />
-                              Heredar al contenido público
+                              Heredar al contenido interno
                             </>
                           )}
                         </label>
@@ -145,7 +145,7 @@ export function VisibilityFields({
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">
-              El heredar alcanza solo el contenido público y nunca permite eliminar.
+              El heredar alcanza el contenido interno salvo lo privado y nunca permite eliminar.
             </p>
           )}
         </div>

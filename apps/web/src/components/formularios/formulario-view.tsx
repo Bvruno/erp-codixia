@@ -5,12 +5,8 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   BarChart3,
-  Check,
   ClipboardList,
-  Eye,
   Link2,
-  Loader2,
-  Pencil,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, apiFetch } from '@/lib/api/cliente';
@@ -20,8 +16,13 @@ import { isFullUuid, validarEsquemaLogica } from '@erp/shared';
 import { nombreDuplicado, resolverFormularioActual } from './utils';
 import { useTareas } from '@/components/tareas/tareas-context';
 import { ShareButton } from '@/components/tareas/share-entity-dialog';
+import { AccionEntidad } from '@/components/entidad/accion-entidad';
+import { CabeceraEntidad, TituloEditableEntidad } from '@/components/entidad/cabecera-entidad';
+import { ToggleModoEntidad } from '@/components/entidad/toggle-modo-entidad';
+import { IndicadorGuardado } from '@/components/entidad/indicador-guardado';
+import { AvisoSoloLectura } from '@/components/entidad/aviso-solo-lectura';
+import { EntidadPagina } from '@/components/entidad/entidad-pagina';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EditorFormulario } from './editor-formulario';
 import { PanelPreview } from './panel-preview';
@@ -114,13 +115,6 @@ export function FormularioView({ formularioId: paramId }: { formularioId: string
       nombreGuardado,
       entidad.id
     );
-
-  const sinGuardar =
-    !!form &&
-    (form.name !== nombreGuardado ||
-      (form.description ?? '') !== descripcion ||
-      form.esquema !== esquema ||
-      form.ajustes !== ajustes);
 
   const refetchCtx = ctx.refetch;
 
@@ -252,48 +246,49 @@ export function FormularioView({ formularioId: paramId }: { formularioId: string
         : { texto: 'Borrador', clase: 'bg-muted text-muted-foreground' };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3">
-        <ClipboardList className="size-5 shrink-0 text-amber-500" />
-        <Input
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          disabled={!canWrite}
-          className="h-9 min-w-48 flex-1 border-none bg-transparent text-base font-semibold shadow-none focus-visible:ring-0"
-          placeholder="Formulario sin título"
-        />
-        <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-medium', estadoBadge.clase)}>
-          {estadoBadge.texto}
-        </span>
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-          {saveState === 'saving' ? (
-            <>
-              <Loader2 className="size-3 animate-spin" /> Guardando…
-            </>
-          ) : saveState === 'unsaved' || sinGuardar ? (
-            'Sin guardar'
-          ) : (
-            <>
-              <Check className="size-3 text-emerald-500" /> Guardado
-            </>
-          )}
-        </span>
-        <div className="ml-auto flex flex-wrap items-center gap-2">
-          <ShareButton
-            onClick={() =>
-              entidad && ctx.openShare('formulario', entidad as unknown as Parameters<typeof ctx.openShare>[1])
-            }
+    <EntidadPagina>
+      <CabeceraEntidad
+        tipo="formulario"
+        titulo={
+          <TituloEditableEntidad
+            valor={nombre}
+            onCambio={setNombre}
+            disabled={!canWrite}
+            placeholder="Formulario sin título"
           />
-          <Button variant="outline" size="sm" onClick={() => setConfigOpen(true)} disabled={!canWrite}>
-            <Link2 className="size-4" />
-            Enlace y acceso
-          </Button>
-          <Button variant="outline" size="sm" onClick={irARespuestas}>
-            <BarChart3 className="size-4" />
-            Respuestas
-          </Button>
-        </div>
-      </div>
+        }
+        badges={
+          <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-medium', estadoBadge.clase)}>
+            {estadoBadge.texto}
+          </span>
+        }
+        estado={<IndicadorGuardado estado={saveState} />}
+        acciones={
+          <>
+            <ShareButton
+              onClick={() =>
+                entidad && ctx.openShare('formulario', entidad as unknown as Parameters<typeof ctx.openShare>[1])
+              }
+            />
+            <AccionEntidad
+              icono={Link2}
+              onClick={() => setConfigOpen(true)}
+              disabled={!canWrite}
+            >
+              Enlace y acceso
+            </AccionEntidad>
+            <AccionEntidad icono={BarChart3} onClick={irARespuestas}>
+              Respuestas
+            </AccionEntidad>
+            <span className="lg:hidden">
+              <ToggleModoEntidad
+                modo={vistaMovil === 'editar' ? 'editar' : 'ver'}
+                onCambio={(m) => setVistaMovil(m === 'editar' ? 'editar' : 'previa')}
+              />
+            </span>
+          </>
+        }
+      />
 
       {duplicado && canWrite && (
         <p
@@ -304,36 +299,7 @@ export function FormularioView({ formularioId: paramId }: { formularioId: string
         </p>
       )}
 
-      {!canWrite && (
-        <p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
-          Tienes acceso de solo lectura: puedes ver el formulario y sus respuestas, pero no editarlo.
-        </p>
-      )}
-
-      <div className="flex gap-1 rounded-lg border p-1 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setVistaMovil('editar')}
-          className={cn(
-            'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm',
-            vistaMovil === 'editar' ? 'bg-muted font-medium' : 'text-muted-foreground'
-          )}
-        >
-          <Pencil className="size-3.5" />
-          Editar
-        </button>
-        <button
-          type="button"
-          onClick={() => setVistaMovil('previa')}
-          className={cn(
-            'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm',
-            vistaMovil === 'previa' ? 'bg-muted font-medium' : 'text-muted-foreground'
-          )}
-        >
-          <Eye className="size-3.5" />
-          Vista previa
-        </button>
-      </div>
+      {!canWrite && <AvisoSoloLectura />}
 
       <div className="grid items-start gap-6 lg:grid-cols-2 xl:grid-cols-[1fr_minmax(380px,44%)]">
         <div className={cn(vistaMovil === 'previa' && 'hidden lg:block')}>
@@ -358,6 +324,6 @@ export function FormularioView({ formularioId: paramId }: { formularioId: string
         onAjustes={setAjustes}
         onEstadoCambio={(e) => setEstado(e)}
       />
-    </div>
+    </EntidadPagina>
   );
 }

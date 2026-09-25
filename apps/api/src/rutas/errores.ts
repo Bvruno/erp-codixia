@@ -3,14 +3,14 @@ import { z } from 'zod';
 import { rpcArgs } from '@erp/shared';
 import { getAdminClient } from '../lib/supabase/admin';
 import { verificarJwt } from '../supabase/verificar-token';
-import { sendTelegramAlert } from '../lib/telegram-alert';
+import { emitirErrorPlataforma } from '../lib/telegram-plataforma';
 import { captureErrorServer } from '../lib/captura-errores';
 
 export const rutasErrores = new Hono();
 
 // El SPA no escribe error_logs directo: POST /errores persiste vía RPC
 // log_error con service role (0058 revocó anon/authenticated/public) y
-// dispara la alerta Telegram server-side cuando el fingerprint es nuevo.
+// notifica a la plataforma cuando el fingerprint es nuevo.
 const esquemaError = z.object({
   message: z.string().min(1).max(4000),
   level: z.enum(['error', 'warning']).optional(),
@@ -49,7 +49,14 @@ rutasErrores.post('/', async (c) => {
     const supabase = getAdminClient();
     const { data } = await supabase.rpc('log_error', await rpcArgs(payload));
     if (data?.is_new) {
-      await sendTelegramAlert(supabase, data.id).catch(() => {});
+      await emitirErrorPlataforma({
+        id: data.id,
+        source: 'client',
+        level: body.data.level,
+        message: body.data.message,
+        name: body.data.name,
+        route: body.data.route,
+      }).catch(() => {});
     }
     return c.json({ id: data?.id ?? null, isNew: data?.is_new ?? false });
   } catch {

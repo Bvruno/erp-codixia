@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -29,8 +29,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { EmptyState } from '@/components/ui/empty-state';
-import { TableSkeleton } from '@/components/ui/skeleton';
+import { CabeceraEntidad } from '@/components/entidad/cabecera-entidad';
+import { PanelEntidad } from '@/components/entidad/panel-entidad';
+import { EntidadPagina } from '@/components/entidad/entidad-pagina';
+import { EstadoEntidad, EsqueletoEntidad } from '@/components/entidad/estado-entidad';
 import {
   Table,
   TableBody,
@@ -218,7 +220,7 @@ function TodoPrefsFields({
           )}
         </div>
       ) : (
-        <p className="border-t pt-2 text-[11px] text-muted-foreground">
+        <p className="border-t pt-2 text-xs text-muted-foreground">
           Los días de la semana solo aplican a frecuencias diaria y semanal.
         </p>
       )}
@@ -246,7 +248,7 @@ function TodoPrefsFields({
           </div>
         </div>
       ) : (
-        <p className="border-t pt-2 text-[11px] text-muted-foreground">
+        <p className="border-t pt-2 text-xs text-muted-foreground">
           La hora límite solo aplica a la frecuencia diaria.
         </p>
       )}
@@ -624,36 +626,37 @@ export function ToDoView({ todoId: paramTodoId }: ToDoViewProps) {
     setRenamingId(null);
   };
 
-  if (loading && todoId) return <TableSkeleton rows={5} cols={3} />;
+  if (loading && todoId) return <EsqueletoEntidad variante="tabla" filas={5} columnas={3} />;
 
-  if (resolviendo && !todo) return <TableSkeleton rows={5} cols={3} />;
+  if (resolviendo && !todo) return <EsqueletoEntidad variante="tabla" filas={5} columnas={3} />;
 
   if (!ctx.loading && !todo) {
     return (
-      <div className="space-y-4">
-        <EmptyState icon={ListChecks} title="No encontrado" description="El TO-DO no existe o no tienes acceso" />
-      </div>
+      <EstadoEntidad
+        icono={ListChecks}
+        titulo="No encontrado"
+        descripcion="El TO-DO no existe o no tienes acceso"
+      />
     );
   }
 
-  if (loading || !todo) return <TableSkeleton rows={5} cols={3} />;
+  if (loading || !todo) return <EsqueletoEntidad variante="tabla" filas={5} columnas={3} />;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold">{todo.name}</h1>
-        {ctx.isAdmin && (
-          <div className="ml-auto flex items-center gap-2">
-            <ShareButton onClick={() => ctx.openShare('todo', todo)} />
-          </div>
-        )}
-      </div>
-      <div className="rounded-md border bg-card p-4">
+    <EntidadPagina>
+      <CabeceraEntidad
+        tipo="todo"
+        titulo={todo.name}
+        acciones={
+          ctx.isAdmin ? <ShareButton onClick={() => ctx.openShare('todo', todo)} /> : undefined
+        }
+      />
+      <PanelEntidad>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <CircleDot className="size-5 text-primary" />
             <div>
-              <h2 className="text-lg font-bold leading-tight">{cycleTitleText}</h2>
+              <h2 className="text-base font-bold leading-tight">{cycleTitleText}</h2>
               <p className="text-xs text-muted-foreground">
                 {doneRows.length} de {activeRows.length} completadas · {nextReset}
               </p>
@@ -663,7 +666,7 @@ export function ToDoView({ todoId: paramTodoId }: ToDoViewProps) {
             <ProgressBar value={overallPct} done={overallPct === 100 && activeRows.length > 0} />
           </div>
         </div>
-      </div>
+      </PanelEntidad>
 
       <div className="rounded-md border">
         <Table>
@@ -823,7 +826,7 @@ export function ToDoView({ todoId: paramTodoId }: ToDoViewProps) {
         confirmLabel="Eliminar"
         onConfirm={() => void handleDelete()}
       />
-    </div>
+    </EntidadPagina>
   );
 }
 
@@ -967,13 +970,13 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
         )}
         <div className="mt-0.5 flex flex-wrap items-center gap-1.5 lg:hidden">
           {row.frequency !== 'daily' && (
-            <Badge variant="outline" className="gap-1 px-1.5 py-0 text-[10px] font-normal">
+            <Badge variant="outline" className="gap-1 px-1.5 py-0 text-xs font-normal">
               <Repeat className="size-3" />
               {frequencyLabel(row.frequency, row.interval_days)}
             </Badge>
           )}
           {row.week_days && row.week_days.length > 0 && row.frequency !== 'interval' && (
-            <Badge variant="outline" className="gap-1 px-1.5 py-0 text-[10px] font-normal">
+            <Badge variant="outline" className="gap-1 px-1.5 py-0 text-xs font-normal">
               <CalendarDays className="size-3" />
               {weekDaysLabel(row.week_days)}
             </Badge>
@@ -982,7 +985,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
             <Badge
               variant="outline"
               className={cn(
-                'gap-1 px-1.5 py-0 text-[10px] font-normal',
+                'gap-1 px-1.5 py-0 text-xs font-normal',
                 timePast && 'border-red-500/40 text-red-500'
               )}
             >
@@ -1004,7 +1007,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
       <TableCell className="hidden xl:table-cell">
         <div className="flex flex-wrap items-center gap-1.5">
           {row.week_days && row.week_days.length > 0 && row.frequency !== 'interval' && (
-            <Badge variant="outline" className="gap-1 px-1.5 py-0 text-[10px] font-normal">
+            <Badge variant="outline" className="gap-1 px-1.5 py-0 text-xs font-normal">
               <CalendarDays className="size-3" />
               {weekDaysLabel(row.week_days)}
             </Badge>
@@ -1013,7 +1016,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
             <Badge
               variant="outline"
               className={cn(
-                'gap-1 px-1.5 py-0 text-[10px] font-normal',
+                'gap-1 px-1.5 py-0 text-xs font-normal',
                 timePast && 'border-red-500/40 text-red-500'
               )}
             >
@@ -1022,7 +1025,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
             </Badge>
           )}
           {!appliesToday && (
-            <span className="text-[10px] text-muted-foreground">no aplica hoy</span>
+            <span className="text-xs text-muted-foreground">no aplica hoy</span>
           )}
         </div>
       </TableCell>

@@ -4,19 +4,18 @@ import { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } fr
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { canalRealtime, removerCanal } from '@/lib/realtime';
 import { api, apiFetch } from '@/lib/api/cliente';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Eye, EyeOff, CheckCircle2, XCircle, Users, Settings2, RotateCcw } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, XCircle, Users, Settings2, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
-import { TableSkeleton } from '@/components/ui/skeleton';
 import { TaskList } from '@/components/tareas/task-list';
 import { StatusConfigDialog } from '@/components/tareas/status-config-dialog';
-import { FilterPopover } from '@/components/tareas/filter-popover';
+import { FiltroPopover, BarraFiltrosEntidad, BuscadorEntidad } from '@/components/entidad/filtro-popover';
+import { AccionEntidad } from '@/components/entidad/accion-entidad';
+import { CabeceraEntidad, TituloEditableEntidad } from '@/components/entidad/cabecera-entidad';
+import { EntidadPagina } from '@/components/entidad/entidad-pagina';
+import { EstadoEntidad, EsqueletoEntidad } from '@/components/entidad/estado-entidad';
 import { avatarColor, getInitials } from '@/components/tareas/assignee-select';
 import { useTareas } from '@/components/tareas/tareas-context';
-import { cn } from '@/lib/utils';
 import { ShareButton } from '@/components/tareas/share-entity-dialog';
-import { EmptyState } from '@/components/ui/empty-state';
 import { resolveStatuses, resolvePriorities, hiddenStatuses } from '@/lib/task-config';
 import { friendlyTaskError } from '@/lib/task-errors';
 import { saveAssignmentGrants } from '@/lib/auth/actions';
@@ -55,7 +54,6 @@ export function TaskBoard() {
   const [dragTaskId, setDragTaskId] = useState<string | null>(null);
   const [dragDrop, setDragDrop] = useState<TaskDropTarget | null>(null);
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
-  const [editingFocusedTitle, setEditingFocusedTitle] = useState(false);
   const dragTaskIdRef = useRef<string | null>(null);
   const dragDropRef = useRef<TaskDropTarget | null>(null);
   const dragOriginalTasksRef = useRef<Task[]>([]);
@@ -640,123 +638,92 @@ export function TaskBoard() {
   });
 
   if (loading || (listId === null && ctx.lists.length > 0)) {
-    return <TableSkeleton rows={5} cols={6} />;
+    return <EsqueletoEntidad variante="tabla" filas={5} columnas={6} />;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {focusedTask ? (
-          editingFocusedTitle && canEditList ? (
-            <Input
-              autoFocus
-              defaultValue={focusedTask.title}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-                if (e.key === 'Escape') setEditingFocusedTitle(false);
-              }}
-              onBlur={(e) => {
-                setEditingFocusedTitle(false);
-                const v = e.target.value.trim();
-                if (v && v !== focusedTask.title) void handleUpdateTask(focusedTask.id, { title: v });
-              }}
-              className="h-auto min-w-0 max-w-md border-0 bg-transparent px-1 -mx-1 text-2xl font-bold text-foreground focus-visible:ring-1"
+    <EntidadPagina>
+      <CabeceraEntidad
+        tipo="list"
+        titulo={
+          focusedTask && canEditList ? (
+            <TituloEditableEntidad
+              valor={focusedTask.title}
+              onCommit={(v) => void handleUpdateTask(focusedTask.id, { title: v })}
+              placeholder="Título de la tarea"
             />
           ) : (
-            <h1
-              onClick={() => {
-                if (canEditList) setEditingFocusedTitle(true);
-              }}
-              className={cn('text-2xl font-bold', canEditList && 'cursor-pointer hover:underline')}
-              title={canEditList ? 'Click para editar el t�tulo' : focusedTask.title}
-            >
-              {focusedTask.title}
-            </h1>
+            focusedTask?.title || selectedList?.name || 'Proyectos'
           )
-        ) : (
-          <h1 className="text-2xl font-bold">{selectedList?.name || 'Proyectos'}</h1>
-        )}
-        <div className="flex flex-wrap items-center gap-1.5">
-          {sortBy !== 'position' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSortBy('position')}
-              title="Volver al orden manual"
+        }
+        acciones={
+          <>
+            {sortBy !== 'position' && (
+              <AccionEntidad
+                icono={RotateCcw}
+                onClick={() => setSortBy('position')}
+                title="Volver al orden manual"
+              >
+                Orden manual
+              </AccionEntidad>
+            )}
+            <AccionEntidad
+              icono={showAddRows ? EyeOff : Eye}
+              onClick={() => {
+                const next = !showAddRows;
+                setShowAddRows(next);
+                localStorage.setItem('tasks-show-add-rows', String(next));
+              }}
+              title={showAddRows ? 'Ocultar filas de creación' : 'Mostrar filas de creación'}
             >
-              <RotateCcw className="size-4" />
-              <span className="hidden text-xs ml-1 sm:inline">Orden manual</span>
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              const next = !showAddRows;
-              setShowAddRows(next);
-              localStorage.setItem('tasks-show-add-rows', String(next));
-            }}
-            title={showAddRows ? 'Ocultar filas de creaci�n' : 'Mostrar filas de creaci�n'}
-          >
-            {showAddRows ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            <span className="hidden text-xs ml-1 sm:inline">{showAddRows ? 'Ocultar' : 'Mostrar'} filas de creaci�n</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleDoneCancelled}
-            title={showDoneCancelled ? 'Ocultar estados ocultos por defecto' : 'Mostrar estados ocultos por defecto'}
-          >
-            {showDoneCancelled ? <CheckCircle2 className="size-4" /> : <XCircle className="size-4" />}
-            <span className="hidden text-xs ml-1 sm:inline">{showDoneCancelled ? 'Ocultar' : 'Mostrar'} ocultos por defecto</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setGroupBy((prev) => (prev === 'status' ? 'assignee' : 'status'))}
-            title={groupBy === 'assignee' ? 'Agrupar por estado' : 'Agrupar por persona asignada'}
-          >
-            <Users className="size-4" />
-            <span className="hidden text-xs ml-1 sm:inline">{groupBy === 'assignee' ? 'Agrupar por estado' : 'Agrupar por persona'}</span>
-          </Button>
-          {canEditList && selectedList && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowConfig(true)}
-              title="Configurar estados y prioridades de la lista"
+              <span className="hidden sm:inline">{showAddRows ? 'Ocultar' : 'Mostrar'} filas de creación</span>
+            </AccionEntidad>
+            <AccionEntidad
+              icono={showDoneCancelled ? CheckCircle2 : XCircle}
+              onClick={toggleDoneCancelled}
+              title={showDoneCancelled ? 'Ocultar estados ocultos por defecto' : 'Mostrar estados ocultos por defecto'}
             >
-              <Settings2 className="size-4" />
-              <span className="hidden text-xs ml-1 sm:inline">Configurar estados y prioridades</span>
-            </Button>
-          )}
-        </div>
-        {ctx.isAdmin && selectedList && (
-          <div className="ml-auto flex items-center gap-2">
-            <ShareButton onClick={() => ctx.openShare('list', selectedList)} />
-          </div>
-        )}
-      </div>
+              <span className="hidden sm:inline">{showDoneCancelled ? 'Ocultar' : 'Mostrar'} ocultos por defecto</span>
+            </AccionEntidad>
+            <AccionEntidad
+              icono={Users}
+              onClick={() => setGroupBy((prev) => (prev === 'status' ? 'assignee' : 'status'))}
+              title={groupBy === 'assignee' ? 'Agrupar por estado' : 'Agrupar por persona asignada'}
+            >
+              <span className="hidden sm:inline">{groupBy === 'assignee' ? 'Agrupar por estado' : 'Agrupar por persona'}</span>
+            </AccionEntidad>
+            {canEditList && selectedList && (
+              <AccionEntidad
+                icono={Settings2}
+                onClick={() => setShowConfig(true)}
+                title="Configurar estados y prioridades de la lista"
+              >
+                <span className="hidden sm:inline">Configurar estados y prioridades</span>
+              </AccionEntidad>
+            )}
+            {ctx.isAdmin && selectedList && (
+              <ShareButton onClick={() => ctx.openShare('list', selectedList)} />
+            )}
+          </>
+        }
+      />
 
       {!selectedList && ctx.lists.length === 0 && (
-        <EmptyState
-          title="Sin listas"
-          description="Crea un espacio de trabajo, una carpeta y una lista para empezar"
+        <EstadoEntidad
+          titulo="Sin listas"
+          descripcion="Crea un espacio de trabajo, una carpeta y una lista para empezar"
         />
       )}
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 max-w-xs">
-          <Search className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
-          <Input placeholder="Buscar tarea..." className="pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
-        <FilterPopover
+      <BarraFiltrosEntidad>
+        <BuscadorEntidad valor={search} onCambio={setSearch} placeholder="Buscar tarea..." />
+        <FiltroPopover
           label="Estado"
           options={statuses.map((s) => ({ key: s.key, label: s.label, color: s.color }))}
           value={filterStatus}
           onSelect={setFilterStatus}
           allLabel="Todos los estados"
         />
-        <FilterPopover
+        <FiltroPopover
           label="Prioridad"
           options={priorities.map((p) => ({ key: p.key, label: p.label, color: p.color }))}
           value={filterPriority}
@@ -764,7 +731,7 @@ export function TaskBoard() {
           allLabel="Todas las prioridades"
         />
         {canEditList && (
-          <FilterPopover
+          <FiltroPopover
             label="Persona"
             options={collaborators.map((c) => {
               const av = avatarColor(c.id);
@@ -779,7 +746,7 @@ export function TaskBoard() {
             allLabel="Todos"
           />
         )}
-      </div>
+      </BarraFiltrosEntidad>
 
       <TaskList
         tasks={filteredRootTasks}
@@ -814,7 +781,6 @@ export function TaskBoard() {
         onTaskDragEnd={handleTaskDragEnd}
         onTaskFocus={(id) => {
           setFocusedTaskId(id);
-          setEditingFocusedTitle(false);
         }}
       />
       {selectedList && canEditList && (
@@ -830,7 +796,7 @@ export function TaskBoard() {
         />
       )}
       {assignAccessDialog}
-    </div>
+    </EntidadPagina>
   );
 }
 

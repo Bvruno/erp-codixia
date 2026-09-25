@@ -333,7 +333,7 @@ export default function DashboardLayout({
             <>
               {visibleSections.map((section) => (
                 <div key={section.label}>
-                  <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/50">
+                  <p className="px-2 pb-1 pt-3 text-xs font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/50">
                     {section.label}
                   </p>
                   <div className="space-y-0.5">
@@ -353,7 +353,7 @@ export default function DashboardLayout({
               ))}
               {visibleSettings.length > 0 && (
                 <div>
-                  <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/50">
+                  <p className="px-2 pb-1 pt-3 text-xs font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/50">
                     Sistema
                   </p>
                   <div className="space-y-0.5">
@@ -428,7 +428,7 @@ export default function DashboardLayout({
                   <nav className="flex-1 space-y-2 overflow-y-auto p-3">
                     {visibleSections.map((section) => (
                       <div key={section.label}>
-                        <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/50">
+                        <p className="px-2 pb-1 pt-3 text-xs font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/50">
                           {section.label}
                         </p>
                         <div className="space-y-0.5">

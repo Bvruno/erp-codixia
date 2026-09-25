@@ -1,0 +1,236 @@
+/* ─────────────────────────────────────────────────────────────────────────
+ * design-system/tokens.css — "ERP Codixia"
+ *
+ * Machine-readable form of DESIGN.md. Agents MUST paste the `:root { … }`
+ * block (including the light-mode and accent-theme blocks) verbatim into
+ * the first `<style>` of every artifact generated against this system,
+ * then reference tokens exclusively via `var(--name)`.
+ *
+ * Source of truth: apps/web/src/estilos/globals.css (Tailwind v4 +
+ * shadcn `base-nova`). Values are copied 1:1 — do not "improve" them.
+ *
+ * Schema notes:
+ *   - OD standard names: --bg / --surface / --fg / --muted / --border
+ *     / --accent / --success / --warn / --danger  (craft/color.md).
+ *   - Dark is the default (`:root`). Light is `[data-mode='light']`.
+ *   - Accent themes: [data-accent='violet'|'rose'|'emerald'|'cobalt'|'amber'].
+ *   - `--surface-warm`, `--fg-2`, `--meta`, `--border-soft` are schema
+ *     slots that collapse to their richer siblings (alias via var()).
+ *   - Keep this file additive: never rename keys, only overwrite values.
+ * ─────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ─── Surfaces (dark default) ──────────────────────────────────── */
+  --bg: oklch(0.13 0.01 260);
+  --surface: oklch(0.18 0.01 260);
+  --surface-warm: oklch(0.205 0.01 260);
+  --sidebar-bg: oklch(0.16 0.01 260);
+  --sidebar-border: oklch(0.28 0.01 260);
+
+  /* ─── Foreground ramp ──────────────────────────────────────────── */
+  --fg: oklch(0.985 0 0);
+  --fg-2: var(--fg);
+  --muted: oklch(0.65 0.01 260);
+  --meta: var(--muted);
+
+  /* ─── Borders ──────────────────────────────────────────────────── */
+  --border: oklch(0.28 0.01 260);
+  --border-soft: var(--border);
+
+  /* ─── Accent (violet default) ──────────────────────────────────── */
+  --accent: oklch(0.526 0.247 293);
+  --accent-on: oklch(0.985 0 0);
+  --accent-hover: oklch(0.6 0.22 293);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+  --accent-soft-2: color-mix(in oklab, var(--accent), transparent 78%);
+
+  /* ─── Semantic ─────────────────────────────────────────────────── */
+  --success: oklch(0.62 0.16 162);
+  --warn: oklch(0.745 0.16 65);
+  --danger: oklch(0.577 0.245 27.325);
+
+  /* ─── Typography ───────────────────────────────────────────────── */
+  --font-display: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', Consolas, 'Courier New', monospace;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 48px;
+  --text-4xl: 64px;
+
+  --leading-body: 1.5;
+  --leading-tight: 1.25;
+  --tracking-display: -0.02em;
+  --tracking-eyebrow: 0.1em;
+  --tracking-wordmark: 0.16em;
+
+  /* ─── Spacing (4px base) ───────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-20: 80px;
+
+  --section-y-desktop: 80px;
+  --section-y-tablet: 48px;
+  --section-y-phone: 32px;
+
+  /* ─── Controls ─────────────────────────────────────────────────── */
+  --control-h-sm: 2rem;
+  --control-h: 2.25rem;
+  --control-h-lg: 2.5rem;
+  --tap-target-min: 2.75rem;
+
+  /* ─── Radius (base 10px) ───────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-pill: 9999px;
+
+  /* ─── Elevation (dark) ─────────────────────────────────────────── */
+  --elev-flat: none;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 10px rgb(0 0 0 / 0.22);
+  --elev-raised: 0 2px 4px rgb(0 0 0 / 0.35), 0 12px 28px -6px rgb(0 0 0 / 0.45);
+  --elev-popover: 0 4px 14px -2px rgb(0 0 0 / 0.4), 0 14px 36px -6px rgb(0 0 0 / 0.35);
+
+  /* ─── Focus ring ───────────────────────────────────────────────── */
+  --focus-ring: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 70%);
+
+  /* ─── Motion ───────────────────────────────────────────────────── */
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 350ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ─── Layout ───────────────────────────────────────────────────── */
+  --container-max: 1200px;
+  --container-gutter-desktop: 24px;
+  --container-gutter-tablet: 16px;
+  --container-gutter-phone: 12px;
+  --sidebar-width: 16rem;
+  --sidebar-width-collapsed: 3.5rem;
+  --topbar-height: 4rem;
+}
+
+[data-mode='light'] {
+  --bg: oklch(0.99 0.002 260);
+  --surface: oklch(1 0 0);
+  --surface-warm: oklch(0.985 0.002 260);
+  --sidebar-bg: oklch(0.985 0.002 260);
+  --sidebar-border: oklch(0.922 0.004 260);
+
+  --fg: oklch(0.21 0.01 260);
+  --muted: oklch(0.52 0.015 260);
+
+  --border: oklch(0.922 0.004 260);
+
+  --elev-card: 0 1px 2px rgb(17 17 26 / 0.04), 0 1px 3px rgb(17 17 26 / 0.05);
+  --elev-raised: 0 2px 4px rgb(17 17 26 / 0.06), 0 12px 28px -6px rgb(17 17 26 / 0.12);
+  --elev-popover: 0 4px 14px -2px rgb(17 17 26 / 0.1), 0 14px 36px -6px rgb(17 17 26 / 0.14);
+}
+
+/* ─── Accent themes (both modes) ─────────────────────────────────── */
+[data-accent='violet'] {
+  --accent: oklch(0.526 0.247 293);
+  --accent-on: oklch(0.985 0 0);
+  --accent-hover: oklch(0.6 0.22 293);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+  --accent-soft-2: color-mix(in oklab, var(--accent), transparent 78%);
+}
+
+[data-accent='rose'] {
+  --accent: oklch(0.645 0.22 16);
+  --accent-on: oklch(0.985 0 0);
+  --accent-hover: oklch(0.71 0.2 16);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+  --accent-soft-2: color-mix(in oklab, var(--accent), transparent 78%);
+}
+
+[data-accent='emerald'] {
+  --accent: oklch(0.62 0.16 162);
+  --accent-on: oklch(0.16 0.02 162);
+  --accent-hover: oklch(0.68 0.15 162);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+  --accent-soft-2: color-mix(in oklab, var(--accent), transparent 78%);
+}
+
+[data-accent='cobalt'] {
+  --accent: oklch(0.585 0.2 254);
+  --accent-on: oklch(0.985 0 0);
+  --accent-hover: oklch(0.66 0.18 254);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+  --accent-soft-2: color-mix(in oklab, var(--accent), transparent 78%);
+}
+
+[data-accent='amber'] {
+  --accent: oklch(0.745 0.16 65);
+  --accent-on: oklch(0.18 0.03 65);
+  --accent-hover: oklch(0.8 0.15 65);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --accent-soft: color-mix(in oklab, var(--accent), transparent 88%);
+  --accent-soft-2: color-mix(in oklab, var(--accent), transparent 78%);
+}
+
+/* ─── High contrast (opt-in: .high-contrast on <html>) ────────────── */
+[data-mode='dark'].high-contrast {
+  --muted: oklch(0.82 0.01 260);
+  --border: oklch(0.45 0.01 260);
+  --surface: oklch(0.24 0.01 260);
+  --surface-warm: oklch(0.28 0.01 260);
+}
+
+[data-mode='light'].high-contrast {
+  --muted: oklch(0.34 0.015 260);
+  --border: oklch(0.78 0.004 260);
+  --surface: oklch(1 0 0);
+  --surface-warm: oklch(0.965 0.004 260);
+}
+
+/* ─── App bridge ──────────────────────────────────────────────────────
+ * Equivalences with apps/web tokens. These exist so generated artifacts
+ * can be mapped back to the SPA. Do NOT reference them in OD artifacts —
+ * use the standard names above. */
+:root {
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--surface);
+  --card-2: var(--surface-warm);
+  --card-foreground: var(--fg);
+  --popover: var(--surface);
+  --popover-foreground: var(--fg);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-on);
+  --primary-hover: var(--accent-hover);
+  --primary-soft: var(--accent-soft);
+  --primary-soft-2: var(--accent-soft-2);
+  --secondary: var(--surface-warm);
+  --secondary-foreground: var(--fg);
+  --muted-foreground: var(--muted);
+  --input: var(--border);
+  --ring: var(--accent);
+  --destructive: var(--danger);
+  --sidebar: var(--sidebar-bg);
+  --sidebar-foreground: var(--fg);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-on);
+  --sidebar-border: var(--sidebar-border);
+  --radius: 0.625rem;
+}

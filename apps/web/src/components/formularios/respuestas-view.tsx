@@ -30,7 +30,10 @@ import { resumenRespuestas, isFullUuid, valorLegible } from '@erp/shared';
 import { resolverFormularioActual } from './utils';
 import { MigrarRespuestasDialog } from './migrar-respuestas-dialog';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { AccionEntidad } from '@/components/entidad/accion-entidad';
+import { CabeceraEntidad } from '@/components/entidad/cabecera-entidad';
+import { EntidadPagina } from '@/components/entidad/entidad-pagina';
+import { EstadoEntidad, EsqueletoEntidad } from '@/components/entidad/estado-entidad';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import {
@@ -104,15 +107,15 @@ function TarjetaResumenPregunta({ resumen }: { resumen: ResumenPregunta }) {
       {resumen.tipo === 'numero' && (
         <div className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="text-lg font-semibold">{resumen.promedio ?? '—'}</p>
+            <p className="text-base font-semibold">{resumen.promedio ?? '—'}</p>
             <p className="text-xs text-muted-foreground">Promedio</p>
           </div>
           <div>
-            <p className="text-lg font-semibold">{resumen.minimo ?? '—'}</p>
+            <p className="text-base font-semibold">{resumen.minimo ?? '—'}</p>
             <p className="text-xs text-muted-foreground">Mínimo</p>
           </div>
           <div>
-            <p className="text-lg font-semibold">{resumen.maximo ?? '—'}</p>
+            <p className="text-base font-semibold">{resumen.maximo ?? '—'}</p>
             <p className="text-xs text-muted-foreground">Máximo</p>
           </div>
         </div>
@@ -266,85 +269,88 @@ export function RespuestasView({ formularioId: paramId }: { formularioId: string
   };
 
   if (ctx.loading || loading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-80" />
-      </div>
-    );
+    return <EsqueletoEntidad variante="editor" />;
   }
 
   if (!form) {
     return (
-      <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-10 text-center">
-        <BarChart3 className="size-6 text-muted-foreground" />
-        <p className="font-medium">Formulario no encontrado</p>
-        <Button variant="outline" size="sm" onClick={() => router.push('/proyectos')}>
-          <ArrowLeft className="size-4" />
-          Volver a espacios
-        </Button>
-      </div>
+      <EstadoEntidad
+        icono={BarChart3}
+        titulo="Formulario no encontrado"
+        descripcion="Puede que se haya eliminado o no tengas acceso."
+        accion={{ label: 'Volver a espacios', onClick: () => router.push('/proyectos') }}
+      />
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3">
-        <BarChart3 className="size-5 shrink-0 text-amber-500" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-semibold">{form.name}</p>
-          <p className="text-xs text-muted-foreground">
+    <EntidadPagina>
+      <CabeceraEntidad
+        tipo="formulario"
+        titulo={form.name}
+        subtitulo={
+          <>
             {respuestas.length} respuesta{respuestas.length === 1 ? '' : 's'}
             {nuevas > 0 && (
               <span className="ml-2 rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-600 dark:text-emerald-400">
                 {nuevas} nueva{nuevas === 1 ? '' : 's'}
               </span>
             )}
-          </p>
-        </div>
-        <Button variant="outline" size="sm" onClick={refrescar} disabled={refrescando}>
-          {refrescando ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
-          Actualizar
-        </Button>
-        <Button variant="outline" size="sm" onClick={exportarCsv} disabled={respuestas.length === 0}>
-          <Download className="size-4" />
-          CSV
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setMigrarAbierto(true)}
-          disabled={respuestas.length === 0}
-        >
-          <Table2 className="size-4" />
-          Migrar a documento
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            if (!entidad) {
-              router.push('/proyectos');
-              return;
-            }
-            const ws = ctx.workspaces.find((w) => w.id === entidad.workspace_id);
-            if (!ws) {
-              router.push('/proyectos');
-              return;
-            }
-            const folder = entidad.folder_id
-              ? ctx.folders.find((f) => f.id === entidad.folder_id)
-              : undefined;
-            router.push(
-              `/proyectos/${entitySlug(ws, ctx.workspaces)}/${folder ? entitySlug(folder, ctx.folders) : 'raiz'}/formulario/${entitySlug(entidad, ctx.formularios)}`
-            );
-          }}
-          className="text-muted-foreground"
-        >
-          <ArrowLeft className="size-4" />
-          Volver
-        </Button>
-      </div>
+          </>
+        }
+        acciones={
+          <>
+            <AccionEntidad
+              icono={refrescando ? undefined : RefreshCw}
+              onClick={refrescar}
+              disabled={refrescando}
+              title="Actualizar respuestas"
+            >
+              {refrescando && <Loader2 className="size-3.5 animate-spin" />}
+              Actualizar
+            </AccionEntidad>
+            <AccionEntidad
+              icono={Download}
+              onClick={exportarCsv}
+              disabled={respuestas.length === 0}
+              title="Exportar a CSV"
+            >
+              CSV
+            </AccionEntidad>
+            <AccionEntidad
+              icono={Table2}
+              onClick={() => setMigrarAbierto(true)}
+              disabled={respuestas.length === 0}
+              title="Migrar respuestas a un documento"
+            >
+              Migrar a documento
+            </AccionEntidad>
+            <AccionEntidad
+              icono={ArrowLeft}
+              onClick={() => {
+                if (!entidad) {
+                  router.push('/proyectos');
+                  return;
+                }
+                const ws = ctx.workspaces.find((w) => w.id === entidad.workspace_id);
+                if (!ws) {
+                  router.push('/proyectos');
+                  return;
+                }
+                const folder = entidad.folder_id
+                  ? ctx.folders.find((f) => f.id === entidad.folder_id)
+                  : undefined;
+                router.push(
+                  `/proyectos/${entitySlug(ws, ctx.workspaces)}/${folder ? entitySlug(folder, ctx.folders) : 'raiz'}/formulario/${entitySlug(entidad, ctx.formularios)}`
+                );
+              }}
+              title="Volver al formulario"
+            >
+              Volver
+            </AccionEntidad>
+          </>
+        }
+      />
 
       <Tabs defaultValue="resumen">
         <TabsList>
@@ -433,6 +439,6 @@ export function RespuestasView({ formularioId: paramId }: { formularioId: string
         formulario={form}
         respuestas={respuestas}
       />
-    </div>
+    </EntidadPagina>
   );
 }

@@ -37,6 +37,7 @@
       "@/lib/tema": ["./src/lib/tema.ts"],
       "@/lib/vista-inicial": ["./src/lib/vista-inicial.ts"],
       "@/lib/use-cache-hidratacion": ["./src/lib/use-cache-hidratacion.ts"],
+      "@/lib/entidades-meta": ["./src/lib/entidades-meta.ts"],
       "@/lib/nav-bus": ["./src/lib/nav-bus.ts"],
       "@/lib/captura-errores": ["./src/lib/captura-errores.ts"],
       "@/lib/api/*": ["./src/lib/api/*"],

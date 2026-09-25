@@ -4,7 +4,7 @@ import {
   effectiveLevelOf,
   computeEffectiveLevel,
   effectiveAccessEntries,
-  listDescendants,
+  visibilityOf,
   type AccessTree,
 } from '@/lib/access';
 import type { EntityGrant } from '@/types';
@@ -36,6 +36,7 @@ const tree: AccessTree = {
   ],
   documents: [
     { id: 'd1', organization_id: 'org1', workspace_id: 'ws1', folder_id: 'f1', name: 'Doc 1', visibility: 'restricted', position: 0, created_at: '' },
+    { id: 'd2', organization_id: 'org1', workspace_id: 'ws1', folder_id: 'f1', name: 'Doc privado', visibility: 'private', position: 1, created_at: '' },
   ],
   mindmaps: [
     { id: 'm1', organization_id: 'org1', workspace_id: 'ws1', folder_id: 'f1', name: 'Mapa 1', visibility: 'restricted', content: null, position: 0, created_by: null, created_at: '', updated_at: '' },
@@ -67,9 +68,9 @@ describe('effectiveLevelOf', () => {
     expect(res?.source.id).toBe('l1');
   });
 
-  it('hereda permiso del workspace hacia la lista', () => {
+  it('hereda permiso del workspace hacia la lista, capado a write', () => {
     const res = effectiveLevelOf([grant('workspace', 'ws1', 'manage')], tree, 'list', 'l1');
-    expect(res?.level).toBe('manage');
+    expect(res?.level).toBe('write');
     expect(res?.source.type).toBe('workspace');
   });
 
@@ -112,9 +113,9 @@ describe('mindmap', () => {
     expect(res?.source.id).toBe('m1');
   });
 
-  it('hereda del workspace', () => {
+  it('hereda del workspace, capado a write', () => {
     const res = effectiveLevelOf([grant('workspace', 'ws1', 'manage')], tree, 'mindmap', 'm1');
-    expect(res?.level).toBe('manage');
+    expect(res?.level).toBe('write');
     expect(res?.source.type).toBe('workspace');
   });
 
@@ -149,29 +150,25 @@ describe('effectiveAccessEntries', () => {
   });
 });
 
-describe('listDescendants', () => {
-  it('de workspace devuelve todo el contenido, incluido el de carpetas anidadas', () => {
-    const desc = listDescendants(tree, 'workspace', 'ws1');
-    expect(desc).toContainEqual({ type: 'folder', id: 'f1' });
-    expect(desc).toContainEqual({ type: 'folder', id: 'f2' });
-    expect(desc).toContainEqual({ type: 'list', id: 'l1' });
-    expect(desc).toContainEqual({ type: 'list', id: 'l2' });
-    expect(desc).toContainEqual({ type: 'document', id: 'd1' });
-    expect(desc).toContainEqual({ type: 'mindmap', id: 'm1' });
-    expect(desc).toContainEqual({ type: 'formulario', id: 'fo1' });
+describe('visibilidad y entidades privadas', () => {
+  it('expone la visibilidad por tipo', () => {
+    expect(visibilityOf(tree, 'document', 'd2')).toBe('private');
+    expect(visibilityOf(tree, 'folder', 'f1')).toBe('restricted');
+    expect(visibilityOf(tree, 'document', 'inexistente')).toBeNull();
   });
 
-  it('de folder devuelve subcarpetas, listas y documentos', () => {
-    const desc = listDescendants(tree, 'folder', 'f1');
-    expect(desc).toContainEqual({ type: 'folder', id: 'f2' });
-    expect(desc).toContainEqual({ type: 'document', id: 'd1' });
-    expect(desc).toContainEqual({ type: 'mindmap', id: 'm1' });
-    expect(desc).toContainEqual({ type: 'formulario', id: 'fo1' });
+  it('una entidad privada no hereda grants de ancestros', () => {
+    expect(effectiveLevelOf([grant('workspace', 'ws1', 'manage')], tree, 'document', 'd2')).toBeNull();
+    expect(effectiveLevelOf([grant('folder', 'f1', 'manage')], tree, 'document', 'd2')).toBeNull();
   });
 
-  it('de folder devuelve listas directas', () => {
-    expect(listDescendants(tree, 'folder', 'f2')).toEqual([
-      { type: 'list', id: 'l1' },
-    ]);
+  it('una entidad privada sí recibe su grant directo', () => {
+    const res = effectiveLevelOf([grant('document', 'd2', 'manage')], tree, 'document', 'd2');
+    expect(res?.level).toBe('manage');
+  });
+
+  it('las entidades privadas sin grant directo no aparecen en accesos efectivos', () => {
+    const entries = effectiveAccessEntries([grant('workspace', 'ws1', 'read')], tree);
+    expect(entries.find((e) => e.id === 'd2')).toBeUndefined();
   });
 });

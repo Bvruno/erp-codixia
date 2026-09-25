@@ -13,8 +13,8 @@ export const rutasEstadisticas = new Hono<{
 
 const DIAS_30 = 30 * 86_400_000;
 
-// GET /plataforma/estadisticas — métricas globales de la plataforma.
-rutasEstadisticas.get('/', async (c) => {
+/** Métricas globales; compartido por la vista y el resumen diario. */
+export async function calcularEstadisticas(): Promise<EstadisticasPlataforma> {
   const admin = getAdminClient();
   const hace30 = new Date(Date.now() - DIAS_30).toISOString();
 
@@ -29,7 +29,8 @@ rutasEstadisticas.get('/', async (c) => {
     { count: documentos },
     { data: facturas30 },
   ] = await Promise.all([
-    admin.from('organizations').select('id, status, plan_id, created_at'),    admin.from('owner_applications').select('estado'),
+    admin.from('organizations').select('id, status, plan_id, created_at'),
+    admin.from('owner_applications').select('estado'),
     admin.from('plans').select('id, nombre, precio_mensual'),
     admin.from('org_subscriptions').select('organization_id, plan_id, precio_acordado'),
     admin.from('profiles').select('id', { count: 'exact', head: true }),
@@ -93,7 +94,7 @@ rutasEstadisticas.get('/', async (c) => {
     if (f.estado === 'pagada') cobrado30 += monto;
   }
 
-  const estadisticas: EstadisticasPlataforma = {
+  return {
     empresas: {
       total: organizaciones.length,
       activas: organizaciones.filter((o) => o.status === 'activa').length,
@@ -120,6 +121,10 @@ rutasEstadisticas.get('/', async (c) => {
     },
     mrr_estimado: mrr,
   };
+}
 
+// GET /plataforma/estadisticas — métricas globales de la plataforma.
+rutasEstadisticas.get('/', async (c) => {
+  const estadisticas = await calcularEstadisticas();
   return c.json({ data: estadisticas });
 });

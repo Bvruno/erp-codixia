@@ -1417,7 +1417,7 @@ export function TaskList({
               >
                 {assignee ? (
                   <span
-                    className="inline-flex size-5 items-center justify-center rounded-full text-[10px] font-semibold"
+                    className="inline-flex size-5 items-center justify-center rounded-full text-xs font-semibold"
                     style={{ backgroundColor: av?.bg, color: av?.text }}
                   >
                     {initials}

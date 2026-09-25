@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ERP Codixia inputs</title>
+    <link rel="stylesheet" href="../tokens.css" />
+    <style>
+      body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: var(--text-sm); }
+      main { max-width: 860px; margin: 0 auto; padding: var(--space-12) var(--space-6); display: grid; gap: var(--space-8); }
+      h1 { margin: 0; font-family: var(--font-display); font-size: var(--text-2xl); line-height: var(--leading-tight); letter-spacing: var(--tracking-display); }
+      h2 { margin: 0 0 var(--space-3); font-size: var(--text-lg); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6); }
+      .field { display: grid; gap: var(--space-2); }
+      .field label { font-weight: 500; }
+      .field input, .field textarea { width: 100%; padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md); background: color-mix(in oklab, var(--surface), transparent 30%); color: var(--fg); font: inherit; }
+      .field input { height: var(--control-h); }
+      .field textarea { min-height: 96px; padding: var(--space-2) var(--space-3); resize: vertical; }
+      .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+      .field input:focus-visible, .field textarea:focus-visible { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring); }
+      .field-help { font-size: var(--text-xs); color: var(--muted); }
+      .field-invalid input { border-color: var(--danger); }
+      .field-invalid .field-help { color: var(--danger); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Campos</h1>
+      </header>
+
+      <section>
+        <h2>Estados</h2>
+        <div class="grid">
+          <div class="field">
+            <label for="ok">Nombre de la tarea</label>
+            <input id="ok" type="text" placeholder="Revisar facturación mensual" />
+            <span class="field-help">Visible para todos los miembros.</span>
+          </div>
+          <div class="field field-invalid">
+            <label for="bad">Correo</label>
+            <input id="bad" type="email" value="bruno@codixia" aria-invalid="true" />
+            <span class="field-help">Formato inválido.</span>
+          </div>
+          <div class="field">
+            <label for="notes">Notas</label>
+            <textarea id="notes" placeholder="Detalle opcional…"></textarea>
+          </div>
+          <div class="field">
+            <label for="ro">Solo lectura</label>
+            <input id="ro" type="text" value="Empresa: Codixia S.L." readonly disabled />
+            <span class="field-help">Deshabilitado al 50% de opacidad.</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

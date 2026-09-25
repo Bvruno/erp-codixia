@@ -19,8 +19,10 @@ export * from './logica/mindmap-templates';
 export * from './logica/mindmap';
 export * from './logica/mindmap-layout';
 export * from './logica/shift-utils';
+export * from './logica/documento';
 export * from './logica/formato-hora';
 export * from './logica/invites';
 export * from './logica/logger';
 export * from './logica/plataforma';
+export * from './logica/telegram-plataforma';
 

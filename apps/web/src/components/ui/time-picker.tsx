@@ -69,7 +69,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
       <PopoverContent className="w-auto p-2" align="start">
         <div className="flex gap-2">
           <div className="h-48 overflow-y-auto pr-1">
-            <div className="text-muted-foreground text-[11px] font-medium uppercase mb-1 px-2">
+            <div className="text-muted-foreground text-xs font-medium uppercase mb-1 px-2">
               Hora
             </div>
             <div className="flex flex-col gap-0.5">
@@ -90,7 +90,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
             </div>
           </div>
           <div className="h-48 overflow-y-auto pr-1">
-            <div className="text-muted-foreground text-[11px] font-medium uppercase mb-1 px-2">
+            <div className="text-muted-foreground text-xs font-medium uppercase mb-1 px-2">
               Min
             </div>
             <div className="flex flex-col gap-0.5">
@@ -111,7 +111,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
           </div>
           {!es24h && (
             <div className="flex flex-col gap-0.5">
-              <div className="text-muted-foreground text-[11px] font-medium uppercase mb-1 px-2">
+              <div className="text-muted-foreground text-xs font-medium uppercase mb-1 px-2">
                 Período
               </div>
               {(['AM', 'PM'] as const).map((period) => (

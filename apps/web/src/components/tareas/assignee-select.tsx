@@ -199,7 +199,7 @@ export function AssigneeSelect({
             {value === '' && <Check className="size-4" />}
           </button>
 
-          <p className="px-2 pt-2 pb-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+          <p className="px-2 pt-2 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
             Personas
           </p>
 
@@ -239,7 +239,7 @@ export function AssigneeSelect({
                   style={{ backgroundColor: av.bg, borderColor: av.border }}
                 >
                   <AvatarFallback
-                    className="text-[10px] font-semibold"
+                    className="text-xs font-semibold"
                     style={{ color: av.text, backgroundColor: 'transparent' }}
                   >
                     {getInitials(c.full_name)}
@@ -247,7 +247,7 @@ export function AssigneeSelect({
                 </Avatar>
                 <span className="flex-1 truncate text-left">{c.full_name}</span>
                 {blocked ? (
-                  <span className="text-red-400 text-[10px]">Sin horario</span>
+                  <span className="text-red-400 text-xs">Sin horario</span>
                 ) : (
                   isSelected && <Check className="size-4" />
                 )}

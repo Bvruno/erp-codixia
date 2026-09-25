@@ -60,7 +60,7 @@ import type {
 } from '@/types';
 import Link from 'next/link';
 import { statusLabel, priorityLabel } from '@/lib/task-config';
-import { PageHeader } from '@/components/layout/page-header';
+import { CabeceraEntidad } from '@/components/entidad/cabecera-entidad';
 import {
   contarFiltrosPipeline,
   filtrarTareasPipeline,
@@ -696,7 +696,7 @@ export default function PipelinePage() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <PageHeader title="Pipeline" />
+        <CabeceraEntidad titulo="Pipeline" />
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
             <Search className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
@@ -727,7 +727,7 @@ export default function PipelinePage() {
                 <ListFilter className="size-3.5" />
                 Filtros
                 {activeFilterCount > 0 && (
-                  <span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  <span className="flex size-4 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                     {activeFilterCount}
                   </span>
                 )}
@@ -736,7 +736,7 @@ export default function PipelinePage() {
             <PopoverContent className="w-64 p-2" align="end">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Espacio de trabajo
                   </span>
                   {workspaces.length > 1 ? (
@@ -760,7 +760,7 @@ export default function PipelinePage() {
                 </div>
                 {canVerAsignado && (
                   <div className="flex flex-col gap-1.5">
-                    <span className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Asignado a
                     </span>
                     <Select
@@ -782,7 +782,7 @@ export default function PipelinePage() {
                   </div>
                 )}
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Prioridad
                   </span>
                   <Select
@@ -803,7 +803,7 @@ export default function PipelinePage() {
                   </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Fecha límite
                   </span>
                   <Select
@@ -822,7 +822,7 @@ export default function PipelinePage() {
                   </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Tipo
                   </span>
                   <Select
@@ -840,7 +840,7 @@ export default function PipelinePage() {
                   </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Estado
                   </span>
                   <Select value={filtros.estado} onValueChange={(v) => setFiltro('estado', v)}>
@@ -904,7 +904,7 @@ export default function PipelinePage() {
             <div className="flex h-16 items-end gap-1.5">
               {[...weeklyDone].reverse().map((count, i) => (
                 <div key={i} className="flex flex-1 flex-col items-center gap-0.5">
-                  <span className="text-[10px] tabular-nums text-muted-foreground">{count}</span>
+                  <span className="text-xs tabular-nums text-muted-foreground">{count}</span>
                   <div
                     className="w-full rounded-sm bg-emerald-500/80"
                     style={{ height: `${Math.max(3, (count / weeklyMax) * 48)}px` }}
@@ -912,7 +912,7 @@ export default function PipelinePage() {
                 </div>
               ))}
             </div>
-            <div className="mt-0.5 flex justify-between text-[10px] text-muted-foreground">
+            <div className="mt-0.5 flex justify-between text-xs text-muted-foreground">
               {weeklyLabels.map((l, i) => (
                 <span key={i}>{l}</span>
               ))}
@@ -1116,12 +1116,12 @@ export default function PipelinePage() {
                                   subCount > 0) && (
                                   <div className="flex flex-wrap items-center gap-2">
                                     {task.parent_task_id && (
-                                      <Badge variant="outline" className="text-[10px] py-0">
+                                      <Badge variant="outline" className="text-xs py-0">
                                         Subtarea
                                       </Badge>
                                     )}
                                     {lista && (
-                                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                         <Layers className="size-3" />
                                         {lista.name}
                                       </span>
@@ -1158,7 +1158,7 @@ export default function PipelinePage() {
                                   {task.assigned_profile ? (
                                     <div className="flex items-center gap-1.5">
                                       <Avatar className="size-5">
-                                        <AvatarFallback className="text-[8px]">
+                                        <AvatarFallback className="text-xs">
                                           {task.assigned_profile.full_name
                                             ?.split(' ')
                                             .map((n) => n[0])
@@ -1177,7 +1177,7 @@ export default function PipelinePage() {
                                     </span>
                                   )}
                                   <Badge
-                                    className="text-[10px] py-0"
+                                    className="text-xs py-0"
                                     style={
                                       prioridad
                                         ? {

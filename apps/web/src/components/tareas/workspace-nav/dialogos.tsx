@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { cn } from '@/lib/utils';
+import { ENTIDADES_META } from '@/lib/entidades-meta';
 import { MIND_MAP_TEMPLATES } from '@/lib/mindmap-templates';
 import type { Workspace, Profile } from '@/types';
 import type { DeleteTarget, DialogState, EntityType, MoveTarget, CloneTarget } from './tipos';
@@ -29,12 +30,12 @@ import { VisibilityFields } from './visibilidad';
 // eliminación.
 
 const MOVE_LABELS: Record<'folder' | 'list' | 'document' | 'mindmap' | 'todo' | 'formulario', string> = {
-  folder: 'carpeta',
-  list: 'lista',
-  document: 'documento',
-  mindmap: 'mapa mental',
-  todo: 'TO-DO',
-  formulario: 'formulario',
+  folder: ENTIDADES_META.folder.etiqueta,
+  list: ENTIDADES_META.list.etiqueta,
+  document: ENTIDADES_META.document.etiqueta,
+  mindmap: ENTIDADES_META.mindmap.etiqueta,
+  todo: ENTIDADES_META.todo.etiqueta,
+  formulario: ENTIDADES_META.formulario.etiqueta,
 };
 
 export function DialogosNav({

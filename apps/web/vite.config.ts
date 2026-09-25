@@ -43,6 +43,9 @@ export default defineConfig({
       '@/lib/use-cache-hidratacion': fileURLToPath(
         new URL('./src/lib/use-cache-hidratacion.ts', import.meta.url)
       ),
+      '@/lib/entidades-meta': fileURLToPath(
+        new URL('./src/lib/entidades-meta.ts', import.meta.url)
+      ),
       '@/lib/nav-bus': fileURLToPath(new URL('./src/lib/nav-bus.ts', import.meta.url)),
       '@/lib/captura-errores': fileURLToPath(
         new URL('./src/lib/captura-errores.ts', import.meta.url)

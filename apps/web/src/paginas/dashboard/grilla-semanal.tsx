@@ -86,7 +86,7 @@ export function GrillaSemanal({
                       {h > 0 ? `${h}h` : "—"}
                       <div
                         className={cn(
-                          "text-[10px] font-normal",
+                          "text-xs font-normal",
                           planned > 0
                             ? "text-muted-foreground"
                             : "text-red-400",

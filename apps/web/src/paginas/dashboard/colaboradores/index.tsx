@@ -46,7 +46,7 @@ import {
 } from '@/components/colaboradores/entity-scope-picker';
 import { PermissionPicker } from '@/components/colaboradores/permission-picker';
 import { MemberDetailCard, type GrantSummary, type OrgLimits } from '@/components/colaboradores/member-detail-card';
-import { PageHeader } from '@/components/layout/page-header';
+import { CabeceraEntidad } from '@/components/entidad/cabecera-entidad';
 import type {
   Profile,
   Invitation,
@@ -68,7 +68,6 @@ import {
   entityName,
   grantPath,
   effectiveStatus,
-  PERMISSION_LABELS,
   SCOPE_LABELS,
   type ArbolColaboradores,
 } from './presentacion';
@@ -342,13 +341,13 @@ const router = useRouter();
     resetInvitar,
   });
 
-  const grants = useGrantsColaboradores({ tree, setBusy });
+  const grants = useGrantsColaboradores();
 
   if (loading) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <PageHeader title="Colaboradores" />
+          <CabeceraEntidad titulo="Colaboradores" />
         </div>
         <TableSkeleton rows={5} cols={4} />
       </div>
@@ -406,7 +405,7 @@ const router = useRouter();
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageHeader title="Colaboradores" />
+        <CabeceraEntidad titulo="Colaboradores" />
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
             <Search className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
@@ -653,20 +652,6 @@ const router = useRouter();
       />
 
       <DialogoAccesos tree={tree} grants={grants} />
-
-      <ConfirmDialog
-        open={!!grants.propagateTarget}
-        onOpenChange={(open) => !open && grants.setPropagateTarget(null)}
-        title="¿Propagar acceso al contenido?"
-        description={
-          grants.propagateTarget
-            ? `Se creará acceso "${PERMISSION_LABELS[grants.propagateTarget.permission]}" en todo el contenido interno de "${entityName(tree, grants.propagateTarget.entity_type, grants.propagateTarget.entity_id)}" (subcarpetas, listas y documentos). Los accesos existentes en ese contenido se sobrescribirán.`
-            : ''
-        }
-        confirmLabel="Propagar"
-        loading={busy === 'propagate'}
-        onConfirm={grants.propagateGrant}
-      />
 
       <ConfirmDialog
         open={!!confirm}

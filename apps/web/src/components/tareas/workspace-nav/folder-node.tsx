@@ -4,22 +4,18 @@ import {
   Folder,
   ChevronDown,
   FolderPlus,
-  ListPlus,
-  FilePlus,
-  Network,
-  ListChecks,
-  ClipboardList,
   Pencil,
   Move,
   Trash2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ENTIDADES_META } from '@/lib/entidades-meta';
 import type { WorkspaceFolder, TaskList, TaskDocument, MindMap, Todo, Formulario } from '@/types';
 import type { ReorderKind, RowActionItem, SharedProps } from './tipos';
 import { DRAG_PLACEHOLDER, DROP_TARGET, GripButton, ListRow, DocRow, MindMapRow, TodoRow, FormularioRow, RowActions } from './filas';
 import { VisibilityIcon } from './visibilidad';
 
-// Nodo recursivo de carpeta dentro del árbol de navegación.
+// Nodo recursivo de carpeta dentro del árbol de navegacií³n.
 
 export function FolderNode({
   folder,
@@ -134,35 +130,35 @@ export function FolderNode({
               },
               {
                 key: 'document',
-                icon: <FilePlus className="size-4" />,
+                icon: <ENTIDADES_META.document.icono className="size-4" />,
                 label: 'Nuevo documento',
                 description: 'Crear un documento dentro de esta carpeta',
                 onClick: () => shared.onOpenCreate({ type: 'document', folderId: folder.id }),
               },
               {
                 key: 'mindmap',
-                icon: <Network className="size-4" />,
+                icon: <ENTIDADES_META.mindmap.icono className="size-4" />,
                 label: 'Nuevo mapa mental',
                 description: 'Crear un mapa mental dentro de esta carpeta',
                 onClick: () => shared.onOpenCreate({ type: 'mindmap', folderId: folder.id }),
               },
               {
                 key: 'list',
-                icon: <ListPlus className="size-4" />,
+                icon: <ENTIDADES_META.list.icono className="size-4" />,
                 label: 'Nueva lista',
                 description: 'Crear una lista de tareas dentro de esta carpeta',
                 onClick: () => shared.onOpenCreate({ type: 'list', folderId: folder.id }),
               },
               {
                 key: 'todo',
-                icon: <ListChecks className="size-4" />,
+                icon: <ENTIDADES_META.todo.icono className="size-4" />,
                 label: 'Nuevo TO-DO',
                 description: 'Crear un TO-DO repetitivo dentro de esta carpeta',
                 onClick: () => shared.onOpenCreate({ type: 'todo', folderId: folder.id }),
               },
               {
                 key: 'formulario',
-                icon: <ClipboardList className="size-4" />,
+                icon: <ENTIDADES_META.formulario.icono className="size-4" />,
                 label: 'Nuevo formulario',
                 description: 'Crear un formulario para clientes dentro de esta carpeta',
                 onClick: () => shared.onOpenCreate({ type: 'formulario', folderId: folder.id }),

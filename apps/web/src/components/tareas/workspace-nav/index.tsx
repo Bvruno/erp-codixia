@@ -13,15 +13,11 @@ import {
   Trash2,
   PanelLeftOpen,
   PanelLeftClose,
-  ListTodo,
-  BookOpen,
-  Network,
-  ListChecks,
-  ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { navBus } from '@/lib/nav-bus';
 import { slugify } from '@/lib/slugs';
+import { ENTIDADES_META } from '@/lib/entidades-meta';
 import { usePathname } from 'next/navigation';
 import type { Workspace, WorkspaceFolder, TaskList, TaskDocument, MindMap, Profile, EntityPermission, Todo, Formulario } from '@/types';
 import type {
@@ -133,7 +129,7 @@ export function WorkspaceNav({
   } = useArrastreNav({ canManage, folders, onReorderTo, onMoveEntity });
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Lectura SSR-safe de localStorage post-mount; patrón canónico (ver theme-toggle.tsx).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Lectura SSR-safe de localStorage post-mount; patrí³n caní³nico (ver theme-toggle.tsx).
     setMobileOpen(window.localStorage.getItem('tareas-nav-collapsed') !== '1');
 
     setMobileMounted(true);
@@ -251,7 +247,7 @@ export function WorkspaceNav({
       const wsFormularios = formularios.filter((f) => f.workspace_id === id);
       const tasks = wsLists.reduce((sum, l) => sum + (counts[l.id] || 0), 0);
       const respuestas = wsFormularios.reduce((sum, f) => sum + (counts[f.id] || 0), 0);
-      return 'Se eliminará el espacio con ' + allFolders + ' carpeta(s), ' + wsLists.length + ' lista(s), ' + wsDocs.length + ' documento(s), ' + wsMaps.length + ' mapa(s), ' + wsTodos.length + ' TO-DO(s) y ' + wsFormularios.length + ' formulario(s) con ' + respuestas + ' respuesta(s). Las ' + tasks + ' tarea(s) también se eliminarán. Esta acción no se puede deshacer.';
+      return 'Se eliminará el espacio con ' + allFolders + ' carpeta(s), ' + wsLists.length + ' lista(s), ' + wsDocs.length + ' documento(s), ' + wsMaps.length + ' mapa(s), ' + wsTodos.length + ' TO-DO(s) y ' + wsFormularios.length + ' formulario(s) con ' + respuestas + ' respuesta(s). Las ' + tasks + ' tarea(s) también se eliminarán. Esta accií³n no se puede deshacer.';
     }
     if (type === 'folder') {
       const sub = countAllFolders(id);
@@ -262,22 +258,22 @@ export function WorkspaceNav({
       const fFormularios = formularios.filter((f) => f.folder_id === id);
       const tasks = fLists.reduce((sum, l) => sum + (counts[l.id] || 0), 0);
       const respuestas = fFormularios.reduce((sum, f) => sum + (counts[f.id] || 0), 0);
-      return 'Se eliminará la carpeta con ' + sub + ' sub-carpeta(s), ' + fLists.length + ' lista(s), ' + fDocs.length + ' documento(s), ' + fMaps.length + ' mapa(s), ' + fTodos.length + ' TO-DO(s) y ' + fFormularios.length + ' formulario(s) con ' + respuestas + ' respuesta(s). Las ' + tasks + ' tarea(s) también se eliminarán. Esta acción no se puede deshacer.';
+      return 'Se eliminará la carpeta con ' + sub + ' sub-carpeta(s), ' + fLists.length + ' lista(s), ' + fDocs.length + ' documento(s), ' + fMaps.length + ' mapa(s), ' + fTodos.length + ' TO-DO(s) y ' + fFormularios.length + ' formulario(s) con ' + respuestas + ' respuesta(s). Las ' + tasks + ' tarea(s) también se eliminarán. Esta accií³n no se puede deshacer.';
     }
     if (type === 'list') {
       const tasks = counts[id] || 0;
-      return 'La lista y sus ' + tasks + ' tarea(s) se borrarán. Esta acción no se puede deshacer.';
+      return 'La lista y sus ' + tasks + ' tarea(s) se borrarán. Esta accií³n no se puede deshacer.';
     }
     if (type === 'mindmap') {
-      return 'Se eliminará el mapa mental con todos sus nodos y conexiones. Esta acción no se puede deshacer.';
+      return 'Se eliminará el mapa mental con todos sus nodos y conexiones. Esta accií³n no se puede deshacer.';
     }
     if (type === 'todo') {
-      return 'Se eliminará el TO-DO con todos sus items repetitivos y el progreso de cada trabajador. Esta acción no se puede deshacer.';
+      return 'Se eliminará el TO-DO con todos sus items repetitivos y el progreso de cada trabajador. Esta accií³n no se puede deshacer.';
     }
     if (type === 'formulario') {
-      return 'Se eliminará el formulario con todas sus respuestas, listas de acceso e invitados. Esta acción no se puede deshacer.';
+      return 'Se eliminará el formulario con todas sus respuestas, listas de acceso e invitados. Esta accií³n no se puede deshacer.';
     }
-    return 'Se eliminará el documento con todas sus páginas. Esta acción no se puede deshacer.';
+    return 'Se eliminará el documento con todas sus páginas. Esta accií³n no se puede deshacer.';
   };
 
   const confirmDelete = (type: EntityType, id: string, name: string) => {
@@ -443,15 +439,13 @@ export function WorkspaceNav({
     )?.id;
   })();
 
-  const dialogMeta: Record<DialogState['type'], { title: string; icon: React.ReactNode; placeholder: string }> = {
-    workspace: { title: 'Nuevo espacio de trabajo', icon: <LayoutGrid className="size-4" />, placeholder: 'Nombre del espacio' },
-    folder: { title: 'Nueva carpeta de trabajo', icon: <Folder className="size-4" />, placeholder: 'Nombre de la carpeta' },
-    list: { title: 'Nueva lista', icon: <ListTodo className="size-4" />, placeholder: 'Nombre de la lista' },
-    document: { title: 'Nuevo documento', icon: <BookOpen className="size-4" />, placeholder: 'Nombre del documento' },
-    mindmap: { title: 'Nuevo mapa mental', icon: <Network className="size-4" />, placeholder: 'Nombre del mapa' },
-    todo: { title: 'Nuevo TO-DO', icon: <ListChecks className="size-4" />, placeholder: 'Nombre del TO-DO' },
-    formulario: { title: 'Nuevo formulario', icon: <ClipboardList className="size-4" />, placeholder: 'Nombre del formulario' },
-  };
+  const dialogMeta: Record<DialogState['type'], { title: string; icon: React.ReactNode; placeholder: string }> = Object.fromEntries(
+    (Object.keys(ENTIDADES_META) as (keyof typeof ENTIDADES_META)[]).map((tipo) => {
+      const meta = ENTIDADES_META[tipo];
+      const Icono = meta.icono;
+      return [tipo, { title: meta.etiquetaCrear, icon: <Icono className="size-4" />, placeholder: meta.placeholder }];
+    })
+  ) as Record<DialogState['type'], { title: string; icon: React.ReactNode; placeholder: string }>;
 
   const shared: SharedProps = {
     workspaces,
@@ -522,7 +516,7 @@ export function WorkspaceNav({
             : 'lg:flex lg:h-full lg:w-14 lg:shrink-0'
         )}
       >
-        {/* Cabecera expandida (móvil + desktop expandido) */}
+        {/* Cabecera expandida (mí³vil + desktop expandido) */}
         <div
           className={cn(
             'flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border px-3',
@@ -549,8 +543,8 @@ export function WorkspaceNav({
             <button
               onClick={closeNav}
               className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent/50 hover:text-foreground"
-              aria-label="Ocultar navegación"
-              title="Ocultar navegación"
+              aria-label="Ocultar navegacií³n"
+              title="Ocultar navegacií³n"
             >
               <PanelLeftClose className="size-4" />
             </button>
@@ -563,15 +557,15 @@ export function WorkspaceNav({
             <button
               onClick={() => setNavOpen(true)}
               className="flex size-8 items-center justify-center rounded-lg text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-              aria-label="Expandir navegación"
-              title="Expandir navegación"
+              aria-label="Expandir navegacií³n"
+              title="Expandir navegacií³n"
             >
               <PanelLeftOpen className="size-4" />
             </button>
           </div>
         )}
 
-        {/* Árbol completo (móvil drawer + desktop expandido) */}
+        {/* írbol completo (mí³vil drawer + desktop expandido) */}
         <div className={cn('flex-1 overflow-y-auto px-2 pb-3', !navOpen && 'lg:hidden')}>
         {wsSorted.length === 0 ? (
           <div className="flex flex-col items-center gap-2 px-2 py-10 text-center">
@@ -661,44 +655,44 @@ export function WorkspaceNav({
                       create={[
                         {
                           key: 'list',
-                          icon: <ListTodo className="size-4" />,
+                          icon: <ENTIDADES_META.list.icono className="size-4" />,
                           label: 'Nueva lista',
-                          description: 'Crear una lista de tareas en la raíz',
+                          description: 'Crear una lista de tareas en la raí­z',
                           onClick: () => openDialog({ type: 'list', workspaceId: ws.id }),
                         },
                         {
                           key: 'document',
-                          icon: <BookOpen className="size-4" />,
+                          icon: <ENTIDADES_META.document.icono className="size-4" />,
                           label: 'Nuevo documento',
-                          description: 'Crear un documento en la raíz',
+                          description: 'Crear un documento en la raí­z',
                           onClick: () => openDialog({ type: 'document', workspaceId: ws.id }),
                         },
                         {
                           key: 'mindmap',
-                          icon: <Network className="size-4" />,
+                          icon: <ENTIDADES_META.mindmap.icono className="size-4" />,
                           label: 'Nuevo mapa mental',
-                          description: 'Crear un mapa mental en la raíz',
+                          description: 'Crear un mapa mental en la raí­z',
                           onClick: () => openDialog({ type: 'mindmap', workspaceId: ws.id }),
                         },
                         {
                           key: 'todo',
-                          icon: <ListChecks className="size-4" />,
+                          icon: <ENTIDADES_META.todo.icono className="size-4" />,
                           label: 'Nuevo TO-DO',
-                          description: 'Crear un TO-DO repetitivo en la raíz',
+                          description: 'Crear un TO-DO repetitivo en la raí­z',
                           onClick: () => openDialog({ type: 'todo', workspaceId: ws.id }),
                         },
                         {
                           key: 'formulario',
-                          icon: <ClipboardList className="size-4" />,
+                          icon: <ENTIDADES_META.formulario.icono className="size-4" />,
                           label: 'Nuevo formulario',
-                          description: 'Crear un formulario para clientes en la raíz',
+                          description: 'Crear un formulario para clientes en la raí­z',
                           onClick: () => openDialog({ type: 'formulario', workspaceId: ws.id }),
                         },
                         {
                           key: 'folder',
                           icon: <FolderPlus className="size-4" />,
                           label: 'Nueva carpeta',
-                          description: 'Crear una carpeta en la raíz',
+                          description: 'Crear una carpeta en la raí­z',
                           onClick: () => openDialog({ type: 'folder', workspaceId: ws.id }),
                         },
                       ]}
@@ -813,7 +807,7 @@ export function WorkspaceNav({
       />
       </aside>
 
-    {/* Backdrop (móvil) */}
+    {/* Backdrop (mí³vil) */}
       <div
         onClick={() => navBus.closeDrawer()}
         aria-hidden={!drawerOpen}
@@ -839,22 +833,11 @@ export function WorkspaceNav({
                       : dragGhost.type === 'todo'
                         ? todos.find((t) => t.id === dragGhost.id)
                         : formularios.find((f) => f.id === dragGhost.id);
-          const ghostIcon =
-            dragGhost.type === 'workspace' ? (
-              <Folder className="size-4 shrink-0 text-blue-500" />
-            ) : dragGhost.type === 'folder' ? (
-              <Folder className="size-4 shrink-0 text-yellow-500" />
-            ) : dragGhost.type === 'list' ? (
-              <ListTodo className="size-4 shrink-0 text-muted-foreground" />
-            ) : dragGhost.type === 'document' ? (
-              <BookOpen className="size-4 shrink-0 text-indigo-500" />
-            ) : dragGhost.type === 'mindmap' ? (
-              <Network className="size-4 shrink-0 text-emerald-500" />
-            ) : dragGhost.type === 'todo' ? (
-              <ListChecks className="size-4 shrink-0 text-rose-500" />
-            ) : (
-              <ClipboardList className="size-4 shrink-0 text-amber-500" />
-            );
+          const ghostIcon = (() => {
+            const meta = ENTIDADES_META[dragGhost.type];
+            const Icono = meta.icono;
+            return <Icono className={cn('size-4 shrink-0', meta.color)} />;
+          })();
           return (
             <div
               ref={ghostElRef}

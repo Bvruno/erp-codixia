@@ -100,6 +100,9 @@ Sin tokens ni emails en los logs (se redactan). Se apaga con `LOG_SUPABASE=0`.
 | `npm run test` | todos los tests (shared + api + web) |
 | `npm run test:shared` / `test:api` / `test:web` | tests por paquete |
 | `npm run e2e -w @erp/web` | e2e Playwright (levanta api + web solos) |
+| `npm run db:start` / `db:stop` | stack Supabase local en Docker (puertos 5442x) |
+| `npm run db:reset` | recrea la BD local y re-aplica el historial de migraciones |
+| `npm run test:rls` | matriz de permisos RLS contra el Postgres local |
 | `npm run lint` | ESLint (apps + packages) |
 | `npm run typecheck` | tsc en los tres paquetes |
 | `npm run build -w @erp/web` | build de producción del SPA |
@@ -109,10 +112,20 @@ Sin tokens ni emails en los logs (se redactan). Se apaga con `LOG_SUPABASE=0`.
 
 ## Base de datos
 
+- **Local**: `npm run db:start` levanta Supabase en Docker (Studio 54423,
+  Mailpit 54424, API 54421, DB 54422; configuración en `supabase/config.toml`).
+  `npm run db:reset` recrea la BD y aplica `supabase/migrations/` — espejo
+  exacto del historial remoto (deltas squash + versiones individuales).
+  Credenciales demo tras `npm run seed`: `owner.demo@demo.com` / `demo123456`.
+  Las migraciones históricas 0001→0081 quedan en `supabase/migrations-legacy/`
+  como referencia (en producción se aplicaron squash; no son re-aplicables).
 - **BD nueva** → `supabase/schema.sql` completo (SQL Editor). Es el estado canónico consolidado.
-- **BD existente** → migraciones delta por orden en `supabase/migrations/` (0001→0058+).
-- El modelo de permisos vive en RLS: `entity_permission()` (CTE recursivo por ancestros),
-  grants `read/write/manage` + herencia capada, helpers `SECURITY DEFINER` con `search_path` fijo.
+- **BD existente** → migración delta nueva en `supabase/migrations/` (nunca renumerar las aplicadas).
+- El modelo de permisos vive en RLS sobre `entities` + `entity_visibility`
+  (herencia capada a write, `private` corta la herencia, admin aislado por org).
+  Detalle y guía para tipos nuevos: `docs/PERMISOS.md`; diagramas y flujos:
+  `docs/PERMISOS-FLUJOS.md`.
+  Tests: `npm run test:rls` (Supabase local) con `supabase/tests/permisos_matriz.sql`.
 
 ## Seguridad (notas)
 

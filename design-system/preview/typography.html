@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ERP Codixia typography</title>
+    <link rel="stylesheet" href="../tokens.css" />
+    <style>
+      body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+      main { max-width: 860px; margin: 0 auto; padding: var(--space-12) var(--space-6); display: grid; gap: var(--space-8); }
+      h1 { margin: 0; font-family: var(--font-display); font-size: var(--text-2xl); line-height: var(--leading-tight); letter-spacing: var(--tracking-display); }
+      p { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+      .eyebrow { font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--muted); }
+      .row { display: grid; grid-template-columns: 120px 1fr; gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-bottom: 1px solid var(--border); }
+      .tag { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); }
+      .wordmark { font-weight: 700; letter-spacing: var(--tracking-wordmark); text-transform: uppercase; font-size: var(--text-xs); color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="eyebrow">Tipografía</span>
+        <h1>Escala y roles</h1>
+        <p>System UI para display y body; mono para datos y atajos.</p>
+      </header>
+
+      <section>
+        <div class="row"><span class="tag">--text-3xl · 48</span><span style="font-size: var(--text-3xl); font-family: var(--font-display); letter-spacing: var(--tracking-display); line-height: var(--leading-tight); font-weight: 600">Panel de empresa</span></div>
+        <div class="row"><span class="tag">--text-2xl · 32</span><span style="font-size: var(--text-2xl); font-family: var(--font-display); letter-spacing: var(--tracking-display); line-height: var(--leading-tight); font-weight: 600">Título de página</span></div>
+        <div class="row"><span class="tag">--text-xl · 24</span><span style="font-size: var(--text-xl); font-family: var(--font-display); line-height: var(--leading-tight); font-weight: 600">Sección</span></div>
+        <div class="row"><span class="tag">--text-lg · 20</span><span style="font-size: var(--text-lg); line-height: var(--leading-tight); font-weight: 600">Subtítulo</span></div>
+        <div class="row"><span class="tag">--text-base · 16</span><span style="font-size: var(--text-base)">Párrafo base de la aplicación.</span></div>
+        <div class="row"><span class="tag">--text-sm · 14</span><span style="font-size: var(--text-sm)">Texto de UI, tablas y formularios.</span></div>
+        <div class="row"><span class="tag">--text-xs · 12</span><span style="font-size: var(--text-xs)">Metadatos, ayuda, badges.</span></div>
+        <div class="row"><span class="tag">--font-mono</span><span class="num" style="font-family: var(--font-mono); font-variant-numeric: tabular-nums">128.450,00 · Ctrl + K</span></div>
+        <div class="row"><span class="tag">eyebrow</span><span class="eyebrow">Trabajo pendiente</span></div>
+        <div class="row"><span class="tag">tagline</span><span class="wordmark">Plataforma</span></div>
+      </section>
+
+      <section>
+        <span class="eyebrow">Párrafo</span>
+        <p style="color: var(--fg); max-width: 62ch; margin-top: var(--space-3)">
+          Codixia organiza tareas, documentos y mapas por empresa. Cada vista prioriza el dato:
+          títulos en sentence case, texto secundario en muted y un único acento para la acción
+          principal. Línea de 1.5 y ancho de lectura de 60–70 caracteres.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

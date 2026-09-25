@@ -7,6 +7,7 @@ import type {
   Todo,
   TaskDocument,
   TaskList,
+  Visibility,
   Workspace,
   WorkspaceFolder,
 } from '@/types';
@@ -34,6 +35,30 @@ export type LevelSource = {
   level: EntityPermission;
 };
 
+/** Visibilidad de una entidad del árbol (null si no está en el árbol). */
+export function visibilityOf(
+  tree: AccessTree,
+  type: EntityType,
+  id: string
+): Visibility | null {
+  switch (type) {
+    case 'workspace':
+      return tree.workspaces.find((w) => w.id === id)?.visibility ?? null;
+    case 'folder':
+      return tree.folders.find((f) => f.id === id)?.visibility ?? null;
+    case 'list':
+      return tree.lists.find((l) => l.id === id)?.visibility ?? null;
+    case 'document':
+      return tree.documents.find((d) => d.id === id)?.visibility ?? null;
+    case 'mindmap':
+      return tree.mindmaps.find((m) => m.id === id)?.visibility ?? null;
+    case 'todo':
+      return tree.todos.find((t) => t.id === id)?.visibility ?? null;
+    case 'formulario':
+      return tree.formularios.find((f) => f.id === id)?.visibility ?? null;
+  }
+}
+
 function folderChainIds(tree: AccessTree, folderId: string | null): string[] {
   const ids: string[] = [];
   let f = folderId ? tree.folders.find((x) => x.id === folderId) ?? null : null;
@@ -49,7 +74,9 @@ function folderChainIds(tree: AccessTree, folderId: string | null): string[] {
 /**
  * Nivel efectivo de permiso de un miembro sobre una entidad.
  * Grant propio cuenta siempre; grants de ancestros (carpetas y
- * workspace) solo si tienen inherit=true.
+ * workspace) solo si tienen inherit=true y la entidad NO es privada
+ * (restringido sí hereda), con nivel capado a write. Espeja la
+ * semántica de `entity_effective` en la BD.
  */
 export function effectiveLevelOf(
   grants: EntityGrant[],
@@ -61,14 +88,23 @@ export function effectiveLevelOf(
 
   const collect = (t: EntityType, i: string, requireInherit: boolean) => {
     const g = grants.find((x) => x.entity_type === t && x.entity_id === i);
-    if (g && (!requireInherit || g.inherit)) {
-      found.push({ type: t, id: i, level: g.permission });
-    }
+    if (!g || (requireInherit && !g.inherit)) return;
+    const level: EntityPermission = requireInherit
+      ? PERM_RANK[g.permission] >= 2
+        ? 'write'
+        : g.permission
+      : g.permission;
+    found.push({ type: t, id: i, level });
   };
 
   collect(type, id, false);
 
-  if (type === 'folder' || type === 'list' || type === 'document' || type === 'mindmap' || type === 'todo' || type === 'formulario') {
+  const targetPrivada = visibilityOf(tree, type, id) === 'private';
+
+  if (
+    !targetPrivada &&
+    (type === 'folder' || type === 'list' || type === 'document' || type === 'mindmap' || type === 'todo' || type === 'formulario')
+  ) {
     let folderId: string | null = null;
     let wsId: string | null = null;
 
@@ -222,66 +258,3 @@ export function effectiveAccessEntries(grants: EntityGrant[], tree: AccessTree):
   return entries;
 }
 
-/**
- * Descendientes directos/recursivos de una entidad (para propagar
- * grants). Listas y documentos no tienen hijos.
- */
-export function listDescendants(
-  tree: AccessTree,
-  type: EntityType,
-  id: string
-): { type: EntityType; id: string }[] {
-  const out: { type: EntityType; id: string }[] = [];
-
-  const addFolderTree = (folderId: string) => {
-    tree.folders
-      .filter((f) => f.parent_folder_id === folderId)
-      .forEach((child) => {
-        out.push({ type: 'folder', id: child.id });
-        addFolderTree(child.id);
-      });
-  };
-
-  if (type === 'workspace') {
-    tree.folders
-      .filter((f) => f.workspace_id === id && !f.parent_folder_id)
-      .forEach((f) => {
-        out.push({ type: 'folder', id: f.id });
-        addFolderTree(f.id);
-      });
-    tree.lists
-      .filter((l) => l.workspace_id === id)
-      .forEach((l) => out.push({ type: 'list', id: l.id }));
-    tree.documents
-      .filter((d) => d.workspace_id === id)
-      .forEach((d) => out.push({ type: 'document', id: d.id }));
-    tree.mindmaps
-      .filter((m) => m.workspace_id === id)
-      .forEach((m) => out.push({ type: 'mindmap', id: m.id }));
-    tree.todos
-      .filter((t) => t.workspace_id === id)
-      .forEach((t) => out.push({ type: 'todo', id: t.id }));
-    tree.formularios
-      .filter((f) => f.workspace_id === id)
-      .forEach((f) => out.push({ type: 'formulario', id: f.id }));
-  } else if (type === 'folder') {
-    addFolderTree(id);
-    tree.lists
-      .filter((l) => l.folder_id === id)
-      .forEach((l) => out.push({ type: 'list', id: l.id }));
-    tree.documents
-      .filter((d) => d.folder_id === id)
-      .forEach((d) => out.push({ type: 'document', id: d.id }));
-    tree.mindmaps
-      .filter((m) => m.folder_id === id)
-      .forEach((m) => out.push({ type: 'mindmap', id: m.id }));
-    tree.todos
-      .filter((t) => t.folder_id === id)
-      .forEach((t) => out.push({ type: 'todo', id: t.id }));
-    tree.formularios
-      .filter((f) => f.folder_id === id)
-      .forEach((f) => out.push({ type: 'formulario', id: f.id }));
-  }
-
-  return out;
-}

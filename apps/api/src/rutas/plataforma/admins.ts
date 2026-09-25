@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { zNuevoPlatformAdmin, type PlatformAdmin } from '@erp/shared';
 import { getAdminClient } from '../../lib/supabase/admin';
+import { emitirEvento } from '../../lib/telegram-plataforma';
 import type { ContextoUsuario } from '../../middleware/verificar-jwt';
 import {
   buscarUsuarioPorEmail,
@@ -74,6 +75,12 @@ rutasAdmins.post('/', async (c) => {
     payload: { email: usuario.email },
   });
 
+  void emitirEvento(
+    'admin_agregado',
+    { email: usuario.email ?? usuario.id },
+    { entidadTipo: 'platform_admin', entidadId: usuario.id }
+  );
+
   return c.json({ ok: true, user_id: usuario.id }, 201);
 });
 
@@ -98,12 +105,19 @@ rutasAdmins.delete('/:id', async (c) => {
   if (error) return c.json({ error: 'No se pudo quitar al administrador' }, 500);
 
   invalidarPlataformaCache(objetivo);
+  const { data: usuarioObjetivo } = await admin.auth.admin.getUserById(objetivo);
   await registrarAuditoria({
     actorId: yo,
     accion: 'admin.quitar',
     entidadTipo: 'platform_admin',
     entidadId: objetivo,
   });
+
+  void emitirEvento(
+    'admin_quitado',
+    { email: usuarioObjetivo.user?.email ?? objetivo },
+    { entidadTipo: 'platform_admin', entidadId: objetivo }
+  );
 
   return c.json({ ok: true });
 });

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { createContext, useContext, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import {
@@ -153,7 +153,7 @@ function Tags({ labels }: { labels: string[] }) {
   return (
     <div className="mt-1 flex flex-wrap gap-1">
       {labels.map((l) => (
-        <span key={l} className="rounded-full bg-black/10 px-1.5 py-0.5 text-[10px] leading-none">
+        <span key={l} className="rounded-full bg-black/10 px-1.5 py-0.5 text-xs leading-none">
           {l}
         </span>
       ))}
@@ -222,7 +222,7 @@ function PriorityBadge({ priority }: { priority: string | null }) {
   if (!color || !priority) return null;
   return (
     <span
-      className="rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none text-white"
+      className="rounded-full px-1.5 py-0.5 text-xs font-medium leading-none text-white"
       style={{ backgroundColor: color }}
     >
       {etiquetaPrioridad(priority)}
@@ -452,7 +452,7 @@ export function IdeaNode({ id, data, selected, width, height }: MindMapNodeProps
           ctx.editable && (
             <button
               onClick={() => setShowNotes(true)}
-              className="nodrag nopan mt-1 text-[10px] text-black/40 hover:text-black/70"
+              className="nodrag nopan mt-1 text-xs text-black/40 hover:text-black/70"
             >
               + notas
             </button>
@@ -670,7 +670,7 @@ export function ImageNode({ id, data, selected, width, height }: MindMapNodeProp
             title="Subir imagen"
           >
             <ImagePlus className="size-6" />
-            <span className="text-[10px]">{busy ? 'Subiendo…' : 'Subir imagen'}</span>
+            <span className="text-xs">{busy ? 'Subiendo…' : 'Subir imagen'}</span>
           </button>
         )}
         <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-black/40 px-2 py-1">

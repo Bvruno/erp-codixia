@@ -9,7 +9,7 @@ import { computeEffectiveLevel } from '@/lib/access';
 import { parseSnapshot, EMPTY_SNAPSHOT } from '@/lib/mindmap';
 import { getTemplate } from '@/lib/mindmap-templates';
 import { entitySlug, findEntityByParam } from '@/lib/slugs';
-import { cacheGet, cacheSet } from '@/lib/cache';
+import { cacheDel, cacheGet, cacheSet } from '@/lib/cache';
 import { claveEstructura, TTL_CACHE } from '@/lib/cache-claves';
 import { queryClient } from '@/lib/query-client';
 import type { Workspace, WorkspaceFolder, TaskList as TaskListEntry, TaskDocument, MindMap, Profile, EntityType, EntityGrant, EntityPermission, Todo, Formulario } from '@/types';
@@ -348,6 +348,10 @@ export function TareasProvider({ children }: { children: React.ReactNode }) {
         setStructureError(null);
         void cacheSet(cacheKey, payload);
       } catch (e) {
+        // Un fallo de red con copia hidratada dejaría un rol/estructura
+        // obsoletos (p. ej. permisos cambiados): se descarta la copia para
+        // que la próxima carga no la reutilice.
+        void cacheDel(cacheKey);
         setStructureError(e instanceof Error ? e.message : 'Error cargando la estructura');
         if (!cached) setLoading(false);
       }
@@ -1238,7 +1242,14 @@ export function TareasProvider({ children }: { children: React.ReactNode }) {
     openShare,
     closeShare,
     saveShareGrants,
-    onCreate,
+    onCreate: async (input: CreateInput) => {
+      const res = await onCreate(input);
+      // Un error de creación (RLS/permisos, destino inexistente) puede
+      // deberse a estructura o rol desactualizados: revalidar en segundo
+      // plano para que los menús reflejen el estado real.
+      if (res?.error) void fetchStructure({ forzar: true });
+      return res;
+    },
     onUpdate,
     onDelete,
     onMoveEntity,

@@ -69,7 +69,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (color: str
           ))}
         </div>
         <div className="mt-1.5 border-t pt-1.5">
-          <p className="mb-1.5 px-0.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+          <p className="mb-1.5 px-0.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
             Vivos
           </p>
           <div className="grid grid-cols-5 gap-1.5">

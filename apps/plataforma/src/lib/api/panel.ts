@@ -14,6 +14,16 @@ import type {
   EstadoFactura,
   EstadisticasPlataforma,
 } from '@erp/shared/plataforma';
+import type {
+  CategoriaTelegram,
+  ConfigTelegramPlataforma,
+  EnvioTelegram,
+  EstadoBotTelegram,
+  EstadoWebhookTelegram,
+  EventoTelegram,
+  NotificacionPlataforma,
+  ResumenSaludTelegram,
+} from '@erp/shared/telegram-plataforma';
 
 function query(params: Record<string, string | number | undefined | null>): string {
   const qs = new URLSearchParams();
@@ -194,4 +204,115 @@ export function listarAuditoria(params: {
   return api.get<Pagina<EntradaAuditoriaPlataforma> & { page: number; pageSize: number }>(
     `/plataforma/auditoria${query(params)}`
   );
+}
+
+// ---- Telegram de plataforma ----
+
+export interface RespuestaConfigTelegram {
+  data: ConfigTelegramPlataforma;
+  bot: EstadoBotTelegram;
+  webhook: EstadoWebhookTelegram;
+  salud: ResumenSaludTelegram;
+}
+
+export function obtenerConfigTelegram() {
+  return api.get<RespuestaConfigTelegram>('/plataforma/telegram/config');
+}
+
+export function guardarConfigTelegram(
+  cambios: Partial<{
+    bot_token: string | null;
+    chat_destino: string | null;
+    chat_etiqueta: string | null;
+    enabled: boolean;
+    nivel_minimo: 'warning' | 'error';
+    agrupar_errores_segundos: number;
+    rate_limit_hora: number;
+    quiet_hours: { activo: boolean; desde: string; hasta: string };
+    markdown: boolean;
+    digest_activo: boolean;
+    digest_hora: string;
+  }>
+) {
+  return api.put<RespuestaConfigTelegram>('/plataforma/telegram/config', cambios);
+}
+
+export function probarBotTelegram(bot_token?: string) {
+  return api.post<{
+    ok: boolean;
+    bot: EstadoBotTelegram | null;
+    error: string | null;
+    token_origen: 'bd' | 'entorno' | 'ninguno';
+    es_token_guardado: boolean;
+  }>('/plataforma/telegram/config/probar', { bot_token: bot_token ?? null });
+}
+
+export function activarWebhookTelegram(base_url: string) {
+  return api.post<{ ok: true; webhook: EstadoWebhookTelegram | null }>(
+    '/plataforma/telegram/webhook',
+    { base_url }
+  );
+}
+
+export function desactivarWebhookTelegram() {
+  return api.delete<{ ok: true }>('/plataforma/telegram/webhook');
+}
+
+export function sincronizarTelegram() {
+  return api.post<{ ok: true; procesados: number; vinculado: boolean; offset: number }>(
+    '/plataforma/telegram/sincronizar'
+  );
+}
+
+export function listarEventosTelegram() {
+  return api.get<{
+    data: EventoTelegram[];
+    categorias: { id: CategoriaTelegram; etiqueta: string; descripcion: string }[];
+  }>('/plataforma/telegram/eventos');
+}
+
+export function guardarEventoTelegram(
+  evento: string,
+  cambios: { habilitado?: boolean; plantilla?: string }
+) {
+  return api.put<{ data: EventoTelegram }>(`/plataforma/telegram/eventos/${evento}`, cambios);
+}
+
+export function restaurarEventoTelegram(evento: string) {
+  return api.post<{ data: EventoTelegram }>(`/plataforma/telegram/eventos/${evento}/restaurar`);
+}
+
+export function cambiarCategoriaTelegram(categoria: CategoriaTelegram, habilitado: boolean) {
+  return api.put<{ ok: true; actualizados: number }>('/plataforma/telegram/eventos', {
+    categoria,
+    habilitado,
+  });
+}
+
+export function listarEnviosTelegram(params: {
+  evento?: string;
+  estado?: 'ok' | 'fallo' | '';
+  page?: number;
+}) {
+  return api.get<Pagina<EnvioTelegram> & { page: number; pageSize: number }>(
+    `/plataforma/telegram/envios${query(params)}`
+  );
+}
+
+export function probarEnvioTelegram(chat_destino?: string | null) {
+  return api.post<{ ok: true }>('/plataforma/telegram/envios/probar', {
+    chat_destino: chat_destino ?? null,
+  });
+}
+
+export function listarNotificacionesTelegram() {
+  return api.get<{ data: NotificacionPlataforma[]; no_leidas: number }>(
+    '/plataforma/telegram/notificaciones'
+  );
+}
+
+export function marcarNotificacionesLeidas(ids?: number[]) {
+  return api.post<{ ok: true; marcadas: number }>('/plataforma/telegram/notificaciones/leer', {
+    ids,
+  });
 }

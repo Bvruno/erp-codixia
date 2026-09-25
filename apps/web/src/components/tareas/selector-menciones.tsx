@@ -92,7 +92,7 @@ export const ListaMenciones = forwardRef<
             <Icono className="size-3.5 shrink-0" />
             <span className="truncate">{item.label}</span>
             {item.tipo === 'tarea' && (
-              <span className="ml-auto shrink-0 text-[10px] text-muted-foreground/70">tarea</span>
+              <span className="ml-auto shrink-0 text-xs text-muted-foreground/70">tarea</span>
             )}
           </button>
         );

@@ -6,6 +6,7 @@ import {
   type EmpresaPlataforma,
 } from '@erp/shared';
 import { getAdminClient } from '../../lib/supabase/admin';
+import { emitirEvento } from '../../lib/telegram-plataforma';
 import {
   invalidarPerfilCache,
   type ContextoUsuario,
@@ -211,6 +212,16 @@ rutasEmpresas.post('/', async (c) => {
     payload: { nombre: body.data.nombre, email_owner: body.data.email_owner ?? null },
   });
 
+  void emitirEvento(
+    'empresa_creada',
+    {
+      empresa: body.data.nombre,
+      owner_email: body.data.email_owner ?? '—',
+      enlace_invitacion: creada.data.link,
+    },
+    { entidadTipo: 'organization', entidadId: creada.data.organizationId }
+  );
+
   return c.json(
     {
       ok: true,
@@ -248,6 +259,12 @@ rutasEmpresas.post('/:id/suspender', async (c) => {
     payload: { motivo: body.data.motivo },
   });
 
+  void emitirEvento(
+    'empresa_suspendida',
+    { empresa: data.name, motivo: body.data.motivo },
+    { entidadTipo: 'organization', entidadId: data.id }
+  );
+
   return c.json({ ok: true });
 });
 
@@ -257,7 +274,7 @@ rutasEmpresas.post('/:id/reactivar', async (c) => {
     .from('organizations')
     .update({ status: 'activa', suspended_at: null, suspended_reason: null })
     .eq('id', c.req.param('id'))
-    .select('id')
+    .select('id, name')
     .maybeSingle();
   if (error || !data) return c.json({ error: 'Empresa no encontrada' }, 404);
 
@@ -268,6 +285,12 @@ rutasEmpresas.post('/:id/reactivar', async (c) => {
     entidadTipo: 'organization',
     entidadId: data.id,
   });
+
+  void emitirEvento(
+    'empresa_reactivada',
+    { empresa: data.name },
+    { entidadTipo: 'organization', entidadId: data.id }
+  );
 
   return c.json({ ok: true });
 });
@@ -299,6 +322,12 @@ rutasEmpresas.delete('/:id', async (c) => {
     entidadId: org.id,
     payload: { nombre: org.name },
   });
+
+  void emitirEvento(
+    'empresa_eliminada',
+    { empresa: org.name },
+    { entidadTipo: 'organization', entidadId: org.id }
+  );
 
   return c.json({ ok: true });
 });

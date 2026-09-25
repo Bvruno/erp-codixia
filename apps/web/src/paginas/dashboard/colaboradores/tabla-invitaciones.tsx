@@ -75,23 +75,23 @@ export function TablaInvitaciones({
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-[10px]">
+                      <Badge variant="outline" className="text-xs">
                         {ROLE_LABELS[inv.role]}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       {inv.entity_type && inv.permission ? (
                         <div className="flex flex-col items-start gap-0.5">
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge variant="outline" className="text-xs">
                             {scopeOf(tree, inv)}
                           </Badge>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {PERMISSION_LABELS[inv.permission]}
                             {inv.inherit ? ' · hereda' : ''}
                           </span>
                         </div>
                       ) : (
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           Toda la organización
                         </Badge>
                       )}

@@ -65,7 +65,7 @@ export function BarraSeleccion({
     >
       {hayNodos && (
         <>
-          <span className="px-1 text-[11px] font-medium text-muted-foreground">
+          <span className="px-1 text-xs font-medium text-muted-foreground">
             {cantidadNodos} nodos
           </span>
           <div className="mx-1 h-5 w-px bg-border" />
@@ -113,7 +113,7 @@ export function BarraSeleccion({
       {hayEdges && (
         <>
           {hayNodos && <div className="mx-1 h-5 w-px bg-border" />}
-          <span className="px-1 text-[11px] font-medium text-muted-foreground">
+          <span className="px-1 text-xs font-medium text-muted-foreground">
             {edges.length === 1 ? '1 conexión' : `${edges.length} conexiones`}
           </span>
           <div className="mx-1 h-5 w-px bg-border" />
@@ -124,7 +124,7 @@ export function BarraSeleccion({
                 type="button"
                 onClick={() => onEdgeKind(k.key)}
                 className={cn(
-                  'rounded-md px-2 py-0.5 text-[11px] transition-colors hover:bg-muted',
+                  'rounded-md px-2 py-0.5 text-xs transition-colors hover:bg-muted',
                   mismoTipo && primerEdge?.kind === k.key && 'bg-primary/10 font-medium text-primary'
                 )}
                 aria-pressed={mismoTipo && primerEdge?.kind === k.key}
@@ -163,7 +163,7 @@ export function BarraSeleccion({
         <Trash2 className="size-4" />
       </BotonBarra>
       {hayEdges && (
-        <span className="hidden items-center gap-1 px-1 text-[10px] text-muted-foreground sm:flex">
+        <span className="hidden items-center gap-1 px-1 text-xs text-muted-foreground sm:flex">
           <Check className="size-3" /> {edges.length === 1 ? 'conexión' : 'conexiones'}
         </span>
       )}

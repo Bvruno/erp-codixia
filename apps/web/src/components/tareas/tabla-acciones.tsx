@@ -19,7 +19,7 @@ import {
   TableRowsSplit,
   Trash2,
 } from 'lucide-react';
-import { ToolbarButton, ToolbarDivider } from './editor-toolbar';
+import { BotonHerramienta, SeparadorHerramienta } from '@/components/entidad/barra-herramientas';
 import { ColorCeldaPicker } from './celda-color-picker';
 
 /** Índices de la celda activa dentro de la tabla (o null si no hay celda). */
@@ -111,124 +111,124 @@ export function AccionesTabla({ editor }: { editor: Editor }) {
 
   if (!enTabla) {
     return (
-      <ToolbarButton
+      <BotonHerramienta
         title="Insertar tabla"
         onClick={() => cadena().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
       >
         <TableCellsMerge className="size-4" />
-      </ToolbarButton>
+      </BotonHerramienta>
     );
   }
 
   return (
     <>
-      <ToolbarButton title="Seleccionar toda la tabla" onClick={() => seleccionarTabla(editor)}>
+      <BotonHerramienta title="Seleccionar toda la tabla" onClick={() => seleccionarTabla(editor)}>
         <TableProperties className="size-4" />
-      </ToolbarButton>
-      <ToolbarDivider />
-      <ToolbarButton
+      </BotonHerramienta>
+      <SeparadorHerramienta />
+      <BotonHerramienta
         title="Insertar fila arriba"
         disabled={!editor.can().addRowBefore()}
         onClick={() => cadena().addRowBefore().run()}
       >
         <ArrowUpToLine className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Insertar fila abajo"
         disabled={!editor.can().addRowAfter()}
         onClick={() => cadena().addRowAfter().run()}
       >
         <ArrowDownToLine className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Insertar columna a la izquierda"
         disabled={!editor.can().addColumnBefore()}
         onClick={() => cadena().addColumnBefore().run()}
       >
         <ArrowLeftToLine className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Insertar columna a la derecha"
         disabled={!editor.can().addColumnAfter()}
         onClick={() => cadena().addColumnAfter().run()}
       >
         <ArrowRightToLine className="size-4" />
-      </ToolbarButton>
-      <ToolbarDivider />
-      <ToolbarButton
+      </BotonHerramienta>
+      <SeparadorHerramienta />
+      <BotonHerramienta
         title="Eliminar fila"
         disabled={!editor.can().deleteRow()}
         onClick={() => cadena().deleteRow().run()}
       >
         <TableRowsSplit className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Eliminar columna"
         disabled={!editor.can().deleteColumn()}
         onClick={() => cadena().deleteColumn().run()}
       >
         <TableColumnsSplit className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Eliminar tabla"
         disabled={!editor.can().deleteTable()}
         onClick={() => cadena().deleteTable().run()}
       >
         <Trash2 className="size-4" />
-      </ToolbarButton>
-      <ToolbarDivider />
-      <ToolbarButton
+      </BotonHerramienta>
+      <SeparadorHerramienta />
+      <BotonHerramienta
         title="Fusionar celdas"
         disabled={!editor.can().mergeCells()}
         onClick={() => cadena().mergeCells().run()}
       >
         <TableCellsMerge className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Dividir celda"
         disabled={!editor.can().splitCell()}
         onClick={() => cadena().splitCell().run()}
       >
         <TableCellsSplit className="size-4" />
-      </ToolbarButton>
-      <ToolbarDivider />
-      <ToolbarButton
+      </BotonHerramienta>
+      <SeparadorHerramienta />
+      <BotonHerramienta
         title="Encabezado de fila"
         active={esEncabezadoDeFila(editor)}
         onClick={() => cadena().toggleHeaderRow().run()}
       >
         <Rows3 className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Encabezado de columna"
         active={esEncabezadoDeColumna(editor)}
         onClick={() => cadena().toggleHeaderColumn().run()}
       >
         <Columns3 className="size-4" />
-      </ToolbarButton>
-      <ToolbarDivider />
-      <ToolbarButton
+      </BotonHerramienta>
+      <SeparadorHerramienta />
+      <BotonHerramienta
         title="Alinear a la izquierda"
         active={alinearActivo(editor, 'left')}
         onClick={() => cadena().setCellAttribute('align', 'left').run()}
       >
         <AlignLeft className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Centrar"
         active={alinearActivo(editor, 'center')}
         onClick={() => cadena().setCellAttribute('align', 'center').run()}
       >
         <AlignCenter className="size-4" />
-      </ToolbarButton>
-      <ToolbarButton
+      </BotonHerramienta>
+      <BotonHerramienta
         title="Alinear a la derecha"
         active={alinearActivo(editor, 'right')}
         onClick={() => cadena().setCellAttribute('align', 'right').run()}
       >
         <AlignRight className="size-4" />
-      </ToolbarButton>
-      <ToolbarDivider />
+      </BotonHerramienta>
+      <SeparadorHerramienta />
       <ColorCeldaPicker editor={editor} tipo="fondo" />
       <ColorCeldaPicker editor={editor} tipo="borde" />
     </>

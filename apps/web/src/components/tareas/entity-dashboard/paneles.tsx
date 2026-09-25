@@ -104,7 +104,7 @@ export function PanelDistribucion({
           <div className="flex h-24 items-end gap-1.5">
             {weeklyDone.map((count, i) => (
               <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                <span className="text-[10px] font-medium tabular-nums text-muted-foreground">{count}</span>
+                <span className="text-xs font-medium tabular-nums text-muted-foreground">{count}</span>
                 <div
                   className="w-full rounded-sm bg-emerald-500/80"
                   style={{ height: `${Math.max(4, (count / Math.max(1, ...weeklyDone)) * 80)}px` }}
@@ -112,7 +112,7 @@ export function PanelDistribucion({
               </div>
             ))}
           </div>
-          <div className="flex justify-between text-[10px] text-muted-foreground">
+          <div className="flex justify-between text-xs text-muted-foreground">
             {weeklyLabels.map((l, i) => (
               <span key={i}>{l}</span>
             ))}
@@ -138,7 +138,7 @@ export function PanelProximas({ upcoming, todayStart }: { upcoming: Task[]; toda
               <div key={t.id} className="flex items-center gap-2 rounded-md border px-2 py-1.5 text-sm">
                 <span className="min-w-0 flex-1 truncate">{t.title}</span>
                 <span className="text-xs text-muted-foreground">{formatDate(t.due_date!)}</span>
-                <Badge variant={days <= 2 ? 'destructive' : 'secondary'} className="text-[10px]">
+                <Badge variant={days <= 2 ? 'destructive' : 'secondary'} className="text-xs">
                   {days === 0 ? 'hoy' : days === 1 ? 'mañana' : `en ${days} d`}
                 </Badge>
               </div>
@@ -354,7 +354,7 @@ export function PanelAsignados({ assignedTop }: { assignedTop: { id: string; cou
       <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {assignedTop.map((a) => (
           <div key={a.id} className="rounded-md border px-3 py-2">
-            <p className="text-lg font-bold tabular-nums">{a.count}</p>
+            <p className="text-base font-bold tabular-nums">{a.count}</p>
             <p className="truncate text-xs text-muted-foreground">{a.name || 'Colaborador'}</p>
           </div>
         ))}

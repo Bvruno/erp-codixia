@@ -1,12 +1,19 @@
 'use client';
 
-import { Folder, ListTodo, BookOpen, Network, ListChecks, ClipboardList } from 'lucide-react';
+import { Folder } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { navBus } from '@/lib/nav-bus';
+import { ENTIDADES_META } from '@/lib/entidades-meta';
 import type { Workspace, WorkspaceFolder, TaskList, TaskDocument, MindMap, Todo, Formulario } from '@/types';
 import { RailBtn } from './filas';
 
 // Rail lateral de workspaces (desktop colapsado): botones por entidad.
+
+const ICONO_LISTA = ENTIDADES_META.list.icono;
+const ICONO_DOCUMENTO = ENTIDADES_META.document.icono;
+const ICONO_MAPA = ENTIDADES_META.mindmap.icono;
+const ICONO_TODO = ENTIDADES_META.todo.icono;
+const ICONO_FORMULARIO = ENTIDADES_META.formulario.icono;
 
 export function RailNav({
   wsSorted,
@@ -54,7 +61,7 @@ export function RailNav({
   return (
     <div className="hidden flex-1 flex-col gap-1 overflow-y-auto p-2 lg:flex">
       {wsSorted.length === 0 ? (
-        <p className="px-1 py-3 text-center text-[10px] text-muted-foreground">
+        <p className="px-1 py-3 text-center text-xs text-muted-foreground">
           Sin espacios
         </p>
       ) : (
@@ -116,7 +123,7 @@ export function RailNav({
                     navBus.closeDrawer();
                   }}
                 >
-                  <ListTodo className="size-4 text-muted-foreground" />
+                  <ICONO_LISTA className={cn('size-4', ENTIDADES_META.list.color)} />
                 </RailBtn>
               ))}
               {wsAllDocs.map((d) => (
@@ -129,7 +136,7 @@ export function RailNav({
                     navBus.closeDrawer();
                   }}
                 >
-                  <BookOpen className="size-4 text-indigo-500" />
+                  <ICONO_DOCUMENTO className={cn('size-4', ENTIDADES_META.document.color)} />
                 </RailBtn>
               ))}
               {wsAllMaps.map((m) => (
@@ -142,7 +149,7 @@ export function RailNav({
                     navBus.closeDrawer();
                   }}
                 >
-                  <Network className="size-4 text-emerald-500" />
+                  <ICONO_MAPA className={cn('size-4', ENTIDADES_META.mindmap.color)} />
                 </RailBtn>
               ))}
               {wsAllTodos.map((t) => (
@@ -155,7 +162,7 @@ export function RailNav({
                     navBus.closeDrawer();
                   }}
                 >
-                  <ListChecks className="size-4 text-rose-500" />
+                  <ICONO_TODO className={cn('size-4', ENTIDADES_META.todo.color)} />
                 </RailBtn>
               ))}
               {wsAllFormularios.map((f) => (
@@ -168,7 +175,7 @@ export function RailNav({
                     navBus.closeDrawer();
                   }}
                 >
-                  <ClipboardList className="size-4 text-amber-500" />
+                  <ICONO_FORMULARIO className={cn('size-4', ENTIDADES_META.formulario.color)} />
                 </RailBtn>
               ))}
             </div>

@@ -1,9 +1,11 @@
+import { randomUUID } from 'crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { isFullUuid, matchParam } from '@erp/shared';
 import { clienteUsuarioMiddleware, type VariablesDatos } from '../lib/supabase/usuario';
 import { crearNotificaciones } from '../lib/notificaciones';
+import { ejecutarEscritura, sinPermisoEscritura } from '../lib/escrituras';
 import { mapearError } from './entidades';
 
 export const rutasTareas = new Hono<{ Variables: VariablesDatos }>();
@@ -164,13 +166,19 @@ const esquemaCrear = z.object({
 });
 
 // POST /tareas — crear (con joins para optimismo).
+// El INSERT va sin RETURNING: la policy de SELECT de `tasks` no ve la fila
+// nueva dentro de la misma sentencia (task_permission la lee en un
+// SECURITY DEFINER con el mismo command id) y el RETURNING daría 42501 a
+// colaboradores. Se inserta con id propio y se relee en un SELECT aparte.
 rutasTareas.post('/', async (c) => {
   const supabase = c.get('supabase');
   const body = esquemaCrear.safeParse(await c.req.json());
   if (!body.success) return c.json({ error: 'Datos inválidos' }, 400);
-  const { data, error } = await supabase
+  const id = randomUUID();
+  const { error } = await supabase
     .from('tasks')
     .insert({
+      id,
       title: body.data.title,
       status: body.data.status,
       priority: body.data.priority,
@@ -185,10 +193,16 @@ rutasTareas.post('/', async (c) => {
       created_by: body.data.created_by,
       position: body.data.position,
       status_position: body.data.status_position ?? 0,
-    })
-    .select(TAREA_SELECT)
-    .single();
+    });
   if (error) return mapearError(c, error, 'No se pudo crear la tarea');
+
+  const { data, error: lecturaError } = await supabase
+    .from('tasks')
+    .select(TAREA_SELECT)
+    .eq('id', id)
+    .single();
+  if (lecturaError) return mapearError(c, lecturaError, 'No se pudo crear la tarea');
+
   if (data?.assigned_to && data.assigned_to !== data.created_by) {
     await crearNotificaciones({
       actorId: data.created_by,
@@ -232,8 +246,11 @@ rutasTareas.patch('/:id', async (c) => {
     .eq('id', id)
     .maybeSingle();
 
-  const { error } = await supabase.from('tasks').update(body.data as never).eq('id', id);
+  const { error, filas } = await ejecutarEscritura(
+    supabase.from('tasks').update(body.data as never).eq('id', id).select('id')
+  );
   if (error) return mapearError(c, error, 'No se pudo guardar la tarea');
+  if (filas === 0) return sinPermisoEscritura(c);
 
   const actorId = c.get('usuarioId');
   const nuevoAsignado = body.data.assigned_to;
@@ -276,8 +293,11 @@ rutasTareas.delete('/:id', async (c) => {
   const supabase = c.get('supabase');
   const id = c.req.param('id');
   if (!id) return c.json({ error: 'id requerido' }, 400);
-  const { error } = await supabase.from('tasks').delete().eq('id', id);
+  const { error, filas } = await ejecutarEscritura(
+    supabase.from('tasks').delete().eq('id', id).select('id')
+  );
   if (error) return mapearError(c, error, 'No se pudo eliminar la tarea');
+  if (filas === 0) return sinPermisoEscritura(c);
   return c.json({ success: true });
 });
 
@@ -292,20 +312,27 @@ rutasTareas.post('/reordenar', async (c) => {
   if (!body.success) return c.json({ error: 'Datos inválidos' }, 400);
 
   if (body.data.mover && body.data.parent_task_id !== undefined) {
-    const { error } = await supabase
-      .from('tasks')
-      .update({ parent_task_id: body.data.parent_task_id })
-      .eq('id', body.data.mover);
+    const { error, filas } = await ejecutarEscritura(
+      supabase
+        .from('tasks')
+        .update({ parent_task_id: body.data.parent_task_id })
+        .eq('id', body.data.mover)
+        .select('id')
+    );
     if (error) return mapearError(c, error);
+    if (filas === 0) return sinPermisoEscritura(c);
   }
 
   const resultados = await Promise.all(
     body.data.items.map((item) =>
-      supabase.from('tasks').update({ position: item.position }).eq('id', item.id)
+      ejecutarEscritura(
+        supabase.from('tasks').update({ position: item.position }).eq('id', item.id).select('id')
+      )
     )
   );
   const fallo = resultados.find((r) => r.error)?.error;
   if (fallo) return mapearError(c, fallo);
+  if (resultados.some((r) => r.filas === 0)) return sinPermisoEscritura(c);
   return c.json({ success: true });
 });
 

@@ -47,6 +47,12 @@ next-env.d.ts
 # logs locales de smoke tests
 server.log
 
+# artefactos del CLI de Supabase (local)
+/supabase/.temp/
+
+# credenciales locales del stack Supabase (nunca commitear)
+/supabase.local.md
+
 # graphify: grafo de conocimiento (reproducible con `graphify update`)
 /graphify-out/
 /opencode.json

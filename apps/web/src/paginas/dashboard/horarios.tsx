@@ -78,7 +78,7 @@ import { RegistroHorasDialog } from "./registro-horas-dialog";
 import { EntradasTabla } from "./entradas-tabla";
 import { HeatmapHoras } from "./heatmap";
 import { GrillaSemanal } from "./grilla-semanal";
-import { PageHeader } from "@/components/layout/page-header";
+import { CabeceraEntidad } from "@/components/entidad/cabecera-entidad";
 
 type Period = "week" | "month" | "custom";
 
@@ -442,7 +442,7 @@ export default function HorariosPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageHeader title="Horarios" />
+        <CabeceraEntidad titulo="Horarios" />
         <div className="flex flex-wrap items-center gap-2">
           <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
             <SelectTrigger className="w-36">
@@ -646,12 +646,12 @@ export default function HorariosPage() {
                       />
                     </div>
                     {weeklyPct < 70 && weeklyPct > 0 && (
-                      <p className="text-amber-500 mt-1 text-[11px]">
+                      <p className="text-amber-500 mt-1 text-xs">
                         Bajo la meta semanal
                       </p>
                     )}
                     {weeklyPct > 110 && (
-                      <p className="text-purple-500 mt-1 text-[11px]">
+                      <p className="text-purple-500 mt-1 text-xs">
                         Sobre la meta semanal
                       </p>
                     )}
@@ -753,7 +753,7 @@ export default function HorariosPage() {
                 <div className="flex h-16 items-end gap-1.5">
                   {bars.map((h, i) => (
                     <div key={i} className="flex flex-1 flex-col items-center gap-0.5">
-                      <span className="text-[10px] tabular-nums text-muted-foreground">
+                      <span className="text-xs tabular-nums text-muted-foreground">
                         {Math.round(h)}
                       </span>
                       <div
@@ -763,7 +763,7 @@ export default function HorariosPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-0.5 flex justify-between text-[10px] text-muted-foreground">
+                <div className="mt-0.5 flex justify-between text-xs text-muted-foreground">
                   {trendWeeks.map((w, i) => (
                     <span key={i}>{w.label}</span>
                   ))}

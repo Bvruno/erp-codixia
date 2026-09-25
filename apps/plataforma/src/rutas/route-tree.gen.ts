@@ -20,6 +20,8 @@ import { Route as PanelEmpresasRouteImport } from './_panel/empresas'
 import { Route as PanelFacturasRouteImport } from './_panel/facturas'
 import { Route as PanelPlanesRouteImport } from './_panel/planes'
 import { Route as PanelSolicitudesRouteImport } from './_panel/solicitudes'
+import { Route as PanelTelegramRouteImport } from './_panel/telegram'
+import { Route as PanelEmpresasIndexRouteImport } from './_panel/empresas.index'
 import { Route as PanelEmpresasIdRouteImport } from './_panel/empresas.$id'
 
 const PanelRoute = PanelRouteImport.update({
@@ -76,6 +78,16 @@ const PanelSolicitudesRoute = PanelSolicitudesRouteImport.update({
   path: '/solicitudes',
   getParentRoute: () => PanelRoute,
 } as any)
+const PanelTelegramRoute = PanelTelegramRouteImport.update({
+  id: '/telegram',
+  path: '/telegram',
+  getParentRoute: () => PanelRoute,
+} as any)
+const PanelEmpresasIndexRoute = PanelEmpresasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PanelEmpresasRoute,
+} as any)
 const PanelEmpresasIdRoute = PanelEmpresasIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -93,7 +105,9 @@ export interface FileRoutesByFullPath {
   '/facturas': typeof PanelFacturasRoute
   '/planes': typeof PanelPlanesRoute
   '/solicitudes': typeof PanelSolicitudesRoute
+  '/telegram': typeof PanelTelegramRoute
   '/empresas/$id': typeof PanelEmpresasIdRoute
+  '/empresas/': typeof PanelEmpresasIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -101,12 +115,13 @@ export interface FileRoutesByTo {
   '/solicitar': typeof SolicitarRoute
   '/admins': typeof PanelAdminsRoute
   '/auditoria': typeof PanelAuditoriaRoute
-  '/empresas': typeof PanelEmpresasRouteWithChildren
   '/facturas': typeof PanelFacturasRoute
   '/planes': typeof PanelPlanesRoute
   '/solicitudes': typeof PanelSolicitudesRoute
+  '/telegram': typeof PanelTelegramRoute
   '/': typeof PanelIndexRoute
   '/empresas/$id': typeof PanelEmpresasIdRoute
+  '/empresas': typeof PanelEmpresasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -120,8 +135,10 @@ export interface FileRoutesById {
   '/_panel/facturas': typeof PanelFacturasRoute
   '/_panel/planes': typeof PanelPlanesRoute
   '/_panel/solicitudes': typeof PanelSolicitudesRoute
+  '/_panel/telegram': typeof PanelTelegramRoute
   '/_panel/': typeof PanelIndexRoute
   '/_panel/empresas/$id': typeof PanelEmpresasIdRoute
+  '/_panel/empresas/': typeof PanelEmpresasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -136,7 +153,9 @@ export interface FileRouteTypes {
     | '/facturas'
     | '/planes'
     | '/solicitudes'
+    | '/telegram'
     | '/empresas/$id'
+    | '/empresas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -144,12 +163,13 @@ export interface FileRouteTypes {
     | '/solicitar'
     | '/admins'
     | '/auditoria'
-    | '/empresas'
     | '/facturas'
     | '/planes'
     | '/solicitudes'
+    | '/telegram'
     | '/'
     | '/empresas/$id'
+    | '/empresas'
   id:
     | '__root__'
     | '/_panel'
@@ -162,8 +182,10 @@ export interface FileRouteTypes {
     | '/_panel/facturas'
     | '/_panel/planes'
     | '/_panel/solicitudes'
+    | '/_panel/telegram'
     | '/_panel/'
     | '/_panel/empresas/$id'
+    | '/_panel/empresas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -252,6 +274,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PanelSolicitudesRouteImport
       parentRoute: typeof PanelRoute
     }
+    '/_panel/telegram': {
+      id: '/_panel/telegram'
+      path: '/telegram'
+      fullPath: '/telegram'
+      preLoaderRoute: typeof PanelTelegramRouteImport
+      parentRoute: typeof PanelRoute
+    }
+    '/_panel/empresas/': {
+      id: '/_panel/empresas/'
+      path: '/'
+      fullPath: '/empresas/'
+      preLoaderRoute: typeof PanelEmpresasIndexRouteImport
+      parentRoute: typeof PanelEmpresasRoute
+    }
     '/_panel/empresas/$id': {
       id: '/_panel/empresas/$id'
       path: '/$id'
@@ -264,10 +300,12 @@ declare module '@tanstack/react-router' {
 
 interface PanelEmpresasRouteChildren {
   PanelEmpresasIdRoute: typeof PanelEmpresasIdRoute
+  PanelEmpresasIndexRoute: typeof PanelEmpresasIndexRoute
 }
 
 const PanelEmpresasRouteChildren: PanelEmpresasRouteChildren = {
   PanelEmpresasIdRoute: PanelEmpresasIdRoute,
+  PanelEmpresasIndexRoute: PanelEmpresasIndexRoute,
 }
 
 const PanelEmpresasRouteWithChildren = PanelEmpresasRoute._addFileChildren(
@@ -281,6 +319,7 @@ interface PanelRouteChildren {
   PanelFacturasRoute: typeof PanelFacturasRoute
   PanelPlanesRoute: typeof PanelPlanesRoute
   PanelSolicitudesRoute: typeof PanelSolicitudesRoute
+  PanelTelegramRoute: typeof PanelTelegramRoute
   PanelIndexRoute: typeof PanelIndexRoute
 }
 
@@ -291,6 +330,7 @@ const PanelRouteChildren: PanelRouteChildren = {
   PanelFacturasRoute: PanelFacturasRoute,
   PanelPlanesRoute: PanelPlanesRoute,
   PanelSolicitudesRoute: PanelSolicitudesRoute,
+  PanelTelegramRoute: PanelTelegramRoute,
   PanelIndexRoute: PanelIndexRoute,
 }
 

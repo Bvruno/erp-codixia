@@ -190,7 +190,7 @@ export function StatusPicker({
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1.5" align="start">
-        <p className="px-2 pt-1.5 pb-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="px-2 pt-1.5 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
           Estados
         </p>
         <div className="max-h-72 overflow-y-auto">
@@ -250,7 +250,7 @@ export function PriorityPicker({
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-1.5" align="start">
-        <p className="px-2 pt-1.5 pb-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+        <p className="px-2 pt-1.5 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
           Prioridades
         </p>
         <div className="max-h-72 overflow-y-auto">
@@ -342,7 +342,7 @@ export function NotesPopover({
             <div key={n.id}>
               <div className="flex items-center justify-between gap-2">
                 <span className="truncate text-xs font-medium">{n.author?.full_name || 'Usuario'}</span>
-                <span className="shrink-0 text-[10px] text-muted-foreground">
+                <span className="shrink-0 text-xs text-muted-foreground">
                   {format(new Date(n.created_at), 'd MMM')},{' '}
                   {formatHoraDeFecha(new Date(n.created_at))}
                 </span>

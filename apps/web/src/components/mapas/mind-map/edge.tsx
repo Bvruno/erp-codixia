@@ -102,7 +102,7 @@ export function MapEdge({
         ) : typeof label === 'string' && label ? (
           <button
             type="button"
-            className="nodrag nopan rounded-md border bg-background/95 px-1.5 py-0.5 text-[10px] font-semibold shadow-sm hover:border-primary/50"
+            className="nodrag nopan rounded-md border bg-background/95 px-1.5 py-0.5 text-xs font-semibold shadow-sm hover:border-primary/50"
             style={{
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,

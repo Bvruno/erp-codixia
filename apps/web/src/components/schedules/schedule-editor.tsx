@@ -187,7 +187,7 @@ export function ScheduleEditor({
                       <div className="flex items-center gap-1">
                         <Badge
                           variant="outline"
-                          className="text-[10px]"
+                          className="text-xs"
                           style={{ borderColor: `${s.shift?.color}55` }}
                           title={
                             s.shift?.break_start_time && s.shift?.break_end_time

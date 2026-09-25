@@ -439,7 +439,7 @@ function Contenido({
                             aria-label={`Fila ${f.persona} ${f.fecha}`}
                           />
                           <Avatar className="size-6">
-                            <AvatarFallback className="bg-primary-soft text-[10px] font-semibold text-primary">
+                            <AvatarFallback className="bg-primary-soft text-xs font-semibold text-primary">
                               {inicialesDe(f.persona)}
                             </AvatarFallback>
                           </Avatar>
@@ -447,7 +447,7 @@ function Contenido({
                             <span className="block truncate text-[13px] font-medium">
                               {f.persona}
                             </span>
-                            <span className="block truncate text-[11px] text-muted-foreground">
+                            <span className="block truncate text-xs text-muted-foreground">
                               {f.fecha}
                             </span>
                           </span>

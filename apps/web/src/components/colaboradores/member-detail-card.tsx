@@ -93,7 +93,7 @@ function InfoRow({ icon: Icon, label, value }: { icon: typeof Mail; label: strin
     <div className="flex items-start gap-2.5">
       <Icon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
       <div className="min-w-0">
-        <p className="text-muted-foreground text-[10px] uppercase tracking-wide">{label}</p>
+        <p className="text-muted-foreground text-xs uppercase tracking-wide">{label}</p>
         <p className="text-sm break-words">{value}</p>
       </div>
     </div>
@@ -195,34 +195,34 @@ export function MemberDetailCard({
             </div>
             <div className="mt-1 flex flex-wrap gap-1">
               {!canManage && (
-                <Badge variant="outline" className="text-[10px]">
+                <Badge variant="outline" className="text-xs">
                   <ShieldCheck className="size-3" />
                   {roleLabel}
                 </Badge>
               )}
               {isOwner && (
-                <Badge variant="outline" className="text-[10px] gap-1">
+                <Badge variant="outline" className="text-xs gap-1">
                   <Crown className="size-3 text-yellow-500" />
                   Dueño
                 </Badge>
               )}
               {isSelf && (
-                <Badge variant="outline" className="text-[10px] gap-1">
+                <Badge variant="outline" className="text-xs gap-1">
                   <UserCheck className="size-3" />
                   Tú
                 </Badge>
               )}
               {member.blocked ? (
-                <Badge variant="destructive" className="text-[10px]">
+                <Badge variant="destructive" className="text-xs">
                   Bloqueado
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-400 text-[10px]">
+                <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-400 text-xs">
                   Activo
                 </Badge>
               )}
               {member.access_mode === 'grants_only' && (
-                <Badge variant="outline" className="text-[10px] gap-1 text-amber-400" title="Invitado por link con acceso aislado: solo ve los archivos con permiso asignado">
+                <Badge variant="outline" className="text-xs gap-1 text-amber-400" title="Invitado por link con acceso aislado: solo ve los archivos con permiso asignado">
                   <Lock className="size-3" />
                   Acceso restringido
                 </Badge>
@@ -244,7 +244,7 @@ export function MemberDetailCard({
                   <SelectItem value="collaborator">Colaborador</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-muted-foreground text-[10px]">Rol</p>
+              <p className="text-muted-foreground text-xs">Rol</p>
             </div>
           )}
         </div>
@@ -255,7 +255,7 @@ export function MemberDetailCard({
           <div className="space-y-5">
             {hasContact && (
               <div>
-                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wide">Contacto</p>
+                <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Contacto</p>
                 <div className="mt-2 space-y-2.5">
                   {member.email && <InfoRow icon={Mail} label="Email" value={member.email} />}
                   {member.phone && <InfoRow icon={Phone} label="Teléfono" value={member.phone} />}
@@ -275,7 +275,7 @@ export function MemberDetailCard({
 
             {hasProfileInfo && (
               <div>
-                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wide">Perfil</p>
+                <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Perfil</p>
                 <div className="mt-2 space-y-2.5">
                   {member.position && <InfoRow icon={Briefcase} label="Cargo" value={member.position} />}
                   {member.bio && <InfoRow icon={Users} label="Bio" value={member.bio} />}
@@ -285,7 +285,7 @@ export function MemberDetailCard({
 
             {emergencies.length > 0 && (
               <div>
-                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wide">
+                <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                   Contactos de emergencia
                 </p>
                 <div className="mt-2 space-y-2">
@@ -308,7 +308,7 @@ export function MemberDetailCard({
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <CalendarDays className="text-muted-foreground size-4" />
-                  <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wide">Carga horaria</p>
+                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Carga horaria</p>
                 </div>
                 {canManage && !isOwner && (
                   <ScheduleEditor
@@ -325,7 +325,7 @@ export function MemberDetailCard({
 
               <div className="mt-2 grid grid-cols-3 gap-2">
                 <div className="bg-muted/40 rounded-md p-2">
-                  <p className="text-muted-foreground text-[10px] text-center">Diarias</p>
+                  <p className="text-muted-foreground text-xs text-center">Diarias</p>
                   <div className="mt-1 flex items-center justify-center gap-1">
                     <Input
                       type="number"
@@ -341,7 +341,7 @@ export function MemberDetailCard({
                   </div>
                 </div>
                 <div className="bg-muted/40 rounded-md p-2">
-                  <p className="text-muted-foreground text-[10px] text-center">Semana objetivo</p>
+                  <p className="text-muted-foreground text-xs text-center">Semana objetivo</p>
                   <div className="mt-1 flex items-center justify-center gap-1">
                     <Input
                       type="number"
@@ -357,7 +357,7 @@ export function MemberDetailCard({
                   </div>
                 </div>
                 <div className="bg-muted/40 rounded-md p-2 text-center">
-                  <p className="text-muted-foreground text-[10px]">Semana real</p>
+                  <p className="text-muted-foreground text-xs">Semana real</p>
                   <p className={`mt-1.5 font-semibold text-sm ${userSchedules.length === 0 ? 'text-red-400' : ''}`}>
                     {isOwner ? '—' : `${weeklyRealHours}h`}
                   </p>
@@ -375,7 +375,7 @@ export function MemberDetailCard({
                     <span />
                   )}
                   {orgLimits && (
-                    <p className="text-muted-foreground text-[10px]">
+                    <p className="text-muted-foreground text-xs">
                       Límites org: {orgLimits.daily_hours}h/día · {orgLimits.weekly_hours}h/semana
                     </p>
                   )}
@@ -392,12 +392,12 @@ export function MemberDetailCard({
                     const s = userSchedules.find((x) => x.day_of_week === d);
                     return (
                       <div key={d} className="space-y-1" title={s?.shift?.name}>
-                        <p className="text-muted-foreground text-center text-[9px] font-medium uppercase">
+                        <p className="text-muted-foreground text-center text-xs font-medium uppercase">
                           {DAY_SHORT_LABELS[d].charAt(0)}
                         </p>
                         {s?.shift ? (
                           <div
-                            className="rounded border border-l-4 p-1 text-center text-[10px] font-medium truncate"
+                            className="rounded border border-l-4 p-1 text-center text-xs font-medium truncate"
                             style={{ borderColor: `${s.shift.color}88`, borderLeftColor: s.shift.color }}
                             title={`${s.shift.name} · ${formatHora(s.shift.start_time)}–${formatHora(s.shift.end_time)}`}
                           >
@@ -405,7 +405,7 @@ export function MemberDetailCard({
                           </div>
                         ) : (
                           <div className="border-border/60 rounded border border-dashed p-1 text-center">
-                            <span className="text-muted-foreground text-[10px]">—</span>
+                            <span className="text-muted-foreground text-xs">—</span>
                           </div>
                         )}
                       </div>
@@ -419,7 +419,7 @@ export function MemberDetailCard({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Settings2 className="text-muted-foreground size-4" />
-                  <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wide">Accesos</p>
+                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">Accesos</p>
                 </div>
                 {canManage && (
                   <Button variant="outline" size="sm" className="h-7 text-xs" onClick={onManageAccess}>
@@ -437,14 +437,14 @@ export function MemberDetailCard({
                   {grants.map((g) => (
                     <div key={`${g.typeLabel}:${g.name}`} className="rounded-md border p-1.5">
                       <div className="flex items-center gap-1.5">
-                        <Badge variant="outline" className="text-[10px] shrink-0">
+                        <Badge variant="outline" className="text-xs shrink-0">
                           {PERMISSION_LABELS[g.permission]}
                         </Badge>
                         <p className="text-xs font-medium truncate">
                           {g.typeLabel}: {g.name}
                         </p>
                       </div>
-                      <p className="text-muted-foreground mt-0.5 text-[10px] truncate" title={g.path}>
+                      <p className="text-muted-foreground mt-0.5 text-xs truncate" title={g.path}>
                         {g.path}
                       </p>
                     </div>

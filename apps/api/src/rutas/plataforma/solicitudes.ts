@@ -6,6 +6,7 @@ import {
   type EstadoSolicitud,
 } from '@erp/shared';
 import { getAdminClient } from '../../lib/supabase/admin';
+import { emitirEvento } from '../../lib/telegram-plataforma';
 import type { ContextoUsuario } from '../../middleware/verificar-jwt';
 import {
   crearEmpresaConInvitacion,
@@ -84,6 +85,21 @@ rutasSolicitudes.patch('/:id', async (c) => {
     payload: { estado: data.estado },
   });
 
+  const ref = { entidadTipo: 'owner_application', entidadId: data.id as string };
+  if (body.data.estado === 'en_revision') {
+    void emitirEvento(
+      'solicitud_en_revision',
+      { empresa: data.empresa, contacto: data.nombre_contacto },
+      ref
+    );
+  } else if (body.data.estado === 'rechazada') {
+    void emitirEvento(
+      'solicitud_rechazada',
+      { empresa: data.empresa, motivo: data.notas_admin ?? '—' },
+      ref
+    );
+  }
+
   return c.json({ data });
 });
 
@@ -150,6 +166,17 @@ rutasSolicitudes.post('/:id/aprobar', async (c) => {
     },
   });
 
+  void emitirEvento(
+    'solicitud_aprobada',
+    {
+      empresa: body.data.nombre?.trim() || solicitud.empresa,
+      plan: body.data.plan_id ?? 'Sin plan',
+      enlace_invitacion: creada.data.link,
+      expira_at: creada.data.expiresAt.slice(0, 10),
+    },
+    { entidadTipo: 'owner_application', entidadId: solicitud.id as string }
+  );
+
   return c.json({
     ok: true,
     organization_id: creada.data.organizationId,
@@ -173,7 +200,7 @@ rutasSolicitudes.post('/:id/rechazar', async (c) => {
       updated_at: new Date().toISOString(),
     })
     .eq('id', c.req.param('id'))
-    .select('id')
+    .select('id, empresa')
     .maybeSingle();
   if (error || !data) return c.json({ error: 'Solicitud no encontrada' }, 404);
 
@@ -184,6 +211,12 @@ rutasSolicitudes.post('/:id/rechazar', async (c) => {
     entidadId: data.id,
     payload: { motivo: body.data.motivo },
   });
+
+  void emitirEvento(
+    'solicitud_rechazada',
+    { empresa: data.empresa ?? '—', motivo: body.data.motivo },
+    { entidadTipo: 'owner_application', entidadId: data.id as string }
+  );
 
   return c.json({ ok: true });
 });

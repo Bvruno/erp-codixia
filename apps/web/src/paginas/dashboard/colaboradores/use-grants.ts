@@ -2,22 +2,14 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { api, apiFetch } from '@/lib/api/cliente';
 import { queryClient } from '@/lib/query-client';
-import { listDescendants } from '@/lib/access';
 import type { Profile, EntityPermission, EntityType, EntityGrant } from '@/types';
 import type { ScopeSelection } from '@/components/colaboradores/entity-scope-picker';
-import type { ArbolColaboradores } from './presentacion';
 
 // Gestión de accesos específicos de un colaborador (grants por entidad).
 
 export type GrantsColaboradores = ReturnType<typeof useGrantsColaboradores>;
 
-export function useGrantsColaboradores({
-  tree,
-  setBusy,
-}: {
-  tree: ArbolColaboradores;
-  setBusy: (v: string | null) => void;
-}) {
+export function useGrantsColaboradores() {
   const [accessMember, setAccessMember] = useState<Profile | null>(null);
   const [accessGrants, setAccessGrants] = useState<EntityGrant[]>([]);
   const [accessLoading, setAccessLoading] = useState(false);
@@ -28,7 +20,6 @@ export function useGrantsColaboradores({
     permission: EntityPermission;
     inherit: boolean;
   }>({ type: 'workspace', selection: null, permission: 'read', inherit: true });
-  const [propagateTarget, setPropagateTarget] = useState<EntityGrant | null>(null);
 
   const openAccessDialog = async (member: Profile) => {
     setAccessMember(member);
@@ -106,39 +97,6 @@ export function useGrantsColaboradores({
     }
   };
 
-  const propagateGrant = async () => {
-    const grant = propagateTarget;
-    if (!grant || !accessMember) return;
-
-    const descendants = listDescendants(tree, grant.entity_type, grant.entity_id);
-    if (descendants.length === 0) {
-      toast.info('Esta entidad no tiene contenido interno');
-      setPropagateTarget(null);
-      return;
-    }
-
-    setBusy('propagate');
-    try {
-      await api.post('/entidades/grants/propagar', {
-        grants: descendants.map((d) => ({
-          entity_type: d.type,
-          entity_id: d.id,
-          profile_id: grant.profile_id,
-          permission: grant.permission,
-          inherit: grant.inherit,
-        })),
-      });
-      toast.success(`Acceso propagado a ${descendants.length} elemento(s) del contenido`);
-      invalidarAccesos();
-    } catch (e) {
-      toast.error('Error al propagar el acceso: ' + (e instanceof Error ? e.message : 'error'));
-    } finally {
-      setBusy(null);
-      setPropagateTarget(null);
-      if (accessMember) openAccessDialog(accessMember);
-    }
-  };
-
   return {
     accessMember,
     setAccessMember,
@@ -147,12 +105,9 @@ export function useGrantsColaboradores({
     agregandoAcceso,
     accessAdd,
     setAccessAdd,
-    propagateTarget,
-    setPropagateTarget,
     openAccessDialog,
     saveGrant,
     removeGrant,
     addGrant,
-    propagateGrant,
   };
 }

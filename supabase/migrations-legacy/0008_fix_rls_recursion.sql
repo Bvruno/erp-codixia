@@ -7,28 +7,31 @@
 CREATE OR REPLACE FUNCTION get_my_org_id()
 RETURNS UUID
 LANGUAGE sql
+STABLE
 SECURITY DEFINER
 SET search_path = ''
 AS $$
-  SELECT organization_id FROM profiles WHERE id = auth.uid() AND blocked = false;
+  SELECT organization_id FROM public.profiles WHERE id = auth.uid() AND blocked = false;
 $$;
 
 CREATE OR REPLACE FUNCTION get_my_role()
 RETURNS TEXT
 LANGUAGE sql
+STABLE
 SECURITY DEFINER
 SET search_path = ''
 AS $$
-  SELECT role FROM profiles WHERE id = auth.uid() AND blocked = false;
+  SELECT role FROM public.profiles WHERE id = auth.uid() AND blocked = false;
 $$;
 
 CREATE OR REPLACE FUNCTION get_my_profile_id()
 RETURNS UUID
 LANGUAGE sql
+STABLE
 SECURITY DEFINER
 SET search_path = ''
 AS $$
-  SELECT id FROM profiles WHERE id = auth.uid() AND blocked = false;
+  SELECT id FROM public.profiles WHERE id = auth.uid() AND blocked = false;
 $$;
 
 -- ============================================================
@@ -36,6 +39,7 @@ $$;
 -- ============================================================
 
 DROP POLICY IF EXISTS "profiles_select_org" ON profiles;
+DROP POLICY IF EXISTS "profiles_insert_own" ON profiles;
 DROP POLICY IF EXISTS "profiles_update_org_admin" ON profiles;
 DROP POLICY IF EXISTS "org_view_members" ON organizations;
 DROP POLICY IF EXISTS "org_update_owner" ON organizations;

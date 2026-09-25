@@ -97,7 +97,7 @@ export function BrandWordmark({
           ERP Codixia
         </span>
         {showTagline && (
-          <span className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          <span className="truncate text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
             Plataforma
           </span>
         )}

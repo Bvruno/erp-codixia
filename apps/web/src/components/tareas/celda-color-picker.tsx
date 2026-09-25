@@ -64,7 +64,7 @@ export function ColorCeldaPicker({
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-2" align="start">
-        <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {esBorde ? 'Color de borde' : 'Color de celda'}
         </p>
         <div className="grid grid-cols-6 gap-1.5">

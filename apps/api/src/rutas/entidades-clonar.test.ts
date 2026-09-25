@@ -184,7 +184,9 @@ describe('POST /entidades/:type/:id/clonar', () => {
     });
     expect(res.status).toBe(200);
     const json = (await res.json()) as { id: string };
-    expect(json.id).toBe('nuevo-task_lists');
+    // El id lo genera la API (el INSERT va sin RETURNING por RLS).
+    expect(json.id).toMatch(/^[0-9a-f-]{36}$/);
+    const idClon = json.id;
 
     const insercionLista = estado.inserts.find((i) => i.tabla === 'task_lists');
     expect(insercionLista?.filas[0]).toMatchObject({
@@ -204,7 +206,7 @@ describe('POST /entidades/:type/:id/clonar', () => {
     expect(raiz?.parent_task_id).toBeNull();
     expect(raiz?.created_by).toBe(estado.usuarioId);
     expect(sub?.parent_task_id).toBe(raiz?.id);
-    expect(sub?.list_id).toBe('nuevo-task_lists');
+    expect(sub?.list_id).toBe(idClon);
 
     const insercionNotas = estado.inserts.find((i) => i.tabla === 'task_notes');
     expect(insercionNotas?.filas[0]).toMatchObject({ task_id: raiz?.id, content: 'nota' });
@@ -213,7 +215,7 @@ describe('POST /entidades/:type/:id/clonar', () => {
     expect(upsertGrants?.filas).toHaveLength(1);
     expect(upsertGrants?.filas[0]).toMatchObject({
       entity_type: 'list',
-      entity_id: 'nuevo-task_lists',
+      entity_id: idClon,
       profile_id: 'colab-1',
       permission: 'read',
     });
@@ -242,11 +244,12 @@ describe('POST /entidades/:type/:id/clonar', () => {
       body: JSON.stringify({ name: 'Copia de Manual' }),
     });
     expect(res.status).toBe(200);
+    const clonDoc = (await res.json()) as { id: string };
 
     const insercionPaginas = estado.inserts.find((i) => i.tabla === 'document_pages');
     expect(insercionPaginas?.filas).toHaveLength(2);
     expect(insercionPaginas?.filas[0]).toMatchObject({
-      document_id: 'nuevo-documents',
+      document_id: clonDoc.id,
       content: 'Hola',
     });
   });
@@ -284,9 +287,10 @@ describe('POST /entidades/:type/:id/clonar', () => {
       body: JSON.stringify({ name: 'Copia de Limpieza' }),
     });
     expect(res.status).toBe(200);
+    const clonTodo = (await res.json()) as { id: string };
     const insercionItems = estado.inserts.find((i) => i.tabla === 'todo_items');
     expect(insercionItems?.filas[0]).toMatchObject({
-      todo_id: 'nuevo-todos',
+      todo_id: clonTodo.id,
       name: 'Barrer',
       created_by: estado.usuarioId,
     });

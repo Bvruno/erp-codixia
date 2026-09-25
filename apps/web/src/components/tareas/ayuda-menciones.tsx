@@ -32,26 +32,26 @@ export function AyudaMenciones() {
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-3" align="end">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Menciones
         </p>
         <ul className="mt-1.5 space-y-1">
           {MENCIONES.map((m) => (
             <li key={m.simbolo} className="flex items-start gap-2 text-xs">
-              <span className="mt-px flex size-5 shrink-0 items-center justify-center rounded border bg-muted font-mono text-[11px] font-semibold">
+              <span className="mt-px flex size-5 shrink-0 items-center justify-center rounded border bg-muted font-mono text-xs font-semibold">
                 {m.simbolo}
               </span>
               <span className="text-muted-foreground">{m.texto}</span>
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Atajos
         </p>
         <ul className="mt-1.5 space-y-1">
           {ATAJOS.map((a) => (
             <li key={a.teclas} className="flex items-center justify-between gap-2 text-xs">
-              <span className="font-mono text-[11px] text-foreground">{a.teclas}</span>
+              <span className="font-mono text-xs text-foreground">{a.teclas}</span>
               <span className="text-right text-muted-foreground">{a.texto}</span>
             </li>
           ))}

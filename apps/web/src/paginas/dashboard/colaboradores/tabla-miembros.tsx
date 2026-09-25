@@ -106,13 +106,13 @@ export function TablaMiembros({
                       <div className="flex flex-wrap items-center gap-1.5">
                         <p className="font-medium text-sm">{c.full_name}</p>
                         {isOwner && (
-                          <Badge variant="outline" className="text-[10px] gap-1">
+                          <Badge variant="outline" className="text-xs gap-1">
                             <Crown className="size-3 text-yellow-500" />
                             Dueño
                           </Badge>
                         )}
                         {isSelf && (
-                          <Badge variant="outline" className="text-[10px] gap-1">
+                          <Badge variant="outline" className="text-xs gap-1">
                             <UserCheck className="size-3" />
                             Tú
                           </Badge>
@@ -140,7 +140,7 @@ export function TablaMiembros({
                   </TableCell>
                   <TableCell>
                     {grantCounts[c.id] > 0 ? (
-                      <Badge variant="outline" className="text-[10px] gap-1">
+                      <Badge variant="outline" className="text-xs gap-1">
                         <Settings2 className="size-3" />
                         {grantCounts[c.id]} acceso(s)
                       </Badge>
@@ -159,7 +159,7 @@ export function TablaMiembros({
                         {c.access_mode === 'grants_only' && (
                           <Badge
                             variant="outline"
-                            className="text-[10px] gap-1 text-amber-400"
+                            className="text-xs gap-1 text-amber-400"
                             title="Invitado por link con acceso aislado: solo ve los archivos con permiso asignado"
                           >
                             <Lock className="size-3" />

@@ -422,7 +422,7 @@ export function ConfigCompartirDialog({
                     listas.map((l) => (
                       <div key={l.id} className="flex items-center justify-between rounded px-2 py-1 text-sm hover:bg-muted/50">
                         <span className="flex items-center gap-2">
-                          <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                          <span className="rounded bg-muted px-1.5 py-0.5 text-xs uppercase text-muted-foreground">
                             {l.tipo}
                           </span>
                           {l.valor}
@@ -536,7 +536,7 @@ export function ConfigCompartirDialog({
                   <div key={i.id} className="flex items-center justify-between rounded px-2 py-1 text-sm hover:bg-muted/50">
                     <span className="flex min-w-0 items-center gap-2">
                       <span className="truncate">{i.nombre}</span>
-                      <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                      <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
                         {i.estado === 'respondido' ? 'Respondió' : i.estado === 'revocado' ? 'Revocado' : 'Pendiente'}
                       </span>
                     </span>

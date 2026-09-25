@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { apiFetch } from '@/lib/api/cliente';
 import { TTL_CACHE } from '@/lib/cache-claves';
 import { entitySlug, findEntityByParam } from '@/lib/slugs';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Folder, LayoutGrid, ListTodo, CheckCircle2, Clock, AlertCircle, Layers, CalendarClock, Settings2 } from 'lucide-react';
+import { ListTodo, CheckCircle2, Clock, AlertCircle, Layers, CalendarClock, Settings2 } from 'lucide-react';
 import { unionConfig } from '@/lib/task-config';
 import { StatusConfigDialog } from '@/components/tareas/status-config-dialog';
+import { AccionEntidad } from '@/components/entidad/accion-entidad';
+import { CabeceraEntidad } from '@/components/entidad/cabecera-entidad';
+import { EntidadPagina } from '@/components/entidad/entidad-pagina';
+import { EsqueletoEntidad } from '@/components/entidad/estado-entidad';
 import { useTareas } from '@/components/tareas/tareas-context';
 import { ShareButton } from '@/components/tareas/share-entity-dialog';
 import type { Task, TaskList as TaskListEntry, Profile, Shift, Schedule } from '@/types';
@@ -111,18 +113,7 @@ export function EntityDashboard({ scope }: { scope: Scope }) {
   /* eslint-enable react-hooks/set-state-in-effect */
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-72" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Skeleton className="h-64 w-full rounded-xl" />
-          <Skeleton className="h-64 w-full rounded-xl" />
-        </div>
-      </div>
-    );
+    return <EsqueletoEntidad variante="tablero" />;
   }
 
   const workspace = scope.type === 'workspace'
@@ -305,58 +296,57 @@ export function EntityDashboard({ scope }: { scope: Scope }) {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
-        {scope.type === 'workspace'
-          ? <Folder className="size-6 text-blue-500" />
-          : <LayoutGrid className="size-6 text-yellow-500" />}
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold truncate">{scope.type === 'workspace' ? workspace!.name : folder!.name}</h1>
-          <p className="text-sm text-muted-foreground">
-            {scope.type === 'workspace'
-              ? `${scopeFolders.length} carpeta(s) · ${scopeLists.length} lista(s) · ${total} tareas`
-              : `${workspace!.name} / ${folder!.name} · ${scopeLists.length} lista(s) · ${total} tareas`}
-          </p>
-        </div>
-        <Badge className="bg-primary/10 text-primary">{completion}% completado</Badge>
-        {ctx.isAdmin && (
-          <ShareButton
-            onClick={() =>
-              ctx.openShare(
-                scope.type,
-                scope.type === 'workspace' ? workspace! : folder!
-              )
-            }
-          />
-        )}
-        <div className="flex items-center gap-1 rounded-md border p-0.5 text-xs">
-          {(
-            [
-              ['7', '7d'],
-              ['30', '30d'],
-              ['all', 'Todo'],
-            ] as [Period, string][]
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setPeriod(value)}
-              className={`rounded px-2 py-1 font-medium transition-colors ${
-                period === value
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {scope.type === 'workspace' && canManageWs && (
-          <Button variant="outline" size="sm" onClick={() => setShowConfig(true)} className="w-full sm:w-auto">
-            <Settings2 className="size-3.5" />
-            <span className="text-xs sm:ml-1">Estados y prioridades por defecto</span>
-          </Button>
-        )}
-      </div>
+    <EntidadPagina className="space-y-6">
+      <CabeceraEntidad
+        tipo={scope.type}
+        titulo={scope.type === 'workspace' ? workspace!.name : folder!.name}
+        subtitulo={
+          scope.type === 'workspace'
+            ? `${scopeFolders.length} carpeta(s) · ${scopeLists.length} lista(s) · ${total} tareas`
+            : `${workspace!.name} / ${folder!.name} · ${scopeLists.length} lista(s) · ${total} tareas`
+        }
+        badges={<Badge className="bg-primary/10 text-primary">{completion}% completado</Badge>}
+        acciones={
+          <>
+            <div className="flex items-center gap-1 rounded-md border p-0.5 text-xs">
+              {(
+                [
+                  ['7', '7d'],
+                  ['30', '30d'],
+                  ['all', 'Todo'],
+                ] as [Period, string][]
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => setPeriod(value)}
+                  className={`rounded px-2 py-1 font-medium transition-colors ${
+                    period === value
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {scope.type === 'workspace' && canManageWs && (
+              <AccionEntidad icono={Settings2} onClick={() => setShowConfig(true)}>
+                Estados y prioridades por defecto
+              </AccionEntidad>
+            )}
+            {ctx.isAdmin && (
+              <ShareButton
+                onClick={() =>
+                  ctx.openShare(
+                    scope.type,
+                    scope.type === 'workspace' ? workspace! : folder!
+                  )
+                }
+              />
+            )}
+          </>
+        }
+      />
 
       <StatsGrid stats={stats} />
 
@@ -417,6 +407,6 @@ export function EntityDashboard({ scope }: { scope: Scope }) {
           onSaved={() => void dashboardQuery.refetch()}
         />
       )}
-    </div>
+    </EntidadPagina>
   );
 }

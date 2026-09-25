@@ -145,17 +145,17 @@ export function AssignAccessDialog({
                     key={`${g.entity_type}:${g.entity_id}`}
                     className="flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs"
                   >
-                    <Badge variant="outline" className="text-[10px]">
+                    <Badge variant="outline" className="text-xs">
                       {SCOPE_LABELS[g.entity_type]}
                     </Badge>
                     <span className="min-w-0 flex-1 truncate">
                       {entityName(tree, g.entity_type, g.entity_id)}
                     </span>
-                    <Badge variant="outline" className="text-[10px]">
+                    <Badge variant="outline" className="text-xs">
                       {PERMISSION_LABELS[g.permission]}
                     </Badge>
                     {!g.inherit && (
-                      <span className="text-muted-foreground text-[10px]">sin heredar</span>
+                      <span className="text-muted-foreground text-xs">sin heredar</span>
                     )}
                     <button
                       type="button"

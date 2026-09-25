@@ -31,17 +31,14 @@ import {
   Undo2,
   Redo2,
   Trash2,
-  Save,
   Loader2,
-  Check,
   LayoutTemplate,
-  Pencil,
-  Eye,
   Info,
   Keyboard,
   Lightbulb,
   Shapes,
   Waypoints,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -109,6 +106,16 @@ import { usePortapapelesMapa } from './use-portapapeles';
 import { useGuiasAlineacion } from './use-guias';
 import { BarraHerramientas } from './barra-herramientas';
 import { BarraSeleccion, type EdgeSeleccionado } from './barra-seleccion';
+import {
+  BarraHerramientas as BarraHerramientasEntidad,
+  BotonHerramienta,
+  SeparadorHerramienta,
+} from '@/components/entidad/barra-herramientas';
+import { CabeceraEntidad } from '@/components/entidad/cabecera-entidad';
+import { EntidadPagina } from '@/components/entidad/entidad-pagina';
+import { ToggleModoEntidad } from '@/components/entidad/toggle-modo-entidad';
+import { IndicadorGuardado } from '@/components/entidad/indicador-guardado';
+import { AvisoSoloLectura } from '@/components/entidad/aviso-solo-lectura';
 import {
   MenuContextualMapa,
   type AccionesMenuMapa,
@@ -1212,90 +1219,83 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
 
   return (
     <EditorContextProvider value={editorValue}>
-      <div className="flex h-[calc(100dvh-6.5rem)] min-h-[480px] flex-col overflow-hidden rounded-md border bg-background">
-        {/* Barra superior */}
-        <div className="flex flex-wrap items-center gap-1 border-b px-2 py-1.5">
-          <span className="mr-2 max-w-40 truncate text-sm font-semibold">{map.name}</span>
-
-          <div className="mx-1 h-5 w-px bg-border" />
-          <button onClick={undo} disabled={!editable || !canUndo} className={TOOL_BTN} title="Deshacer (Ctrl+Z)">
-            <Undo2 className="size-4" />
-          </button>
-          <button onClick={redo} disabled={!editable || !canRedo} className={TOOL_BTN} title="Rehacer (Ctrl+Shift+Z)">
-            <Redo2 className="size-4" />
-          </button>
-
-          <div className="mx-1 h-5 w-px bg-border" />
-          <button
-            onClick={() => setConfirmTemplate(true)}
-            disabled={!editable}
-            className={TOOL_BTN}
-            title="Aplicar plantilla"
-          >
-            <LayoutTemplate className="size-4" />
-          </button>
-          <button
-            onClick={eliminarSeleccion}
-            disabled={!haySeleccion || !editable}
-            className={cn(TOOL_BTN, 'text-destructive hover:text-destructive')}
-            title={`Eliminar selección (${selectedIds.length + selectedEdgeIds.length})`}
-          >
-            <Trash2 className="size-4" />
-          </button>
-          <button
-            onClick={() => setAyudaAbierta(true)}
-            className={TOOL_BTN}
-            title="Atajos de teclado (?)"
-          >
-            <Keyboard className="size-4" />
-          </button>
-          <button
-            onClick={() => setGuiaAbierta(true)}
-            className={TOOL_BTN}
-            title="Cómo usar el mapa (información)"
-          >
-            <Info className="size-4" />
-          </button>
-
-          <div className="ml-auto flex items-center gap-2">
-            {map && ctx.isAdmin && (
-              <ShareButton onClick={() => ctx.openShare('mindmap', map)} />
-            )}
-            <button
-              onClick={() => {
-                setMode(mode === 'edit' ? 'view' : 'edit');
-                escapar();
-                setTool('select');
-              }}
-              disabled={!canWrite}
-              title={
-                !canWrite
-                  ? 'Sin permisos de edición'
-                  : mode === 'edit'
-                    ? 'Cambiar a modo visualización'
-                    : 'Cambiar a modo edición'
-              }
-              className={cn(
-                'flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60',
-                mode === 'edit'
-                  ? 'border-primary/40 bg-primary/10 text-primary hover:bg-primary/20'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+      <EntidadPagina
+        alto="completa"
+        className="h-[calc(100dvh-6.5rem)] min-h-[480px]"
+      >
+        <CabeceraEntidad
+          tipo="mindmap"
+          titulo={map.name}
+          estado={
+            <>
+              <IndicadorGuardado estado={saveState} formato="icono" />
+              {!canWrite && <AvisoSoloLectura variante="badge" />}
+            </>
+          }
+          acciones={
+            <>
+              <BarraHerramientasEntidad>
+                <BotonHerramienta
+                  onClick={undo}
+                  disabled={!editable || !canUndo}
+                  title="Deshacer (Ctrl+Z)"
+                >
+                  <Undo2 className="size-4" />
+                </BotonHerramienta>
+                <BotonHerramienta
+                  onClick={redo}
+                  disabled={!editable || !canRedo}
+                  title="Rehacer (Ctrl+Shift+Z)"
+                >
+                  <Redo2 className="size-4" />
+                </BotonHerramienta>
+                <SeparadorHerramienta />
+                <BotonHerramienta
+                  onClick={() => setConfirmTemplate(true)}
+                  disabled={!editable}
+                  title="Aplicar plantilla"
+                >
+                  <LayoutTemplate className="size-4" />
+                </BotonHerramienta>
+                <BotonHerramienta
+                  onClick={eliminarSeleccion}
+                  disabled={!haySeleccion || !editable}
+                  title={`Eliminar selección (${selectedIds.length + selectedEdgeIds.length})`}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="size-4" />
+                </BotonHerramienta>
+                <BotonHerramienta
+                  onClick={() => setAyudaAbierta(true)}
+                  title="Atajos de teclado (?)"
+                >
+                  <Keyboard className="size-4" />
+                </BotonHerramienta>
+                <BotonHerramienta
+                  onClick={() => setGuiaAbierta(true)}
+                  title="Cómo usar el mapa (información)"
+                >
+                  <Info className="size-4" />
+                </BotonHerramienta>
+              </BarraHerramientasEntidad>
+              {map && ctx.isAdmin && (
+                <ShareButton onClick={() => ctx.openShare('mindmap', map)} />
               )}
-            >
-              {mode === 'edit' ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
-              {mode === 'edit' ? 'Editando' : 'Visualizando'}
-            </button>
-            {saveState === 'saving' && <Loader2 className="size-3.5 animate-spin text-muted-foreground" />}
-            {saveState === 'saved' && <Check className="size-3.5 text-emerald-600" />}
-            {saveState === 'unsaved' && <Save className="size-3.5 text-amber-500" />}
-            {!canWrite && (
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                Solo lectura
-              </span>
-            )}
-          </div>
-        </div>
+              <ToggleModoEntidad
+                modo={mode === 'edit' ? 'editar' : 'ver'}
+                onCambio={(m) => {
+                  setMode(m === 'editar' ? 'edit' : 'view');
+                  escapar();
+                  setTool('select');
+                }}
+                disabled={!canWrite}
+              />
+            </>
+          }
+        />
 
+        {/* Contenedor del lienzo */}
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border bg-background">
         {/* Barra de formato (selección): prioridad y etiquetas */}
         {editable && haySeleccion && (
           <div className="flex flex-wrap items-center gap-2 border-b px-2 py-1.5 text-xs">
@@ -1335,10 +1335,10 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
                       .map((p) => (
                         <span
                           key={p}
-                          className="mr-1 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
+                          className="mr-1 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-medium text-white"
                           style={{ backgroundColor: priorityColor(p) ?? '#6b7280' }}
                         >
-                          {etiquetaPrioridad(p)} ✕
+                          {etiquetaPrioridad(p)} <X className="size-3" aria-hidden="true" />
                         </span>
                       ))}
                   </button>
@@ -1366,10 +1366,10 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
                   <button
                     key={l}
                     onClick={() => removeLabel(l)}
-                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary hover:bg-primary/20"
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary hover:bg-primary/20"
                     title="Quitar etiqueta"
                   >
-                    {l} ✕
+                    {l} <X className="size-3" aria-hidden="true" />
                   </button>
                 ))}
               </>
@@ -1572,7 +1572,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
               )}
               {!trazoPreview && (
                 <div className="pointer-events-none absolute inset-x-0 top-2 flex justify-center">
-                  <span className="rounded-full border bg-popover/95 px-3 py-1 text-[11px] text-muted-foreground shadow-sm">
+                  <span className="rounded-full border bg-popover/95 px-3 py-1 text-xs text-muted-foreground shadow-sm">
                     Dibuja con el mouse · P para salir
                   </span>
                 </div>
@@ -1625,7 +1625,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
 
           {conectorOrigen && (
             <div className="pointer-events-none absolute inset-x-0 top-2 z-30 flex justify-center">
-              <span className="rounded-full border bg-popover/95 px-3 py-1 text-[11px] shadow-sm">
+              <span className="rounded-full border bg-popover/95 px-3 py-1 text-xs shadow-sm">
                 Haz clic en otro nodo para conectar · Esc para cancelar
               </span>
             </div>
@@ -1633,7 +1633,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
 
           {formaPendiente && (
             <div className="pointer-events-none absolute inset-x-0 top-2 z-30 flex justify-center">
-              <span className="rounded-full border bg-popover/95 px-3 py-1 text-[11px] shadow-sm">
+              <span className="rounded-full border bg-popover/95 px-3 py-1 text-xs shadow-sm">
                 Haz clic en el lienzo para colocar la forma · Esc para cancelar
               </span>
             </div>
@@ -1647,7 +1647,8 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
             />
           )}
         </div>
-      </div>
+        </div>
+      </EntidadPagina>
 
       <Dialog open={confirmTemplate} onOpenChange={setConfirmTemplate}>
         <DialogContent className="sm:max-w-md">
@@ -1705,7 +1706,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
             ).map(([tecla, accion]) => (
               <li key={tecla} className="flex items-center justify-between gap-3">
                 <span className="truncate text-muted-foreground">{accion}</span>
-                <kbd className="shrink-0 rounded border bg-muted px-1.5 py-0.5 text-[10px] font-semibold">
+                <kbd className="shrink-0 rounded border bg-muted px-1.5 py-0.5 text-xs font-semibold">
                   {tecla}
                 </kbd>
               </li>
@@ -1740,7 +1741,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
                   Haz <b>doble clic</b> en un nodo para escribir su título y sus notas.
                 </li>
                 <li>
-                  Con un nodo seleccionado pulsa <kbd className="rounded border bg-muted px-1 py-0.5 text-[10px] font-semibold">Tab</kbd>{' '}
+                  Con un nodo seleccionado pulsa <kbd className="rounded border bg-muted px-1 py-0.5 text-xs font-semibold">Tab</kbd>{' '}
                   para crear una idea conectada a la derecha.
                 </li>
                 <li>
@@ -1763,8 +1764,7 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
                   figuras.
                 </li>
                 <li>
-                  Cambia la figura desde la barra flotante del nodo (■ ● ◆ ▲) o con clic derecho →
-                  Forma.
+                  Cambia la figura desde la barra flotante del nodo o con clic derecho en Forma.
                 </li>
                 <li>
                   Arrastra las esquinas para redimensionar y el cuerpo para mover. El color se
@@ -1816,9 +1816,9 @@ export function MindMapCanvas({ mapId: paramMapId }: { mapId: string }) {
                   selección).
                 </li>
                 <li>
-                  Duplica (<kbd className="rounded border bg-muted px-1 py-0.5 text-[10px] font-semibold">Ctrl+D</kbd>),
+                  Duplica (<kbd className="rounded border bg-muted px-1 py-0.5 text-xs font-semibold">Ctrl+D</kbd>),
                   copia y pega, deshaz con{' '}
-                  <kbd className="rounded border bg-muted px-1 py-0.5 text-[10px] font-semibold">Ctrl+Z</kbd>{' '}
+                  <kbd className="rounded border bg-muted px-1 py-0.5 text-xs font-semibold">Ctrl+Z</kbd>{' '}
                   y ordena todo con clic derecho en el lienzo → <b>Auto-organizar</b> (árbol
                   horizontal, vertical o radial).
                 </li>

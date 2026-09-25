@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ERP Codixia spacing &amp; radius</title>
+    <link rel="stylesheet" href="../tokens.css" />
+    <style>
+      body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+      main { max-width: 860px; margin: 0 auto; padding: var(--space-12) var(--space-6); display: grid; gap: var(--space-8); }
+      h1 { margin: 0; font-family: var(--font-display); font-size: var(--text-2xl); line-height: var(--leading-tight); letter-spacing: var(--tracking-display); }
+      h2 { margin: 0 0 var(--space-4); font-size: var(--text-lg); }
+      p { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+      .section { display: grid; gap: var(--space-3); }
+      .bar { display: grid; grid-template-columns: 120px 1fr 80px; align-items: center; gap: var(--space-4); font-size: var(--text-sm); }
+      .fill { height: 12px; border-radius: var(--radius-sm); background: var(--accent); opacity: 0.85; }
+      .tag { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); }
+      .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-4); }
+      .tile { display: grid; place-items: center; height: 96px; border: 1px solid var(--border); background: var(--surface); font-size: var(--text-sm); }
+      .elev { display: grid; gap: var(--space-2); padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--surface); }
+      .elev-card { box-shadow: var(--elev-card); }
+      .elev-raised { box-shadow: var(--elev-raised); }
+      .elev-popover { box-shadow: var(--elev-popover); }
+      .controls { display: flex; align-items: flex-end; gap: var(--space-4); }
+      .control { display: grid; place-items: center; padding: 0 var(--space-4); border-radius: var(--radius-md); background: var(--surface-warm); font-size: var(--text-sm); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Espaciado, radios y elevación</h1>
+        <p>Base de 4px; radios de 8/10/14px; tres niveles de sombra.</p>
+      </header>
+
+      <section class="section">
+        <h2>Spacing</h2>
+        <div class="bar"><span class="tag">--space-1</span><div class="fill" style="width: 4px"></div><span class="tag">4px</span></div>
+        <div class="bar"><span class="tag">--space-2</span><div class="fill" style="width: 8px"></div><span class="tag">8px</span></div>
+        <div class="bar"><span class="tag">--space-3</span><div class="fill" style="width: 12px"></div><span class="tag">12px</span></div>
+        <div class="bar"><span class="tag">--space-4</span><div class="fill" style="width: 16px"></div><span class="tag">16px</span></div>
+        <div class="bar"><span class="tag">--space-6</span><div class="fill" style="width: 24px"></div><span class="tag">24px</span></div>
+        <div class="bar"><span class="tag">--space-8</span><div class="fill" style="width: 32px"></div><span class="tag">32px</span></div>
+        <div class="bar"><span class="tag">--space-12</span><div class="fill" style="width: 48px"></div><span class="tag">48px</span></div>
+        <div class="bar"><span class="tag">--space-20</span><div class="fill" style="width: 80px"></div><span class="tag">80px</span></div>
+      </section>
+
+      <section class="section">
+        <h2>Radius</h2>
+        <div class="tiles">
+          <div class="tile" style="border-radius: var(--radius-sm)">sm · 6px</div>
+          <div class="tile" style="border-radius: var(--radius-md)">md · 8px</div>
+          <div class="tile" style="border-radius: var(--radius-lg)">lg · 10px</div>
+          <div class="tile" style="border-radius: var(--radius-xl)">xl · 14px</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Elevación</h2>
+        <div class="tiles">
+          <div class="elev elev-card"><strong>card</strong><span class="tag">--elev-card</span></div>
+          <div class="elev elev-raised"><strong>raised</strong><span class="tag">--elev-raised</span></div>
+          <div class="elev elev-popover"><strong>popover</strong><span class="tag">--elev-popover</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Altura de controles</h2>
+        <div class="controls">
+          <div class="control" style="height: var(--control-h-sm)">sm · 32px</div>
+          <div class="control" style="height: var(--control-h)">base · 36px</div>
+          <div class="control" style="height: var(--control-h-lg)">lg · 40px</div>
+          <div class="control" style="height: var(--tap-target-min)">tap · 44px</div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

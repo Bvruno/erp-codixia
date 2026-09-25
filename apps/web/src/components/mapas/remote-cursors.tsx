@@ -29,7 +29,7 @@ export function RemoteCursorsLayer({ cursors }: { cursors: Record<string, Remote
             style={{ left: p.x, top: p.y, transform: 'translate(-4px, -4px)' }}
           >
             <span
-              className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 text-[10px] font-bold shadow-sm"
+              className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold shadow-sm"
               style={{ backgroundColor: color.bg, borderColor: color.border, color: color.text }}
               title={c.nombre}
             >

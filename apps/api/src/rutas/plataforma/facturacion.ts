@@ -8,6 +8,7 @@ import {
   type Factura,
 } from '@erp/shared';
 import { getAdminClient } from '../../lib/supabase/admin';
+import { emitirEvento } from '../../lib/telegram-plataforma';
 import type { ContextoUsuario } from '../../middleware/verificar-jwt';
 import { paginacion, registrarAuditoria } from './comun';
 
@@ -67,7 +68,7 @@ rutasFacturacion.put('/empresas/:id/suscripcion', async (c) => {
   const orgId = c.req.param('id');
   const { data: org } = await admin
     .from('organizations')
-    .select('id')
+    .select('id, name')
     .eq('id', orgId)
     .maybeSingle();
   if (!org) return c.json({ error: 'Empresa no encontrada' }, 404);
@@ -107,6 +108,12 @@ rutasFacturacion.put('/empresas/:id/suscripcion', async (c) => {
     entidadId: orgId,
     payload: { plan_id: body.data.plan_id, estado: body.data.estado },
   });
+
+  void emitirEvento(
+    'suscripcion_actualizada',
+    { empresa: org.name, plan: body.data.plan_id, estado: body.data.estado },
+    { entidadTipo: 'organization', entidadId: orgId }
+  );
 
   return c.json({ data });
 });
@@ -176,6 +183,22 @@ rutasFacturacion.post('/facturas', async (c) => {
     payload: { monto: data.monto, periodo: data.periodo },
   });
 
+  const { data: org } = await getAdminClient()
+    .from('organizations')
+    .select('name')
+    .eq('id', body.data.organization_id)
+    .maybeSingle();
+  void emitirEvento(
+    'factura_creada',
+    {
+      empresa: org?.name ?? body.data.organization_id,
+      periodo: body.data.periodo,
+      monto: body.data.monto,
+      moneda: body.data.moneda,
+    },
+    { entidadTipo: 'billing_record', entidadId: String(data.id) }
+  );
+
   return c.json({ data }, 201);
 });
 
@@ -204,6 +227,24 @@ rutasFacturacion.patch('/facturas/:id', async (c) => {
     entidadId: data.id as string,
     payload: { estado: data.estado },
   });
+
+  if (data.estado === 'pagada') {
+    const { data: org } = await getAdminClient()
+      .from('organizations')
+      .select('name')
+      .eq('id', data.organization_id as string)
+      .maybeSingle();
+    void emitirEvento(
+      'factura_pagada',
+      {
+        empresa: org?.name ?? data.organization_id,
+        periodo: data.periodo,
+        monto: data.monto,
+        moneda: data.moneda,
+      },
+      { entidadTipo: 'billing_record', entidadId: String(data.id) }
+    );
+  }
 
   return c.json({ data });
 });

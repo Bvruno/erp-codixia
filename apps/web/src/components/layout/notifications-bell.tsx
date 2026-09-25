@@ -126,7 +126,7 @@ export function NotificationsBell({ className }: { className?: string }) {
         >
           <Bell className="size-5" />
           {noLeidas > 0 && (
-            <span className="bg-primary text-primary-foreground absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold leading-none">
+            <span className="bg-primary text-primary-foreground absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-xs font-semibold leading-none">
               {noLeidas > 9 ? '9+' : noLeidas}
             </span>
           )}
@@ -180,7 +180,7 @@ export function NotificationsBell({ className }: { className?: string }) {
                       {n.body}
                     </span>
                   )}
-                  <span className="text-muted-foreground mt-0.5 block text-[10px]">
+                  <span className="text-muted-foreground mt-0.5 block text-xs">
                     {cuando(n.created_at)}
                   </span>
                 </span>

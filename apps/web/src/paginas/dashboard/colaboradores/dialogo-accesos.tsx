@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Copy, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Loader2 } from 'lucide-react';
 import { effectiveAccessEntries } from '@/lib/access';
 import type { EntityPermission } from '@/types';
 import { EntityScopePicker } from '@/components/colaboradores/entity-scope-picker';
@@ -42,7 +42,6 @@ export function DialogoAccesos({
     agregandoAcceso,
     accessAdd,
     setAccessAdd,
-    setPropagateTarget,
     saveGrant,
     removeGrant,
     addGrant,
@@ -58,7 +57,7 @@ export function DialogoAccesos({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             Accesos de {accessMember?.full_name}
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-xs">
               {accessGrants.length} específico(s)
             </Badge>
           </DialogTitle>
@@ -86,15 +85,6 @@ export function DialogoAccesos({
                         </p>
                       </div>
                       <div className="flex shrink-0 gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-
-                          title="Propagar al contenido interno"
-                          onClick={() => setPropagateTarget(g)}
-                        >
-                          <Copy className="size-3.5" />
-                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -157,11 +147,11 @@ export function DialogoAccesos({
                         key={`${e.type}:${e.id}`}
                         className="flex items-center gap-2 rounded-md px-2 py-1 text-xs"
                       >
-                        <Badge variant="outline" className="text-[10px] shrink-0">
+                        <Badge variant="outline" className="text-xs shrink-0">
                           {PERMISSION_LABELS[e.level]}
                         </Badge>
                         <span className="truncate">{e.path}</span>
-                        <span className="text-muted-foreground shrink-0 text-[10px] ml-auto">
+                        <span className="text-muted-foreground shrink-0 text-xs ml-auto">
                           heredado de {e.source.name}
                         </span>
                       </div>

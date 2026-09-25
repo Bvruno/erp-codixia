@@ -9,8 +9,11 @@ export default defineConfig({
       ),
       '@/lib/auth': fileURLToPath(new URL('./src/lib/auth', import.meta.url)),
       '@/lib/audit': fileURLToPath(new URL('./src/lib/audit.ts', import.meta.url)),
-      '@/lib/telegram-alert': fileURLToPath(
-        new URL('./src/lib/telegram-alert.ts', import.meta.url)
+      '@/lib/telegram-plataforma': fileURLToPath(
+        new URL('./src/lib/telegram-plataforma.ts', import.meta.url)
+      ),
+      '@/lib/telegram-bot': fileURLToPath(
+        new URL('./src/lib/telegram-bot.ts', import.meta.url)
       ),
       '@/lib/org-export': fileURLToPath(
         new URL('./src/lib/org-export.ts', import.meta.url)

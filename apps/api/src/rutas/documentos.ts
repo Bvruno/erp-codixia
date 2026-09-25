@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { clienteUsuarioMiddleware, type VariablesDatos } from '../lib/supabase/usuario';
 import { getAdminClient } from '../lib/supabase/admin';
 import { captureErrorServer } from '../lib/captura-errores';
+import { ejecutarEscritura, sinPermisoEscritura } from '../lib/escrituras';
 import { mapearError } from './entidades';
 
 export const rutasDocumentos = new Hono<{ Variables: VariablesDatos }>();
@@ -35,11 +36,57 @@ rutasDocumentos.put('/:id/paginas/:pageId', async (c) => {
   const supabase = c.get('supabase');
   const body = z.object({ title: z.string(), content: z.string() }).safeParse(await c.req.json());
   if (!body.success) return c.json({ error: 'Datos inválidos' }, 400);
-  const { error } = await supabase
-    .from('document_pages')
-    .update({ title: body.data.title, content: body.data.content })
-    .eq('id', c.req.param('pageId'));
+  const { error, filas } = await ejecutarEscritura(
+    supabase
+      .from('document_pages')
+      .update({ title: body.data.title, content: body.data.content })
+      .eq('id', c.req.param('pageId'))
+      .select('id')
+  );
   if (error) return mapearError(c, error, 'No se pudo guardar el documento');
+  if (filas === 0) return sinPermisoEscritura(c);
+  return c.json({ success: true });
+});
+
+// PATCH /documentos/:id/paginas/reordenar — persiste el orden completo.
+rutasDocumentos.patch('/:id/paginas/reordenar', async (c) => {
+  const supabase = c.get('supabase');
+  const docId = c.req.param('id');
+  const body = z
+    .object({ orden: z.array(z.string().uuid()).min(1).max(100) })
+    .safeParse(await c.req.json());
+  if (!body.success) return c.json({ error: 'Datos inválidos' }, 400);
+
+  const { data: actuales, error: errorLectura } = await supabase
+    .from('document_pages')
+    .select('id')
+    .eq('document_id', docId);
+  if (errorLectura) return mapearError(c, errorLectura);
+
+  const existentes = new Set((actuales ?? []).map((p) => String(p.id)));
+  const { orden } = body.data;
+  if (orden.length !== existentes.size || orden.some((id) => !existentes.has(id))) {
+    return c.json({ error: 'El orden no corresponde a las páginas del documento' }, 400);
+  }
+
+  // Escrituras en paralelo: cada fila es independiente, así el reorden no
+  // acumula un RTT de Supabase por página (el cliente ya serializa reórdenes).
+  const resultados = await Promise.all(
+    orden.map((id, indice) =>
+      ejecutarEscritura(
+        supabase
+          .from('document_pages')
+          .update({ position: indice })
+          .eq('id', id)
+          .eq('document_id', docId)
+          .select('id')
+      )
+    )
+  );
+  const fallo = resultados.find((r) => r.error);
+  if (fallo?.error) return mapearError(c, fallo.error, 'No se pudo reordenar las páginas');
+  if (resultados.some((r) => r.filas === 0)) return sinPermisoEscritura(c);
+
   return c.json({ success: true });
 });
 
@@ -60,8 +107,15 @@ rutasDocumentos.post('/:id/paginas', async (c) => {
 // DELETE /documentos/:id/paginas/:pageId
 rutasDocumentos.delete('/:id/paginas/:pageId', async (c) => {
   const supabase = c.get('supabase');
-  const { error } = await supabase.from('document_pages').delete().eq('id', c.req.param('pageId'));
+  const { error, filas } = await ejecutarEscritura(
+    supabase
+      .from('document_pages')
+      .delete()
+      .eq('id', c.req.param('pageId'))
+      .select('id')
+  );
   if (error) return mapearError(c, error, 'No se pudo eliminar la página');
+  if (filas === 0) return sinPermisoEscritura(c);
   return c.json({ success: true });
 });
 

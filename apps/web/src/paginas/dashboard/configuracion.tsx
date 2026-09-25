@@ -9,7 +9,7 @@ import { OrganizacionTab } from "./organizacion-tab";
 import { TurnosTab } from "./turnos-tab";
 import { TelegramTab } from "./telegram-tab";
 import { DatosTab } from "./datos-tab";
-import { PageHeader } from "@/components/layout/page-header";
+import { CabeceraEntidad } from "@/components/entidad/cabecera-entidad";
 
 export default function ConfiguracionPage() {
   const router = useRouter();
@@ -47,7 +47,7 @@ export default function ConfiguracionPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Configuración" />
+      <CabeceraEntidad titulo="Configuración" />
 
       <Tabs defaultValue="organizacion">
         <TabsList>

@@ -324,6 +324,35 @@ async function main() {
       listId = listData?.[0]?.id || null;
     }
 
+    // Mapa demo para el e2e de navegación (e2e/navegacion-tarea.spec.ts):
+    // abrir un archivo desde el detalle de tarea. Idempotente por nombre.
+    const MAPA_DEMO = 'Mapa demo navegacion';
+    if (listId) {
+      const { data: listRow } = await admin
+        .from('task_lists')
+        .select('id, workspace_id, folder_id')
+        .eq('id', listId)
+        .single();
+      const { data: mapaExistente } = await admin
+        .from('mind_maps')
+        .select('id')
+        .eq('organization_id', orgId)
+        .eq('name', MAPA_DEMO);
+      if (listRow && !mapaExistente?.length) {
+        const { error: mapaErr } = await admin.from('mind_maps').insert({
+          organization_id: orgId,
+          workspace_id: listRow.workspace_id,
+          folder_id: listRow.folder_id,
+          name: MAPA_DEMO,
+          content: { nodes: [], edges: [] },
+          position: 0,
+          visibility: 'public',
+        });
+        if (mapaErr) add('WARN: mapa demo no creado: ' + mapaErr.message);
+        else add('Mapa demo para e2e creado');
+      }
+    }
+
     const { data: tasks } = await admin
       .from('tasks')
       .select('id')

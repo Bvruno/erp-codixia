@@ -4,10 +4,12 @@ import { useMemo, useState } from 'react';
 import {
   ChevronDown,
   ChevronUp,
+  Circle,
   Copy,
   GripVertical,
   Plus,
   Split,
+  Square,
   Trash2,
   X,
 } from 'lucide-react';
@@ -224,8 +226,12 @@ function PreguntaCard({
                 <div className="space-y-2">
                   {(pregunta.opciones ?? []).map((opcion, idx) => (
                     <div key={opcion.id} className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        {pregunta.tipo === 'casillas' ? '☐' : '○'}
+                      <span className="text-muted-foreground">
+                        {pregunta.tipo === 'casillas' ? (
+                          <Square className="size-3.5" aria-hidden="true" />
+                        ) : (
+                          <Circle className="size-3.5" aria-hidden="true" />
+                        )}
                       </span>
                       <Input
                         value={opcion.etiqueta}

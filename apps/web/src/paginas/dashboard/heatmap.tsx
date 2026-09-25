@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -88,7 +88,7 @@ export function HeatmapHoras({ entries, month, dailyTarget }: Props) {
               key={date}
               title={`${format(new Date(date + "T00:00:00"), "d MMM", { locale: es })}: ${hours}h`}
               className={cn(
-                "flex aspect-square items-center justify-center rounded text-[11px] font-mono",
+                "flex aspect-square items-center justify-center rounded text-xs font-mono",
                 intensity(hours, dailyTarget),
                 hours > 0 && "text-foreground",
                 hours === 0 &&

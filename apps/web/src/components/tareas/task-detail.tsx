@@ -1,9 +1,10 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { canalRealtime, removerCanal } from '@/lib/realtime';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useNavigate } from '@tanstack/react-router';
 import { usePerfil } from '@/lib/use-perfil';
 import { aplicarEventoLista, leerEvento, parchearQuery } from '@/lib/realtime-cache';
 import { api, apiFetch } from '@/lib/api/cliente';
@@ -23,20 +24,24 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Send, ArrowLeft, ChevronRight, Circle, Flag, User, Clock,
-  Calendar, Hash, Trash2, Loader2, UserPlus,
+  Send, Circle, Flag, User, Clock,
+  Calendar, Hash, Trash2, Loader2, UserPlus, SquareCheckBig,
 } from 'lucide-react';
 import Link from 'next/link';
 import { format, isToday, isYesterday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import type { Task, TaskNote, Profile, Shift, TaskActivityLog, StatusDef, PriorityDef } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
 import { resolveStatuses, resolvePriorities, statusLabel, statusStyle } from '@/lib/task-config';
 import { useTareasOpcional } from '@/components/tareas/tareas-context';
 import { useFormatoHora } from '@/lib/use-formato-hora';
 import { saveAssignmentGrants, createInvitation } from '@/lib/auth/actions';
 import { useAssignAccess, type GrantDraft } from '@/components/tareas/assign-access-dialog';
+import { AccionEntidad } from '@/components/entidad/accion-entidad';
+import { CabeceraEntidad, TituloEditableEntidad } from '@/components/entidad/cabecera-entidad';
+import { PanelEntidad } from '@/components/entidad/panel-entidad';
+import { EntidadPagina } from '@/components/entidad/entidad-pagina';
+import { EstadoEntidad, EsqueletoEntidad } from '@/components/entidad/estado-entidad';
 import type { AccessTree } from '@/lib/access';
 
 type TaskDetailPayload = {
@@ -88,7 +93,7 @@ export function TaskDetail({
   const ctx = useTareasOpcional();
   const enModal = !!onClose;
   const pathname = usePathname();
-  const router = useRouter();
+  const navigate = useNavigate();
   const { formatHoraDeFecha } = useFormatoHora();
 
   const arbolActual: AccessTree = useMemo(
@@ -292,13 +297,25 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
     setStatuses(data.statuses);
     setPriorities(data.priorities);
     setLoading(false);
-
-    if (!enModal && data.tarea?.list_id && data.chain) {
-      const canonical = `${data.chain.listPath}/tarea/${shortUid(fullTaskId ?? taskId)}`;
-      if (pathname !== canonical) router.replace(canonical);
-    }
-  }, [taskQuery.data, colaboradoresActuales, enModal, fullTaskId, taskId, pathname, router]);
+  }, [taskQuery.data, colaboradoresActuales]);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // URL canónica (slugs + prefijo corto). Solo se aplica si la ruta actual
+  // sigue siendo la de ESTA tarea: durante una transición de ruta el árbol
+  // anterior sigue montado, y un replace ciego secuestraba la navegación a
+  // documento/mapa/formulario/todo (la vista rebotaba al detalle).
+  const canonicalAplicadoRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (enModal || !chain || !fullTaskId) return;
+    const segs = pathname.split('/').filter(Boolean);
+    const paramTarea = segs[0] === 'proyectos' && segs[4] === 'tarea' ? segs[5] : null;
+    if (!paramTarea) return;
+    if (!fullTaskId.replace(/-/g, '').startsWith(paramTarea.replace(/-/g, ''))) return;
+    if (canonicalAplicadoRef.current === fullTaskId) return;
+    canonicalAplicadoRef.current = fullTaskId;
+    const canonical = `${chain.listPath}/tarea/${shortUid(fullTaskId)}`;
+    if (pathname !== canonical) navigate({ to: canonical, replace: true });
+  }, [enModal, chain, fullTaskId, pathname, navigate]);
 
   const refetchTarea = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: ['tarea', 'detalle', fullTaskId] });
@@ -523,110 +540,74 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
   const taskLink = (id: string) => (chain ? `${chain.listPath}/tarea/${shortUid(id)}` : `/proyectos/${shortUid(id)}`);
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-5 w-64" />
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-4">
-            <Skeleton className="h-40 w-full rounded-xl" />
-          </div>
-          <div className="lg:col-span-2">
-            <Skeleton className="h-[60vh] w-full rounded-xl" />
-          </div>
-        </div>
-      </div>
-    );
+    return <EsqueletoEntidad variante="detalle" />;
   }
 
   if (!task) {
     return (
-      <div className="space-y-4">
-        <Link href="/proyectos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" /> Volver a Proyectos
-        </Link>
-        <p className="text-muted-foreground">Tarea no encontrada</p>
-      </div>
+      <EstadoEntidad
+        icono={SquareCheckBig}
+        titulo="Tarea no encontrada"
+        accion={{ label: 'Volver a Proyectos', onClick: () => navigate({ to: '/proyectos' }) }}
+      />
     );
   }
 
+  const ruta = chain
+    ? [
+        { etiqueta: chain.workspace, href: chain.listPath },
+        ...(chain.folder ? [{ etiqueta: chain.folder, href: chain.listPath }] : []),
+        { etiqueta: chain.list, href: chain.listPath },
+        ...(task.parent_task_id
+          ? [{ etiqueta: parentTitle || '...', href: taskLink(task.parent_task_id) }]
+          : []),
+      ]
+    : undefined;
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-        <Input
-          key={task.title}
-          defaultValue={task.title}
-          onBlur={(e) => {
-            const v = e.target.value.trim();
-            if (v && v !== task.title) updateField('title', v);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-          }}
-          readOnly={!canEdit}
-          aria-label="Título de la tarea"
-          title={canEdit ? 'Click para editar el título' : task.title}
-          className="h-auto min-w-0 max-w-[260px] border-0 bg-transparent px-1 -mx-1 text-base font-semibold text-foreground focus-visible:ring-1 sm:max-w-[400px]"
-        />
-        {chain && (
+    <EntidadPagina>
+      <CabeceraEntidad
+        tipo="tarea"
+        ruta={ruta}
+        titulo={
+          <TituloEditableEntidad
+            valor={task.title}
+            onCommit={(v) => updateField('title', v)}
+            disabled={!canEdit}
+            placeholder="Título de la tarea"
+          />
+        }
+        acciones={
           <>
-            <ChevronRight className="size-3 shrink-0" />
-            <span className="hidden max-w-[140px] truncate sm:inline">{chain.workspace}</span>
-            {chain.folder && (
-              <>
-                <ChevronRight className="hidden size-3 shrink-0 md:inline" />
-                <span className="hidden max-w-[140px] truncate md:inline">{chain.folder}</span>
-              </>
+            {task.list_id && esAdminActual && (
+              <AccionEntidad
+                icono={inviting ? undefined : UserPlus}
+                onClick={inviteToList}
+                disabled={inviting}
+                title="Invitar a un colaborador a la lista de esta tarea (acceso aislado)"
+              >
+                {inviting && <Loader2 className="size-3.5 animate-spin" />}
+                Invitar
+              </AccionEntidad>
             )}
-            <ChevronRight className="size-3 shrink-0" />
-            <Link href={chain.listPath} className="hover:text-foreground max-w-[140px] truncate sm:inline">
-              {chain.list}
-            </Link>
+            {canEdit && (
+              <AccionEntidad
+                icono={Trash2}
+                onClick={() => setDeleteOpen(true)}
+                title="Eliminar tarea"
+                className="text-destructive hover:text-destructive"
+              >
+                Eliminar
+              </AccionEntidad>
+            )}
           </>
-        )}
-        {task.parent_task_id && (
-          <>
-            <ChevronRight className="size-3 shrink-0" />
-            <Link href={taskLink(task.parent_task_id)} className="hover:text-foreground hidden max-w-[200px] truncate md:inline">
-              {parentTitle || '...'}
-            </Link>
-          </>
-        )}
-        {task.list_id && esAdminActual && (
-          <button
-            onClick={inviteToList}
-            disabled={inviting}
-            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-60"
-            title="Invitar a un colaborador a la lista de esta tarea (acceso aislado)"
-          >
-            {inviting ? <Loader2 className="size-3.5 animate-spin" /> : <UserPlus className="size-3.5" />}
-            Invitar
-          </button>
-        )}
-      </div>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left: Task Info + Sub-tasks */}
         <div className="lg:col-span-1 space-y-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-base flex-1">
-                  <Input
-                    defaultValue={task.title}
-                    onBlur={(e) => { if (e.target.value !== task.title) updateField('title', e.target.value); }}
-                    readOnly={!canEdit}
-                    className="h-auto text-base font-semibold border-0 bg-transparent focus-visible:ring-1 px-1 -mx-1"
-                  />
-                </CardTitle>
-                {canEdit && (
-                  <Button variant="ghost" size="icon" className="size-7 text-destructive hover:text-destructive" onClick={() => setDeleteOpen(true)} title="Eliminar tarea">
-                    <Trash2 className="size-3.5" />
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <PanelEntidad contenidoClassName="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">Descripción</label>
                 <Textarea
@@ -695,7 +676,7 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                     {collaborators.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         <div className="flex items-center gap-2">
-                          <Avatar className="size-5"><AvatarFallback className="text-[8px]">{initials(c.full_name)}</AvatarFallback></Avatar>
+                          <Avatar className="size-5"><AvatarFallback className="text-xs">{initials(c.full_name)}</AvatarFallback></Avatar>
                           {c.full_name}
                         </div>
                       </SelectItem>
@@ -740,8 +721,7 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+          </PanelEntidad>
 
           <ConfirmDialog
             open={deleteOpen}
@@ -755,11 +735,10 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
 
           {/* Sub-tasks */}
           {subTasks.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Sub-tareas ({subTasks.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1">
+            <PanelEntidad
+              titulo={`Sub-tareas (${subTasks.length})`}
+              contenidoClassName="space-y-1"
+            >
                 {subTasks.map((st) => {
                   const stDef = statuses.find((s) => s.key === st.status);
                   return (
@@ -774,14 +753,13 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                         style={{ backgroundColor: stDef?.color ?? 'var(--muted-foreground)' }}
                       />
                       <span className="flex-1 truncate">{st.title}</span>
-                      <span className="text-muted-foreground text-[10px]">
+                      <span className="text-muted-foreground text-xs">
                         {stDef?.label ?? st.status}
                       </span>
                     </Link>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </PanelEntidad>
           )}
         </div>
 
@@ -820,14 +798,14 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                         {notes.map((note) => (
                           <div key={note.id} className="flex gap-3">
                             <Avatar className="size-7 shrink-0">
-                              <AvatarFallback className="text-[10px]">
+                              <AvatarFallback className="text-xs">
                                 {initials(note.author?.full_name || 'NN')}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-baseline gap-2">
                                 <span className="text-sm font-medium">{note.author?.full_name}</span>
-                                <span className="text-muted-foreground text-[10px]">
+                                <span className="text-muted-foreground text-xs">
                                   {formatTimestamp(new Date(note.created_at))}
                                 </span>
                               </div>
@@ -855,7 +833,7 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-xs">{activityLabel(log)}</p>
-                              <span className="text-muted-foreground text-[10px]">
+                              <span className="text-muted-foreground text-xs">
                                 {formatTimestamp(new Date(log.created_at))}
                               </span>
                             </div>
@@ -889,7 +867,7 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
         </div>
       </div>
       {assignAccessDialog}
-    </div>
+    </EntidadPagina>
   );
 }
 

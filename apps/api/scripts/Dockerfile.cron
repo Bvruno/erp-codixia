@@ -1,6 +1,8 @@
-# Imagen mínima para el Render Cron Job de recordatorios.
-# Env del job: API_URL (base de la API, ej. https://host o https://host/api)
-# y CRON_SECRET (mismo valor que en el servicio de la API).
+# Imagen mínima para los Render Cron Jobs (recordatorios y plataforma).
+# Env del job: API_URL (base de la API, ej. https://host o https://host/api),
+# CRON_SECRET (mismo valor que en el servicio de la API) y, para el job de
+# plataforma, sobreescribir el comando:
+#   sh -c "curl -fsS -X POST -H \"x-cron-secret: $CRON_SECRET\" \"$API_URL/cron/plataforma\""
 FROM curlimages/curl:8.11.0
 
 CMD ["sh", "-c", "curl -fsS -X POST -H \"x-cron-secret: $CRON_SECRET\" \"$API_URL/cron/recordatorios\""]

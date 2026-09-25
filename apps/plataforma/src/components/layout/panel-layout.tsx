@@ -8,11 +8,13 @@ import {
   LogOut,
   Moon,
   ScrollText,
+  Send,
   Shield,
   Sun,
   Ticket,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CampanaPanel } from '@/components/campana-panel';
 import { logout } from '@/lib/auth/actions';
 import { aplicarTema, temaActual, type Tema } from '@/lib/tema';
 import { cn } from '@/lib/utils';
@@ -25,6 +27,7 @@ const NAVEGACION = [
   { to: '/facturas', etiqueta: 'Facturación', icono: CreditCard },
   { to: '/admins', etiqueta: 'Administradores', icono: Shield },
   { to: '/auditoria', etiqueta: 'Auditoría', icono: ScrollText },
+  { to: '/telegram', etiqueta: 'Telegram', icono: Send },
 ] as const;
 
 export function PanelLayout({ email, children }: { email: string | null; children?: ReactNode }) {
@@ -71,7 +74,10 @@ export function PanelLayout({ email, children }: { email: string | null; childre
           ))}
         </nav>
         <div className="space-y-2 border-t p-3">
-          <p className="text-muted-foreground truncate px-1 text-xs">{email ?? 'Sin sesión'}</p>
+          <div className="flex items-center justify-between px-1">
+            <p className="text-muted-foreground truncate text-xs">{email ?? 'Sin sesión'}</p>
+            <CampanaPanel />
+          </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={alternarTema} className="flex-1">
               {tema === 'dark' ? <Sun /> : <Moon />}
@@ -88,7 +94,8 @@ export function PanelLayout({ email, children }: { email: string | null; childre
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="bg-card flex h-14 items-center justify-between border-b px-4 md:hidden">
           <span className="text-sm font-semibold">Plataforma</span>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-1">
+            <CampanaPanel />
             <Button variant="outline" size="sm" onClick={alternarTema}>
               {tema === 'dark' ? <Sun /> : <Moon />}
             </Button>

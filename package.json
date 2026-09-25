@@ -20,6 +20,10 @@
                     "dev:api":  "npm run dev -w @erp/api",
                     "dev:web":  "npm run dev -w @erp/web",
                     "dev:plataforma":  "npm run dev -w @erp/plataforma",
+                    "db:start":  "supabase start",
+                    "db:stop":  "supabase stop",
+                    "db:reset":  "supabase db reset",
+                    "test:rls":  "node scripts/test-rls-local.mjs",
                     "test:shared":  "npm run test -w @erp/shared",
                     "test:api":  "npm run test -w @erp/api",
                     "test:web":  "npm run test -w @erp/web",
@@ -34,6 +38,7 @@
                             "eslint":  "^9",
                             "eslint-plugin-react-hooks":  "^7.1.1",
                             "prettier":  "^3.9.6",
+                            "supabase":  "^2.117.0",
                             "typescript":  "^5",
                             "typescript-eslint":  "^8.70.0"
                         },

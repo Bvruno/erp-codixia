@@ -5,6 +5,7 @@ import { getAdminClient } from '../lib/supabase/admin';
 import { hashInviteToken } from '@erp/shared';
 import { verificarJwtMiddleware } from '../middleware/verificar-jwt';
 import { esPlatformAdmin } from '../middleware/requerir-plataforma';
+import { emitirEvento } from '../lib/telegram-plataforma';
 import { resolveOAuthNewUser, updateOAuthProfile } from '../lib/auth/oauth';
 
 export const rutasAuth = new Hono();
@@ -277,6 +278,15 @@ rutasAuth.post('/onboarding', verificarJwtMiddleware, async (c) => {
     .update({ estado: 'activada', updated_at: new Date().toISOString() })
     .eq('organization_id', perfil.organization_id)
     .in('estado', ['pendiente', 'en_revision', 'aprobada', 'invitada']);
+
+  void emitirEvento(
+    'empresa_activada',
+    {
+      empresa: body.data.org_name,
+      owner: usuario.email ?? usuario.perfil?.full_name ?? 'owner',
+    },
+    { entidadTipo: 'organization', entidadId: perfil.organization_id }
+  );
 
   return c.json({ success: true, redirect: '/' });
 });

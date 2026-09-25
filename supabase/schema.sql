@@ -2253,3 +2253,681 @@ REVOKE ALL ON TABLE plans FROM anon, authenticated;
 REVOKE ALL ON TABLE org_subscriptions FROM anon, authenticated;
 REVOKE ALL ON TABLE billing_records FROM anon, authenticated;
 REVOKE ALL ON TABLE platform_audit_logs FROM anon, authenticated;
+
+-- ============================================================
+-- MODELO DE PERMISOS v2 (migraciones 0071→0077)
+-- Esta sección reemplaza las policies/funciones de permisos definidas
+-- arriba: `entities` es la proyección canónica de jerarquía/visibilidad
+-- y las policies se generan desde `entity_types`.
+-- ============================================================
+
+SET check_function_bodies = off;
+
+CREATE TABLE IF NOT EXISTS public.entity_types (
+  clave TEXT PRIMARY KEY,
+  tabla TEXT NOT NULL,
+  parent_expr TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+INSERT INTO public.entity_types (clave, tabla, parent_expr) VALUES
+  ('workspace',  'workspaces',        NULL),
+  ('folder',     'workspace_folders', 'coalesce(parent_folder_id, workspace_id)'),
+  ('list',       'task_lists',        'coalesce(folder_id, workspace_id)'),
+  ('document',   'documents',         'coalesce(folder_id, workspace_id)'),
+  ('mindmap',    'mind_maps',         'coalesce(folder_id, workspace_id)'),
+  ('todo',       'todos',             'coalesce(folder_id, workspace_id)'),
+  ('formulario', 'formularios',       'coalesce(folder_id, workspace_id)')
+ON CONFLICT (clave) DO UPDATE
+  SET tabla = EXCLUDED.tabla,
+      parent_expr = EXCLUDED.parent_expr;
+
+CREATE TABLE IF NOT EXISTS public.entities (
+  id UUID PRIMARY KEY,
+  entity_type TEXT NOT NULL REFERENCES public.entity_types(clave) ON UPDATE CASCADE,
+  organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+  parent_id UUID REFERENCES public.entities(id) ON DELETE SET NULL,
+  visibility TEXT NOT NULL DEFAULT 'public'
+    CHECK (visibility IN ('public', 'restricted', 'private')),
+  name TEXT NOT NULL,
+  position INT NOT NULL DEFAULT 0,
+  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_entities_org ON public.entities(organization_id);
+CREATE INDEX IF NOT EXISTS idx_entities_parent ON public.entities(parent_id);
+CREATE INDEX IF NOT EXISTS idx_entities_type ON public.entities(entity_type);
+CREATE INDEX IF NOT EXISTS idx_entities_visibility ON public.entities(visibility);
+
+ALTER TABLE public.entities ENABLE ROW LEVEL SECURITY;
+
+INSERT INTO public.entities (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at)
+SELECT w.id, 'workspace', w.organization_id, NULL, w.visibility, w.name, w.position, NULL, w.created_at
+FROM public.workspaces w
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.entities (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at)
+SELECT f.id, 'folder', w.organization_id, COALESCE(f.parent_folder_id, f.workspace_id),
+       f.visibility, f.name, f.position, NULL, f.created_at
+FROM public.workspace_folders f
+JOIN public.workspaces w ON w.id = f.workspace_id
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.entities (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at)
+SELECT l.id, 'list', l.organization_id, COALESCE(l.folder_id, l.workspace_id),
+       l.visibility, l.name, l.position, NULL, l.created_at
+FROM public.task_lists l
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.entities (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at)
+SELECT d.id, 'document', d.organization_id, COALESCE(d.folder_id, d.workspace_id),
+       d.visibility, d.name, d.position, NULL, d.created_at
+FROM public.documents d
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.entities (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at)
+SELECT m.id, 'mindmap', m.organization_id, COALESCE(m.folder_id, m.workspace_id),
+       m.visibility, m.name, m.position, m.created_by, m.created_at
+FROM public.mind_maps m
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.entities (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at)
+SELECT t.id, 'todo', t.organization_id, COALESCE(t.folder_id, t.workspace_id),
+       t.visibility, t.name, t.position, t.created_by, t.created_at
+FROM public.todos t
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.entities (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at)
+SELECT fo.id, 'formulario', fo.organization_id, COALESCE(fo.folder_id, fo.workspace_id),
+       fo.visibility, fo.name, fo.position, fo.created_by, fo.created_at
+FROM public.formularios fo
+ON CONFLICT (id) DO NOTHING;
+
+CREATE OR REPLACE FUNCTION public.sync_entity_projection()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_type TEXT := TG_ARGV[0];
+  v_org UUID;
+  v_parent UUID;
+  v_created_by UUID;
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    DELETE FROM public.entities WHERE id = OLD.id;
+    RETURN OLD;
+  END IF;
+
+  IF v_type = 'workspace' THEN
+    v_org := NEW.organization_id;
+    v_parent := NULL;
+    v_created_by := NULL;
+  ELSIF v_type = 'folder' THEN
+    v_org := (SELECT organization_id FROM public.workspaces WHERE id = NEW.workspace_id);
+    v_parent := COALESCE(NEW.parent_folder_id, NEW.workspace_id);
+    v_created_by := NULL;
+  ELSE
+    v_org := NEW.organization_id;
+    v_parent := COALESCE(NEW.folder_id, NEW.workspace_id);
+    IF v_type IN ('mindmap', 'todo', 'formulario') THEN
+      v_created_by := NEW.created_by;
+    ELSE
+      v_created_by := NULL;
+    END IF;
+  END IF;
+
+  INSERT INTO public.entities
+    (id, entity_type, organization_id, parent_id, visibility, name, position, created_by, created_at, updated_at)
+  VALUES
+    (NEW.id, v_type, v_org, v_parent, NEW.visibility, NEW.name, NEW.position, v_created_by, now(), now())
+  ON CONFLICT (id) DO UPDATE SET
+    entity_type = EXCLUDED.entity_type,
+    organization_id = EXCLUDED.organization_id,
+    parent_id = EXCLUDED.parent_id,
+    visibility = EXCLUDED.visibility,
+    name = EXCLUDED.name,
+    position = EXCLUDED.position,
+    created_by = COALESCE(public.entities.created_by, EXCLUDED.created_by),
+    updated_at = now();
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_workspaces_entity_sync ON public.workspaces;
+CREATE TRIGGER trg_workspaces_entity_sync
+  BEFORE INSERT OR UPDATE OR DELETE ON public.workspaces
+  FOR EACH ROW EXECUTE FUNCTION public.sync_entity_projection('workspace');
+DROP TRIGGER IF EXISTS trg_folders_entity_sync ON public.workspace_folders;
+CREATE TRIGGER trg_folders_entity_sync
+  BEFORE INSERT OR UPDATE OR DELETE ON public.workspace_folders
+  FOR EACH ROW EXECUTE FUNCTION public.sync_entity_projection('folder');
+DROP TRIGGER IF EXISTS trg_lists_entity_sync ON public.task_lists;
+CREATE TRIGGER trg_lists_entity_sync
+  BEFORE INSERT OR UPDATE OR DELETE ON public.task_lists
+  FOR EACH ROW EXECUTE FUNCTION public.sync_entity_projection('list');
+DROP TRIGGER IF EXISTS trg_documents_entity_sync ON public.documents;
+CREATE TRIGGER trg_documents_entity_sync
+  BEFORE INSERT OR UPDATE OR DELETE ON public.documents
+  FOR EACH ROW EXECUTE FUNCTION public.sync_entity_projection('document');
+DROP TRIGGER IF EXISTS trg_mindmaps_entity_sync ON public.mind_maps;
+CREATE TRIGGER trg_mindmaps_entity_sync
+  BEFORE INSERT OR UPDATE OR DELETE ON public.mind_maps
+  FOR EACH ROW EXECUTE FUNCTION public.sync_entity_projection('mindmap');
+DROP TRIGGER IF EXISTS trg_todos_entity_sync ON public.todos;
+CREATE TRIGGER trg_todos_entity_sync
+  BEFORE INSERT OR UPDATE OR DELETE ON public.todos
+  FOR EACH ROW EXECUTE FUNCTION public.sync_entity_projection('todo');
+DROP TRIGGER IF EXISTS trg_formularios_entity_sync ON public.formularios;
+CREATE TRIGGER trg_formularios_entity_sync
+  BEFORE INSERT OR UPDATE OR DELETE ON public.formularios
+  FOR EACH ROW EXECUTE FUNCTION public.sync_entity_projection('formulario');
+
+DELETE FROM public.entity_visibility ev
+WHERE NOT EXISTS (SELECT 1 FROM public.entities e WHERE e.id = ev.entity_id);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'entity_visibility_entity_id_fkey'
+  ) THEN
+    ALTER TABLE public.entity_visibility
+      ADD CONSTRAINT entity_visibility_entity_id_fkey
+      FOREIGN KEY (entity_id) REFERENCES public.entities(id) ON DELETE CASCADE;
+  END IF;
+END;
+$$;
+
+CREATE INDEX IF NOT EXISTS idx_entity_visibility_entity_id ON public.entity_visibility(entity_id);
+
+CREATE OR REPLACE FUNCTION public.sync_grant_entity_type()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_type TEXT;
+BEGIN
+  SELECT entity_type INTO v_type FROM public.entities WHERE id = NEW.entity_id;
+  IF v_type IS NULL THEN
+    RAISE EXCEPTION 'El grant apunta a una entidad inexistente: %', NEW.entity_id;
+  END IF;
+  NEW.entity_type := v_type;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_entity_visibility_type ON public.entity_visibility;
+CREATE TRIGGER trg_entity_visibility_type
+  BEFORE INSERT OR UPDATE ON public.entity_visibility
+  FOR EACH ROW EXECUTE FUNCTION public.sync_grant_entity_type();
+
+CREATE OR REPLACE FUNCTION public.grant_creator_access()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RETURN NEW;
+  END IF;
+  INSERT INTO public.entity_visibility (entity_type, entity_id, profile_id, permission, inherit)
+  VALUES (TG_ARGV[0], NEW.id, auth.uid(), 'manage', false)
+  ON CONFLICT (entity_type, entity_id, profile_id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_effective(e_id UUID)
+RETURNS TEXT
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  WITH RECURSIVE target AS (
+    SELECT visibility, organization_id FROM public.entities WHERE id = e_id
+  ),
+  up(depth, id, parent_id) AS (
+    SELECT 0, e.id, e.parent_id FROM public.entities e WHERE e.id = e_id
+    UNION ALL
+    SELECT u.depth + 1, p.id, p.parent_id
+    FROM up u
+    JOIN public.entities p ON p.id = u.parent_id
+    WHERE u.depth < 64
+  ),
+  grants AS (
+    SELECT ev.permission
+    FROM public.entity_visibility ev
+    CROSS JOIN target t
+    WHERE ev.entity_id = e_id
+      AND ev.profile_id = auth.uid()
+      AND t.organization_id = public.get_my_org_id()
+    UNION ALL
+    SELECT CASE WHEN public.perm_rank(ev.permission) >= 2 THEN 'write' ELSE ev.permission END
+    FROM up u
+    JOIN public.entity_visibility ev
+      ON ev.entity_id = u.id
+      AND ev.profile_id = auth.uid()
+      AND ev.inherit = true
+    CROSS JOIN target t
+    WHERE u.depth > 0
+      AND t.visibility <> 'private'
+      AND t.organization_id = public.get_my_org_id()
+  )
+  SELECT CASE max(public.perm_rank(g.permission))
+    WHEN 3 THEN 'manage'
+    WHEN 2 THEN 'write'
+    WHEN 1 THEN 'read'
+    ELSE NULL
+  END
+  FROM grants g;
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_readable(e_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.entities e
+    WHERE e.id = e_id
+      AND e.organization_id = public.get_my_org_id()
+      AND (
+        public.get_my_role() = 'admin'
+        OR public.entity_effective(e_id) IS NOT NULL
+        OR (public.get_my_access_mode() = 'org' AND e.visibility = 'public')
+      )
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_writable(e_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT EXISTS (SELECT 1 FROM public.entities e WHERE e.id = e_id AND e.organization_id = public.get_my_org_id())
+    AND (
+      public.get_my_role() = 'admin'
+      OR public.perm_rank(public.entity_effective(e_id)) >= 2
+    );
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_manageable(e_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT EXISTS (SELECT 1 FROM public.entities e WHERE e.id = e_id AND e.organization_id = public.get_my_org_id())
+    AND (
+      public.get_my_role() = 'admin'
+      OR public.perm_rank(public.entity_effective(e_id)) >= 3
+    );
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_navigation_visible(e_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  WITH RECURSIVE down(id) AS (
+    SELECT e_id
+    UNION
+    SELECT e.id FROM public.entities e JOIN down d ON e.parent_id = d.id
+  )
+  SELECT EXISTS (SELECT 1 FROM down d WHERE public.entity_readable(d.id));
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_org(e_id UUID)
+RETURNS UUID
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT organization_id FROM public.entities WHERE id = e_id;
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_permission(e_type TEXT, e_id UUID)
+RETURNS TEXT
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT public.entity_effective(e_id);
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_org_id(entity_type TEXT, entity_id UUID)
+RETURNS UUID
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT organization_id FROM public.entities WHERE id = entity_id;
+$$;
+
+CREATE OR REPLACE FUNCTION public.entity_permissions_bulk(e_type TEXT, e_ids UUID[])
+RETURNS TABLE(entity_id UUID, permission TEXT)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT u.eid, public.entity_effective(u.eid)
+  FROM unnest(e_ids) AS u(eid);
+$$;
+
+CREATE OR REPLACE FUNCTION public.task_permission(task_id UUID)
+RETURNS TEXT
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT public.entity_effective(t.list_id)
+  FROM public.tasks t
+  WHERE t.id = task_id AND t.list_id IS NOT NULL;
+$$;
+
+CREATE OR REPLACE FUNCTION public.rebuild_entity_policies()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  r RECORD;
+  p RECORD;
+BEGIN
+  FOR r IN SELECT clave, tabla, parent_expr FROM public.entity_types LOOP
+    FOR p IN
+      SELECT policyname FROM pg_policies
+      WHERE schemaname = 'public' AND tablename = r.tabla
+    LOOP
+      EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', p.policyname, r.tabla);
+    END LOOP;
+
+    EXECUTE format(
+      'CREATE POLICY %I ON public.%I FOR SELECT USING (public.entity_navigation_visible(id))',
+      r.tabla || '_select_visible', r.tabla
+    );
+    EXECUTE format(
+      'CREATE POLICY %I ON public.%I FOR UPDATE USING (public.entity_writable(id))',
+      r.tabla || '_update_writable', r.tabla
+    );
+    EXECUTE format(
+      'CREATE POLICY %I ON public.%I FOR DELETE USING (public.entity_manageable(id))',
+      r.tabla || '_delete_manageable', r.tabla
+    );
+
+    IF r.parent_expr IS NULL THEN
+      EXECUTE format(
+        'CREATE POLICY %I ON public.%I FOR INSERT WITH CHECK (public.get_my_role() = ''admin'' AND organization_id = public.get_my_org_id())',
+        r.tabla || '_insert_writable', r.tabla
+      );
+    ELSE
+      EXECUTE format(
+        'CREATE POLICY %I ON public.%I FOR INSERT WITH CHECK (public.entity_writable(%s))',
+        r.tabla || '_insert_writable', r.tabla, r.parent_expr
+      );
+    END IF;
+  END LOOP;
+END;
+$$;
+
+SELECT public.rebuild_entity_policies();
+
+DROP POLICY IF EXISTS "ev_select" ON public.entity_visibility;
+CREATE POLICY "ev_select" ON public.entity_visibility
+  FOR SELECT USING (
+    public.entity_org(entity_id) = public.get_my_org_id()
+    AND (auth.uid() = profile_id OR public.get_my_role() = 'admin')
+  );
+
+DROP POLICY IF EXISTS "ev_write" ON public.entity_visibility;
+CREATE POLICY "ev_write" ON public.entity_visibility
+  FOR ALL
+  USING (
+    public.entity_org(entity_id) = public.get_my_org_id()
+    AND public.entity_manageable(entity_id)
+  )
+  WITH CHECK (
+    public.entity_org(entity_id) = public.get_my_org_id()
+    AND public.entity_manageable(entity_id)
+    AND EXISTS (
+      SELECT 1 FROM public.profiles p
+      WHERE p.id = entity_visibility.profile_id
+        AND p.organization_id = public.get_my_org_id()
+        AND p.blocked = false
+    )
+  );
+
+DROP POLICY IF EXISTS "tasks_delete_admin" ON public.tasks;
+CREATE POLICY "tasks_delete_admin" ON public.tasks
+  FOR DELETE USING (
+    (public.get_my_role() = 'admin' AND organization_id = public.get_my_org_id())
+    OR (organization_id = public.get_my_org_id() AND public.perm_rank(public.task_permission(id)) >= 3)
+    OR (organization_id = public.get_my_org_id() AND created_by = auth.uid())
+  );
+
+DROP POLICY IF EXISTS "tasks_update_assigned" ON public.tasks;
+CREATE POLICY "tasks_update_assigned" ON public.tasks
+  FOR UPDATE USING (
+    organization_id = public.get_my_org_id() AND auth.uid() = assigned_to
+  );
+
+REVOKE EXECUTE ON FUNCTION public.entity_effective(UUID) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.entity_readable(UUID) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.entity_writable(UUID) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.entity_manageable(UUID) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.entity_navigation_visible(UUID) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.entity_org(UUID) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.rebuild_entity_policies() FROM public, anon;
+
+GRANT EXECUTE ON FUNCTION public.entity_effective(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_readable(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_writable(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_manageable(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_navigation_visible(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_org(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_permission(TEXT, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_org_id(TEXT, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.entity_permissions_bulk(TEXT, UUID[]) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.task_permission(UUID) TO authenticated;
+
+DROP FUNCTION IF EXISTS public.container_write_level(UUID, UUID);
+DROP FUNCTION IF EXISTS public.folder_navigation_visible(UUID);
+DROP FUNCTION IF EXISTS public.workspace_navigation_visible(UUID);
+
+-- ---- Telegram de plataforma + campana (0078) ----
+-- Solo capa /plataforma: bot único, destino único, catálogo de eventos
+-- con plantillas editables, log de envíos y notificaciones in-app.
+-- RLS ON sin policies + REVOKE: solo service role.
+
+CREATE TABLE IF NOT EXISTS platform_telegram_config (
+  id SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  bot_token TEXT,
+  chat_destino TEXT,
+  chat_etiqueta TEXT,
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  nivel_minimo TEXT NOT NULL DEFAULT 'error'
+    CHECK (nivel_minimo IN ('warning', 'error')),
+  agrupar_errores_segundos INT NOT NULL DEFAULT 300
+    CHECK (agrupar_errores_segundos BETWEEN 0 AND 86400),
+  rate_limit_hora INT NOT NULL DEFAULT 30
+    CHECK (rate_limit_hora BETWEEN 1 AND 1000),
+  quiet_hours JSONB NOT NULL DEFAULT
+    '{"activo": false, "desde": "22:00", "hasta": "08:00"}',
+  markdown BOOLEAN NOT NULL DEFAULT true,
+  digest_activo BOOLEAN NOT NULL DEFAULT true,
+  digest_hora TIME NOT NULL DEFAULT '09:00',
+  webhook_secret TEXT,
+  update_offset BIGINT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_by UUID REFERENCES auth.users ON DELETE SET NULL
+);
+
+INSERT INTO platform_telegram_config (id) VALUES (1)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS platform_telegram_eventos (
+  evento TEXT PRIMARY KEY,
+  categoria TEXT NOT NULL,
+  habilitado BOOLEAN NOT NULL DEFAULT true,
+  plantilla TEXT NOT NULL,
+  orden INT NOT NULL DEFAULT 0
+);
+
+INSERT INTO platform_telegram_eventos (evento, categoria, habilitado, plantilla, orden) VALUES
+  ('solicitud_nueva', 'solicitudes', true,
+   '📥 Nueva solicitud
+Empresa: {{empresa}}
+Contacto: {{contacto}} ({{email}})
+País: {{pais}} · Sector: {{sector}}
+Tamaño: {{tamano_equipo}}
+Motivación: {{motivacion}}', 1),
+  ('solicitud_en_revision', 'solicitudes', true,
+   '🔎 Solicitud en revisión
+{{empresa}} — {{contacto}}', 2),
+  ('solicitud_aprobada', 'solicitudes', true,
+   '✅ Solicitud aprobada
+{{empresa}}
+Plan: {{plan}}
+Invitación: {{enlace_invitacion}}
+Expira: {{expira_at}}', 3),
+  ('solicitud_rechazada', 'solicitudes', true,
+   '🚫 Solicitud rechazada
+{{empresa}}
+Motivo: {{motivo}}', 4),
+  ('empresa_creada', 'empresas', true,
+   '🏢 Empresa creada
+{{empresa}}
+Owner: {{owner_email}}
+Invitación: {{enlace_invitacion}}', 5),
+  ('empresa_activada', 'empresas', true,
+   '🎉 Empresa activada
+{{empresa}} — el owner {{owner}} completó el onboarding', 6),
+  ('empresa_suspendida', 'empresas', true,
+   '⏸️ Empresa suspendida
+{{empresa}}
+Motivo: {{motivo}}', 7),
+  ('empresa_reactivada', 'empresas', true,
+   '▶️ Empresa reactivada
+{{empresa}}', 8),
+  ('empresa_eliminada', 'empresas', true,
+   '🗑️ Empresa eliminada
+{{empresa}}', 9),
+  ('factura_creada', 'facturacion', true,
+   '🧾 Factura registrada
+{{empresa}} · {{periodo}}
+{{monto}} {{moneda}}', 10),
+  ('factura_pagada', 'facturacion', true,
+   '💰 Factura pagada
+{{empresa}} · {{periodo}}
+{{monto}} {{moneda}}', 11),
+  ('factura_vencida', 'facturacion', true,
+   '⚠️ Factura pendiente
+{{empresa}} · periodo {{periodo}}
+{{monto}} {{moneda}}', 12),
+  ('suscripcion_actualizada', 'facturacion', true,
+   '📦 Suscripción actualizada
+{{empresa}}
+Plan: {{plan}} · Estado: {{estado}}', 13),
+  ('admin_agregado', 'administracion', true,
+   '🛡️ Nuevo admin de plataforma
+{{email}}', 14),
+  ('admin_quitado', 'administracion', true,
+   '🛡️ Admin de plataforma removido
+{{email}}', 15),
+  ('error_nuevo', 'salud', true,
+   '🚨 Error [{{origen}}]
+{{mensaje}}
+{{ruta}}
+Organización: {{empresa}}
+Veces: {{veces}}', 16),
+  ('uso_limite_plan', 'salud', true,
+   '📊 Límite de plan alcanzado
+{{empresa}}: {{miembros}}/{{limite}} miembros (plan {{plan}})', 17),
+  ('resumen_diario', 'resumen', true,
+   '📅 Resumen diario
+Solicitudes pendientes: {{solicitudes_pendientes}}
+Empresas activas: {{empresas_activas}} · suspendidas: {{empresas_suspendidas}}
+Nuevas (30d): {{empresas_nuevas_30d}}
+Errores abiertos: {{errores_abiertos}}
+Facturas pendientes: {{facturas_pendientes}}
+MRR estimado: {{mrr}}', 18),
+  ('empresa_sin_owner', 'resumen', true,
+   '⏳ Empresa sin owner
+{{empresa}} sigue sin reclamar (creada {{creada}})', 19),
+  ('owner_inactivo', 'resumen', true,
+   '💤 Owner inactivo
+{{empresa}} — {{owner}} sin actividad desde {{ultima_actividad}}', 20)
+ON CONFLICT (evento) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS platform_telegram_envios (
+  id BIGSERIAL PRIMARY KEY,
+  evento TEXT NOT NULL,
+  chat TEXT,
+  ok BOOLEAN NOT NULL,
+  status_code INT,
+  error TEXT,
+  texto TEXT,
+  referencia TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS platform_notifications (
+  id BIGSERIAL PRIMARY KEY,
+  evento TEXT NOT NULL,
+  titulo TEXT NOT NULL,
+  cuerpo TEXT,
+  entidad_tipo TEXT,
+  entidad_id TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS platform_notification_reads (
+  admin_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+  notification_id BIGINT NOT NULL REFERENCES platform_notifications ON DELETE CASCADE,
+  read_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (admin_id, notification_id)
+);
+
+ALTER TABLE platform_telegram_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform_telegram_eventos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform_telegram_envios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform_notification_reads ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE platform_telegram_config FROM anon, authenticated;
+REVOKE ALL ON TABLE platform_telegram_eventos FROM anon, authenticated;
+REVOKE ALL ON TABLE platform_telegram_envios FROM anon, authenticated;
+REVOKE ALL ON TABLE platform_notifications FROM anon, authenticated;
+REVOKE ALL ON TABLE platform_notification_reads FROM anon, authenticated;
+
+CREATE INDEX IF NOT EXISTS platform_telegram_envios_created_idx
+  ON platform_telegram_envios (created_at DESC);
+CREATE INDEX IF NOT EXISTS platform_telegram_envios_evento_idx
+  ON platform_telegram_envios (evento, created_at DESC);
+CREATE INDEX IF NOT EXISTS platform_telegram_envios_referencia_idx
+  ON platform_telegram_envios (referencia, created_at DESC);
+CREATE INDEX IF NOT EXISTS platform_notifications_created_idx
+  ON platform_notifications (created_at DESC);
+CREATE INDEX IF NOT EXISTS platform_notification_reads_admin_idx
+  ON platform_notification_reads (admin_id);

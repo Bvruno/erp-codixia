@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "od-design-system-project/v1",
+  "id": "erp-codixia",
+  "name": "ERP Codixia",
+  "category": "Application",
+  "description": "Panel SaaS multi-empresa: shell de sidebar + topbar, denso en datos, dark-first con modo claro, cinco acentos, radios de 8/10/14px, sombras suaves y foco por color de acento.",
+  "source": {
+    "type": "project",
+    "origin": "F:\\proyectos\\erp-codixia — apps/web/src/estilos/globals.css (Tailwind v4 + shadcn base-nova)"
+  },
+  "files": {
+    "design": "DESIGN.md",
+    "tokens": "tokens.css",
+    "components": "components.html"
+  },
+  "usage": "USAGE.md",
+  "importMode": "normalized",
+  "craft": {
+    "applies": [],
+    "suggested": [
+      "color",
+      "accessibility-baseline"
+    ],
+    "exemptions": []
+  },
+  "preview": {
+    "dir": "preview",
+    "pages": [
+      {
+        "path": "preview/colors.html",
+        "role": "colors",
+        "title": "Colors"
+      },
+      {
+        "path": "preview/typography.html",
+        "role": "typography",
+        "title": "Typography"
+      },
+      {
+        "path": "preview/spacing.html",
+        "role": "spacing",
+        "title": "Spacing & radius"
+      },
+      {
+        "path": "preview/components-buttons.html",
+        "role": "buttons",
+        "title": "Buttons"
+      },
+      {
+        "path": "preview/components-inputs.html",
+        "role": "inputs",
+        "title": "Inputs"
+      },
+      {
+        "path": "preview/app.html",
+        "role": "app",
+        "title": "App Preview"
+      }
+    ]
+  }
+}
