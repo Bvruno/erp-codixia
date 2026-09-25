@@ -49,7 +49,7 @@ export function IndicadorGuardado({
       )}
     >
       {normalizado === 'guardando' && <Loader2 className="size-3.5 animate-spin" />}
-      {normalizado === 'guardado' && <Check className="size-3.5 text-emerald-500" />}
+      {normalizado === 'guardado' && <Check className="size-3.5 text-success" />}
       {formato === 'texto' && texto}
     </span>
   );

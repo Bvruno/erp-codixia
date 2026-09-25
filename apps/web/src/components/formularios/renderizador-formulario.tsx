@@ -133,7 +133,7 @@ export function RenderizadorFormulario({
   if (mensajeExito) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center">
-        <ClipboardList className="mx-auto size-8 text-emerald-500" />
+        <ClipboardList className="mx-auto size-8 text-success" />
         <p className="mt-3 text-lg font-medium">{mensajeExito}</p>
       </div>
     );

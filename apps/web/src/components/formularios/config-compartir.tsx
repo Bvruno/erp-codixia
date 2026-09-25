@@ -501,7 +501,7 @@ export function ConfigCompartirDialog({
             </div>
 
             {nuevosLinks.length > 0 && (
-              <div className="space-y-2 rounded-md border border-emerald-500/40 bg-emerald-500/5 p-3">
+              <div className="space-y-2 rounded-md border border-success/40 bg-success/5 p-3">
                 <p className="text-xs font-medium">Links recién creados (cópialos ahora)</p>
                 {nuevosLinks.map((l) => {
                   const link = construirEnlaceInvitado(base, nombre, l.codigo);

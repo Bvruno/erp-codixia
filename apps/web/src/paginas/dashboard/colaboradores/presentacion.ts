@@ -120,10 +120,10 @@ export function statusLabel(status: string): string {
 
 export function statusBadgeClass(status: string): string {
   return status === 'pending'
-    ? 'bg-blue-500/20 text-blue-400'
+    ? 'bg-info/20 text-info'
     : status === 'accepted'
-    ? 'bg-emerald-500/20 text-emerald-400'
+    ? 'bg-success/20 text-success'
     : status === 'rejected'
-    ? 'bg-red-500/20 text-red-400'
-    : 'bg-gray-500/20 text-gray-400';
+    ? 'bg-destructive/10 text-destructive'
+    : 'bg-muted text-muted-foreground';
 }

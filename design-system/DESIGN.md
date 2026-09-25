@@ -36,9 +36,13 @@ Dark es el modo base; light solo re-mapea superficies y ramp de texto.
 | Acento | `--accent` | violeta `oklch(0.526 0.247 293)` | idem |
 | Acento hover | `--accent-hover` | `oklch(0.6 0.22 293)` | idem |
 | Acento activo | `--accent-active` | `color-mix(accent, black 14%)` | idem |
-| Éxito | `--success` | `oklch(0.62 0.16 162)` | idem |
-| Precaución | `--warn` | `oklch(0.745 0.16 65)` | idem |
+| Éxito | `--success` | `oklch(0.62 0.16 162)` | `oklch(0.48 0.14 162)` |
+| Precaución | `--warn` | `oklch(0.745 0.16 65)` | `oklch(0.5 0.13 65)` |
+| Información | `--info` | `oklch(0.65 0.19 254)` | `oklch(0.48 0.18 254)` |
 | Peligro | `--danger` | `oklch(0.577 0.245 27.325)` | idem |
+
+Los tokens semánticos re-bindean por modo (con su `*-foreground`) para
+mantener AA en texto de 12px sobre tinte `bg-*/15`.
 
 **Accent themes** (`[data-accent='…']` en `<html>`): violet (default),
 rose `oklch(0.645 0.22 16)`, emerald `oklch(0.62 0.16 162)`,
@@ -81,7 +85,7 @@ control táctil mide al menos `--tap-target-min` (44px).
   fondo `--danger`, texto claro. Link = texto `--accent` con subrayado al
   hover. Foco: `box-shadow: --focus-ring` + borde `--accent`.
 - **Inputs / textarea / select:** alto `--control-h`, borde `--border`,
-  fondo `color-mix(surface, transparent 30%)` en dark, `--radius-md`,
+  fondo `color-mix(--border, transparent 70%)` en dark, `--radius-md`,
   placeholder `--muted`, foco con `--focus-ring`. Estado inválido: borde
   `--danger`.
 - **Cards:** `data-slot="card"`, fondo `--surface`, borde `--border`,
@@ -102,9 +106,10 @@ control táctil mide al menos `--tap-target-min` (44px).
   label `--text-sm`; ítem activo en `--fg` weight 600 con barra de 3px
   `--accent` a la izquierda; labels de grupo en `--text-xs` uppercase
   `--tracking-eyebrow`. Colapsado: 3.5rem (`--sidebar-width-collapsed`).
-- **Dialog / popover:** fondo `--surface`, `--radius-xl`, borde `--border`,
-  `box-shadow: --elev-popover` (modales) o `--elev-raised` (dropdowns,
-  toasts). El overlay de modal oscurece el fondo con negro al 50–60%.
+- **Dialog / popover:** diálogo sobre `--bg` con `--radius-lg` (10px) y
+  `--elev-popover`; dropdowns y popovers sobre `--surface` con `--radius-md`
+  y `--elev-raised`. El overlay de modal oscurece el fondo con negro al
+  50–60%.
 - **Menciones y chips:** píldora `--radius-pill`, borde y fondo derivados de
   `--accent`/semántico al 12–35%, texto del color correspondiente.
 - **Skeleton:** fondo `--surface-warm` (o `--muted`) con shimmer; nunca

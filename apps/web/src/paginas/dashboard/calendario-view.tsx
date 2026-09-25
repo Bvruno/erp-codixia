@@ -6,6 +6,7 @@ import { canalRealtime, removerCanal } from '@/lib/realtime';
 import { sesionActual } from '@/lib/auth/sesion';
 import { api, apiFetch } from '@/lib/api/cliente';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Plus, CalendarDays, ListTodo, StickyNote, LayoutGrid } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -467,8 +468,9 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-          Cargando calendario…
+      <div className="flex h-full flex-col gap-3">
+        <Skeleton className="h-9 w-48" />
+        <Skeleton className="min-h-0 flex-1" />
       </div>
     );
   }
@@ -510,7 +512,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
             <PopoverContent className="w-64 p-2" align="end">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Espacio de trabajo
                   </span>
                   {workspaces.length > 1 ? (
@@ -534,7 +536,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                 </div>
                 {canVerAsignado && (
                   <div className="flex flex-col gap-1.5">
-                    <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                       Asignado a
                     </span>
                     <Select value={filters.asignado} onValueChange={(v) => setFiltro('asignado', v)}>
@@ -553,7 +555,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                   </div>
                 )}
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Contenido
                   </span>
                   <Select value={filters.tipo} onValueChange={(v) => setFiltro('tipo', v as FiltrosCalendario['tipo'])}>
@@ -568,7 +570,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                   </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Estado
                   </span>
                   <Select value={filters.estado} onValueChange={(v) => setFiltro('estado', v)}>
@@ -628,10 +630,10 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                 );
               })}
             </div>
-            <Button variant="ghost" size="icon" className="size-7" onClick={() => stripRef.current?.scrollBy({ left: -160, behavior: 'smooth' })} aria-label="Meses anteriores">
+            <Button variant="ghost" size="icon" onClick={() => stripRef.current?.scrollBy({ left: -160, behavior: 'smooth' })} aria-label="Meses anteriores">
               <ChevronLeft className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="size-7" onClick={() => stripRef.current?.scrollBy({ left: 160, behavior: 'smooth' })} aria-label="Meses siguientes">
+            <Button variant="ghost" size="icon" onClick={() => stripRef.current?.scrollBy({ left: 160, behavior: 'smooth' })} aria-label="Meses siguientes">
               <ChevronRight className="size-4" />
             </Button>
           </div>
@@ -639,7 +641,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
           {/* Weekdays */}
           <div className="grid shrink-0 grid-cols-7 border-b">
             {weekdays.map((d) => (
-              <div key={d} className="py-1.5 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <div key={d} className="py-1.5 text-center text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                 {d}
               </div>
             ))}
@@ -691,7 +693,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                         'truncate rounded border border-border bg-card px-1.5 py-0.5 text-left text-xs leading-tight transition-colors hover:bg-accent',
                         t.status === 'done' && 'opacity-55 line-through',
                       )}
-                      style={{ borderLeftWidth: 2, borderLeftColor: PRIORITY_COLOR[t.priority] || '#6b7280' }}
+                      style={{ borderLeftWidth: 1, borderLeftColor: PRIORITY_COLOR[t.priority] || 'var(--muted-foreground)' }}
                       title={t.title}
                     >
                       {t.title}
@@ -707,7 +709,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                         setModal(n);
                       }}
                       onPointerDown={(e) => e.stopPropagation()}
-                      className="flex items-center gap-1 truncate rounded border border-primary/30 bg-primary/5 px-1.5 py-0.5 text-left text-xs leading-tight transition-colors hover:bg-primary/10"
+                      className="flex items-center gap-1 truncate rounded border border-primary/30 bg-primary-soft px-1.5 py-0.5 text-left text-xs leading-tight transition-colors hover:bg-primary-soft-2"
                       title={n.title}
                     >
                       <StickyNote className="size-3 shrink-0 text-primary" />
@@ -755,7 +757,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
             ) : (
               visibleTasks.map((group, gi) => (
                 <div key={gi} className="flex flex-col gap-1.5">
-                  <div className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     {MONTHS_SHORT[month]} {group.day}
                   </div>
                   {group.tasks.map((t) => (
@@ -763,18 +765,18 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                         key={t.id}
                         onClick={() => setTaskDetailId(t.id)}
                         title={t.title}
-                        className="rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-md"
+                        className="rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-card"
                       >
                         <div className="flex items-center gap-1.5">
                           <span
                             className="size-2 shrink-0 rounded-full"
-                            style={{ backgroundColor: PRIORITY_COLOR[t.priority] || '#6b7280' }}
+                            style={{ backgroundColor: PRIORITY_COLOR[t.priority] || 'var(--muted-foreground)' }}
                           />
                           <span className="ml-auto text-xs font-medium text-muted-foreground">
                             {MONTHS_SHORT[month]} {group.day}
                           </span>
                         </div>
-                        <div className="mt-1 truncate text-[13px] font-semibold">{t.title}</div>
+                        <div className="mt-1 truncate text-sm font-semibold">{t.title}</div>
                         <div className="mt-1 flex items-center gap-1.5">
                           <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
                             {STATUS_LABEL[t.status] ?? t.status}
@@ -818,7 +820,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
             ) : (
               visibleNotes.map((group, gi) => (
                 <div key={gi} className="flex flex-col gap-1.5">
-                  <div className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     {MONTHS_SHORT[month]} {group.day}
                   </div>
                   {group.notes.map((n) => (
@@ -829,8 +831,8 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                         setModal(n);
                       }}
                       className={cn(
-                        'rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-md',
-                        selectedNoteId === n.id && 'border-primary shadow-[0_0_0_2px_var(--primary-soft)]',
+                        'rounded-xl border bg-card p-2.5 text-left transition-shadow hover:shadow-card',
+                        selectedNoteId === n.id && 'border-primary ring-2 ring-primary-soft',
                       )}
                     >
                       <div className="flex items-center gap-1.5">
@@ -839,9 +841,9 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
                           {MONTHS_SHORT[month]} {group.day}
                         </span>
                       </div>
-                      <div className="mt-1 truncate text-[13px] font-semibold">{n.title}</div>
+                      <div className="mt-1 truncate text-sm font-semibold">{n.title}</div>
                       {n.image ? (
-                        <img src={n.image} alt={n.title} className="mt-1.5 w-full rounded-lg border bg-white" />
+                        <img src={n.image} alt={n.title} loading="lazy" className="mt-1.5 w-full rounded-lg border bg-card" />
                       ) : (
                         <div className="line-clamp-2 text-xs leading-snug text-muted-foreground">{n.content}</div>
                       )}

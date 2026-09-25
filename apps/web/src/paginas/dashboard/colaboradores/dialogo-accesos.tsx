@@ -103,7 +103,7 @@ export function DialogoAccesos({
                           saveGrant(accessMember!.id, g.entity_type, g.entity_id, v as EntityPermission, g.inherit)
                         }
                       >
-                        <SelectTrigger className="h-7 w-40">
+                        <SelectTrigger className="h-8 w-40">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -118,7 +118,6 @@ export function DialogoAccesos({
                           onCheckedChange={(v) =>
                             saveGrant(accessMember!.id, g.entity_type, g.entity_id, g.permission, v === true)
                           }
-                          className="size-3.5"
                         />
                         Heredar
                       </label>

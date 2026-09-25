@@ -292,7 +292,7 @@ export function RespuestasView({ formularioId: paramId }: { formularioId: string
           <>
             {respuestas.length} respuesta{respuestas.length === 1 ? '' : 's'}
             {nuevas > 0 && (
-              <span className="ml-2 rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-600 dark:text-emerald-400">
+              <span className="ml-2 rounded-full bg-success/15 px-2 py-0.5 text-success">
                 {nuevas} nueva{nuevas === 1 ? '' : 's'}
               </span>
             )}

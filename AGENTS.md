@@ -121,6 +121,11 @@ Reglas de uso:
 
 - TypeScript strict, SOLID/DRY/KISS, Conventional Commits. Todo en español
   (identificadores, rutas REST, commits, UI, clases CSS BEM descriptivas).
+- UI: `apps/web/DESIGN.md` + `apps/web/.impeccable/design.json` son el contrato
+  visual normativo (tokens, componentes, reglas) y `apps/web/PRODUCT.md` el
+  contexto de producto; `apps/web/src/estilos/globals.css` es la fuente de los
+  tokens. Paquete exportable a Open Design en `design-system/` (mantener en
+  sync al cambiar tokens).
 - Tests: `npm run test` (vitest, por workspace:
   `test:shared`/`test:api`/`test:web`/`test:plataforma`);
   e2e: `npm run e2e -w @erp/web` (Playwright, Edge del sistema);

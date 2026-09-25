@@ -293,7 +293,7 @@ export default function DashboardLayout({
                         aria-label={item.name}
                         aria-current={activeClass(item.href) ? "page" : undefined}
                         className={cn(
-                          "flex size-9 items-center justify-center rounded-xl transition-colors",
+                          "flex size-9 items-center justify-center rounded-lg transition-colors",
                           activeClass(item.href)
                             ? "text-sidebar-foreground ring-1 ring-inset ring-primary/60"
                             : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground",
@@ -316,7 +316,7 @@ export default function DashboardLayout({
                         aria-label={item.name}
                         aria-current={activeClass(item.href) ? "page" : undefined}
                         className={cn(
-                          "flex size-9 items-center justify-center rounded-xl transition-colors",
+                          "flex size-9 items-center justify-center rounded-lg transition-colors",
                           activeClass(item.href)
                             ? "text-sidebar-foreground ring-1 ring-inset ring-primary/60"
                             : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground",
@@ -410,7 +410,7 @@ export default function DashboardLayout({
                   aria-label="Abrir menú"
                   aria-expanded={mobileMenuOpen}
                   onClick={() => setMobileMenuOpen((v) => !v)}
-                  className="text-muted-foreground hover:text-primary flex size-9 items-center justify-center rounded-md"
+                  className="text-muted-foreground hover:text-primary flex size-9 items-center justify-center rounded-md pointer-coarse:size-11"
                 >
                   {mobileMenuOpen ? (
                     <X className="size-5" />
@@ -466,7 +466,7 @@ export default function DashboardLayout({
                 onClick={() => navBus.toggleDrawer()}
                 aria-label="Espacios de trabajo"
                 title="Espacios de trabajo"
-                className="text-muted-foreground hover:text-primary flex size-9 items-center justify-center rounded-md"
+                className="text-muted-foreground hover:text-primary flex size-9 items-center justify-center rounded-md pointer-coarse:size-11"
               >
                 <PanelLeftOpen className="size-5" />
               </button>

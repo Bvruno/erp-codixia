@@ -414,7 +414,7 @@ export function FormularioRow({ formulario, shared }: { formulario: Formulario; 
           <ICONO_FORMULARIO className={cn('size-3.5 shrink-0', ENTIDADES_META.formulario.color)} />
           <span className="flex-1 truncate">{formulario.name}</span>
           {formulario.estado === 'publicado' && (
-            <span className="size-1.5 shrink-0 rounded-full bg-emerald-500" title="Publicado" />
+            <span className="size-1.5 shrink-0 rounded-full bg-success" title="Publicado" />
           )}
           <VisibilityIcon visibility={formulario.visibility} />
           <span className="text-xs text-muted-foreground/70 tabular-nums">

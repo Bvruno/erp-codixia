@@ -164,7 +164,7 @@ export function NotificationsBell({ className }: { className?: string }) {
                 onClick={() => void abrirNotificacion(n)}
                 className={cn(
                   'hover:bg-accent flex w-full items-start gap-2 border-b px-3 py-2.5 text-left transition-colors last:border-b-0',
-                  !n.read && 'bg-primary-soft/40',
+                  !n.read && 'bg-primary-soft',
                 )}
               >
                 <span

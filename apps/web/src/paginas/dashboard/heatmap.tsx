@@ -18,9 +18,9 @@ const DIAS_DOM = ["D", "L", "M", "X", "J", "V", "S"];
 
 function intensity(hours: number, target: number): string {
   if (hours <= 0) return "bg-muted";
-  if (hours < target * 0.5) return "bg-amber-200 dark:bg-amber-500/30";
-  if (hours < target) return "bg-blue-300 dark:bg-blue-500/50";
-  return "bg-emerald-400 dark:bg-emerald-500/60";
+  if (hours < target * 0.5) return "bg-warning/25";
+  if (hours < target) return "bg-info/30";
+  return "bg-success/50";
 }
 
 export function HeatmapHoras({ entries, month, dailyTarget }: Props) {
@@ -59,15 +59,15 @@ export function HeatmapHoras({ entries, month, dailyTarget }: Props) {
           <span className="bg-muted size-3 rounded" /> Sin horas
         </span>
         <span className="flex items-center gap-1">
-          <span className="bg-amber-200 dark:bg-amber-500/30 size-3 rounded" />{" "}
+          <span className="bg-warning/25 size-3 rounded" />{" "}
           Parcial
         </span>
         <span className="flex items-center gap-1">
-          <span className="bg-blue-300 dark:bg-blue-500/50 size-3 rounded" /> En
+          <span className="bg-info/30 size-3 rounded" /> En
           meta
         </span>
         <span className="flex items-center gap-1">
-          <span className="bg-emerald-400 dark:bg-emerald-500/60 size-3 rounded" />{" "}
+          <span className="bg-success/50 size-3 rounded" />{" "}
           Meta cumplida
         </span>
       </div>

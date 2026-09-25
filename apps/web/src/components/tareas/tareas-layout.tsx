@@ -5,7 +5,7 @@ import { WorkspaceNav } from './workspace-nav';
 import { EntityEditDialog } from './entity-edit-dialog';
 import { ShareEntityDialog } from './share-entity-dialog';
 import { EmptyWorkspaces } from './empty-workspaces';
-import { TableSkeleton } from '@/components/ui/skeleton';
+import { TableSkeleton, Skeleton } from '@/components/ui/skeleton';
 
 function TareasShell({ children }: { children: React.ReactNode }) {
   const ctx = useTareas();
@@ -15,10 +15,10 @@ function TareasShell({ children }: { children: React.ReactNode }) {
       <div className="flex flex-col gap-4 lg:h-[calc(100dvh-3rem)] lg:flex-row">
         <div className="w-full rounded-md border lg:w-64 lg:shrink-0 lg:h-full">
           <div className="p-3 space-y-2">
-            <div className="h-3 w-32 rounded bg-muted" />
-            <div className="h-4 w-full rounded bg-muted/60" />
-            <div className="h-4 w-4/5 rounded bg-muted/60" />
-            <div className="h-4 w-3/5 rounded bg-muted/60" />
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-3/5" />
           </div>
         </div>
         <div className="min-w-0 flex-1 lg:h-full lg:overflow-y-auto">

@@ -287,10 +287,10 @@ export function EntityDashboard({ scope }: { scope: Scope }) {
   const recent = [...periodTasks].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 8);
 
   const stats: { label: string; value: number; icon: React.ReactNode; color: string }[] = [
-    { label: 'Total tareas', value: total, icon: <Layers className="size-4" />, color: 'text-blue-500' },
-    { label: 'Completadas', value: done, icon: <CheckCircle2 className="size-4" />, color: 'text-emerald-500' },
-    { label: 'En progreso', value: inProgress, icon: <Clock className="size-4" />, color: 'text-yellow-500' },
-    { label: 'Pendientes', value: pending, icon: <AlertCircle className="size-4" />, color: 'text-blue-400' },
+    { label: 'Total tareas', value: total, icon: <Layers className="size-4" />, color: 'text-info' },
+    { label: 'Completadas', value: done, icon: <CheckCircle2 className="size-4" />, color: 'text-success' },
+    { label: 'En progreso', value: inProgress, icon: <Clock className="size-4" />, color: 'text-warning' },
+    { label: 'Pendientes', value: pending, icon: <AlertCircle className="size-4" />, color: 'text-info' },
     { label: 'Vencidas', value: overdue, icon: <CalendarClock className="size-4" />, color: overdue > 0 ? 'text-red-500' : 'text-muted-foreground' },
     { label: 'Sub-tareas', value: subTasks, icon: <ListTodo className="size-4" />, color: 'text-purple-500' },
   ];

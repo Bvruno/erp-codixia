@@ -107,8 +107,8 @@ function CircleCheck({
       className={cn(
         'inline-flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200',
         checked
-          ? 'border-emerald-500 bg-emerald-500 text-white animate-in zoom-in-50'
-          : 'border-muted-foreground/40 text-transparent hover:border-emerald-500 hover:bg-emerald-500/10',
+          ? 'border-success bg-success text-success-foreground animate-in zoom-in-50'
+          : 'border-muted-foreground/40 text-transparent hover:border-success hover:bg-success/10',
         disabled && 'cursor-not-allowed opacity-50'
       )}
       title={checked ? 'Desmarcar' : 'Completar'}
@@ -130,7 +130,7 @@ function ProgressBar({ value, done }: { value: number; done: boolean }) {
       <div
         className={cn(
           'h-full rounded-full transition-all duration-300',
-          done ? 'bg-emerald-500' : 'bg-primary'
+          done ? 'bg-success' : 'bg-primary'
         )}
         style={{ width: `${value}%` }}
       />
@@ -785,7 +785,7 @@ export function ToDoView({ todoId: paramTodoId }: ToDoViewProps) {
             aria-expanded={showCompleted}
           >
             {showCompleted ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
-            <Check className="size-4 text-emerald-500" />
+            <Check className="size-4 text-success" />
             Completadas ({doneRows.length})
           </button>
           {showCompleted && (
@@ -905,7 +905,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
         'group hover:bg-muted/40',
         !row.active && 'opacity-60',
         !appliesToday && 'opacity-70',
-        done && 'bg-emerald-500/5'
+        done && 'bg-success/5'
       )}
     >
       <TableCell className="pl-3">
@@ -961,7 +961,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
             title={canWrite ? 'Doble clic para renombrar' : row.name}
             className={cn(
               '-mx-1 truncate rounded px-1 py-0.5 text-sm font-medium',
-              done && 'text-muted-foreground line-through decoration-emerald-500/60',
+              done && 'text-muted-foreground line-through decoration-success/60',
               canWrite && 'cursor-text hover:bg-muted/70'
             )}
           >
@@ -1035,7 +1035,7 @@ const applyPrefs = (patch: Partial<QuickAddPrefs>) => {
           <span
             className={cn(
               'text-xs tabular-nums text-muted-foreground',
-              done && !isCounter && 'text-emerald-600'
+              done && !isCounter && 'text-success'
             )}
           >
             {isCounter

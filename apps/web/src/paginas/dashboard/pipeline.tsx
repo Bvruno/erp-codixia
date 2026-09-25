@@ -736,7 +736,7 @@ export default function PipelinePage() {
             <PopoverContent className="w-64 p-2" align="end">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Espacio de trabajo
                   </span>
                   {workspaces.length > 1 ? (
@@ -760,7 +760,7 @@ export default function PipelinePage() {
                 </div>
                 {canVerAsignado && (
                   <div className="flex flex-col gap-1.5">
-                    <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                       Asignado a
                     </span>
                     <Select
@@ -782,7 +782,7 @@ export default function PipelinePage() {
                   </div>
                 )}
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Prioridad
                   </span>
                   <Select
@@ -803,7 +803,7 @@ export default function PipelinePage() {
                   </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Fecha límite
                   </span>
                   <Select
@@ -822,7 +822,7 @@ export default function PipelinePage() {
                   </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Tipo
                   </span>
                   <Select
@@ -840,7 +840,7 @@ export default function PipelinePage() {
                   </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="px-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     Estado
                   </span>
                   <Select value={filtros.estado} onValueChange={(v) => setFiltro('estado', v)}>
@@ -906,7 +906,7 @@ export default function PipelinePage() {
                 <div key={i} className="flex flex-1 flex-col items-center gap-0.5">
                   <span className="text-xs tabular-nums text-muted-foreground">{count}</span>
                   <div
-                    className="w-full rounded-sm bg-emerald-500/80"
+                    className="w-full rounded-sm bg-success/80"
                     style={{ height: `${Math.max(3, (count / weeklyMax) * 48)}px` }}
                   />
                 </div>
@@ -1047,7 +1047,7 @@ export default function PipelinePage() {
                           <Fragment key={task.id}>
                             {dragOverColumn === status && dragOverIndex === index && placeholder()}
                             <Card
-                              className="cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md"
+                              className="cursor-grab active:cursor-grabbing"
                               style={{
                                 borderColor: `${statusDef.color}80`,
                                 backgroundColor: `${statusDef.color}14`,
@@ -1130,7 +1130,7 @@ export default function PipelinePage() {
                                       <span
                                         className={`inline-flex items-center gap-1 text-xs ${
                                           isOverdue
-                                            ? 'text-red-500 font-medium'
+                                            ? 'text-destructive font-medium'
                                             : 'text-muted-foreground'
                                         }`}
                                       >

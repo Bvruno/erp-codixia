@@ -1,0 +1,368 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T12:09:10-05:00",
+  "title": "Design System: ERP Codixia",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Violeta eléctrico",
+        "canonical": "oklch(0.526 0.247 293)",
+        "tonalRamp": [
+          "oklch(0.25 0.12 293)",
+          "oklch(0.35 0.17 293)",
+          "oklch(0.45 0.21 293)",
+          "oklch(0.526 0.247 293)",
+          "oklch(0.62 0.22 293)",
+          "oklch(0.72 0.17 293)",
+          "oklch(0.83 0.11 293)",
+          "oklch(0.93 0.05 293)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Grafito azulado",
+        "canonical": "oklch(0.13 0.01 260)",
+        "tonalRamp": [
+          "oklch(0.13 0.01 260)",
+          "oklch(0.18 0.01 260)",
+          "oklch(0.22 0.01 260)",
+          "oklch(0.28 0.01 260)",
+          "oklch(0.45 0.01 260)",
+          "oklch(0.65 0.01 260)",
+          "oklch(0.85 0.005 260)",
+          "oklch(0.99 0.002 260)"
+        ]
+      },
+      "destructive": {
+        "role": "tertiary",
+        "displayName": "Rojo destructivo",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": [
+          "oklch(0.25 0.12 27.325)",
+          "oklch(0.35 0.17 27.325)",
+          "oklch(0.45 0.21 27.325)",
+          "oklch(0.577 0.245 27.325)",
+          "oklch(0.67 0.2 27.325)",
+          "oklch(0.78 0.15 27.325)",
+          "oklch(0.88 0.08 27.325)",
+          "oklch(0.95 0.04 27.325)"
+        ]
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Verde éxito",
+        "canonical": "oklch(0.62 0.16 162)",
+        "modes": {
+          "dark": { "canonical": "oklch(0.62 0.16 162)", "foreground": "oklch(0.16 0.02 162)" },
+          "light": { "canonical": "oklch(0.48 0.14 162)", "foreground": "oklch(0.985 0 0)" }
+        },
+        "tonalRamp": [
+          "oklch(0.25 0.08 162)",
+          "oklch(0.35 0.11 162)",
+          "oklch(0.45 0.14 162)",
+          "oklch(0.55 0.16 162)",
+          "oklch(0.62 0.16 162)",
+          "oklch(0.72 0.12 162)",
+          "oklch(0.83 0.07 162)",
+          "oklch(0.93 0.03 162)"
+        ]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "Ámbar precaución",
+        "canonical": "oklch(0.745 0.16 65)",
+        "modes": {
+          "dark": { "canonical": "oklch(0.745 0.16 65)", "foreground": "oklch(0.18 0.03 65)" },
+          "light": { "canonical": "oklch(0.5 0.13 65)", "foreground": "oklch(0.985 0 0)" }
+        },
+        "tonalRamp": [
+          "oklch(0.25 0.06 65)",
+          "oklch(0.35 0.09 65)",
+          "oklch(0.45 0.11 65)",
+          "oklch(0.55 0.13 65)",
+          "oklch(0.65 0.15 65)",
+          "oklch(0.745 0.16 65)",
+          "oklch(0.84 0.1 65)",
+          "oklch(0.93 0.04 65)"
+        ]
+      },
+      "info": {
+        "role": "tertiary",
+        "displayName": "Azul información",
+        "canonical": "oklch(0.65 0.19 254)",
+        "modes": {
+          "dark": { "canonical": "oklch(0.65 0.19 254)", "foreground": "oklch(0.16 0.02 254)" },
+          "light": { "canonical": "oklch(0.48 0.18 254)", "foreground": "oklch(0.985 0 0)" }
+        },
+        "tonalRamp": [
+          "oklch(0.25 0.1 254)",
+          "oklch(0.35 0.14 254)",
+          "oklch(0.45 0.17 254)",
+          "oklch(0.55 0.19 254)",
+          "oklch(0.65 0.19 254)",
+          "oklch(0.75 0.13 254)",
+          "oklch(0.85 0.07 254)",
+          "oklch(0.94 0.03 254)"
+        ]
+      },
+      "sidebar": {
+        "role": "neutral",
+        "displayName": "Grafito de sidebar",
+        "canonical": "oklch(0.16 0.01 260)",
+        "tonalRamp": [
+          "oklch(0.16 0.01 260)",
+          "oklch(0.2 0.01 260)",
+          "oklch(0.26 0.01 260)",
+          "oklch(0.34 0.01 260)",
+          "oklch(0.48 0.01 260)",
+          "oklch(0.66 0.01 260)",
+          "oklch(0.86 0.005 260)",
+          "oklch(0.985 0.002 260)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Solo títulos de página y cifras KPI. Peso 700, tracking -0.02em."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Títulos de card, diálogo y sección."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto de tablas, paneles y formularios."
+      },
+      "label": {
+        "displayName": "Label / eyebrow",
+        "purpose": "Eyebrows uppercase, tags y grupos de navegación."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card",
+        "value": "0 1px 2px rgb(0 0 0 / 0.3), 0 2px 10px rgb(0 0 0 / 0.22)",
+        "purpose": "Cards y paneles (dark). Light: 0 1px 2px rgb(17 17 26 / 0.04), 0 1px 3px rgb(17 17 26 / 0.05)."
+      },
+      {
+        "name": "raised",
+        "value": "0 2px 4px rgb(0 0 0 / 0.35), 0 12px 28px -6px rgb(0 0 0 / 0.45)",
+        "purpose": "Drag ghost y barras flotantes (dark). Light: 0 2px 4px rgb(17 17 26 / 0.06), 0 12px 28px -6px rgb(17 17 26 / 0.12)."
+      },
+      {
+        "name": "popover",
+        "value": "0 4px 14px -2px rgb(0 0 0 / 0.4), 0 14px 36px -6px rgb(0 0 0 / 0.35)",
+        "purpose": "Dropdowns, menús y diálogos (dark). Light: 0 4px 14px -2px rgb(17 17 26 / 0.1), 0 14px 36px -6px rgb(17 17 26 / 0.14)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Hover, focus y micro-estados (default de transiciones Tailwind)."
+      },
+      {
+        "name": "sidebar-width",
+        "value": "200ms",
+        "purpose": "Colapso y expansión de la sidebar."
+      },
+      {
+        "name": "page-enter",
+        "value": "350ms ease-out (fade-in-up 12px)",
+        "purpose": "Entrada de página; sin fill-mode para no dejar transform persistente."
+      },
+      {
+        "name": "drag-ghost",
+        "value": "300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Rebote del drag ghost al arrastrar tareas; único overshoot del sistema."
+      },
+      {
+        "name": "shimmer",
+        "value": "1.5s ease-in-out infinite",
+        "purpose": "Skeleton shimmer sobre --muted."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal de una vista; el único acento dominante además del nav activo. Alto 36px, radio 8px.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Nueva tarea</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 16px; border: 1px solid transparent; border-radius: calc(var(--radius) * 0.8); background: var(--primary); color: var(--primary-foreground); font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; line-height: 1.25rem; white-space: nowrap; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; } .ds-btn-primary:hover { background: var(--primary-hover); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Acción secundaria: borde hairline, fondo transparente, hover por superficie.",
+      "html": "<button class=\"ds-btn-outline\" type=\"button\">Cancelar</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 16px; border: 1px solid var(--border); border-radius: calc(var(--radius) * 0.8); background: transparent; color: var(--foreground); font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; line-height: 1.25rem; white-space: nowrap; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; } .ds-btn-outline:hover { background: var(--accent); color: var(--accent-foreground); } .ds-btn-outline:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de texto base; borde --input, foco con anillo de 3px del acento.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Buscar tareas…\" />",
+      "css": ".ds-input { display: flex; height: 36px; width: 100%; min-width: 0; padding: 0 12px; border: 1px solid var(--input); border-radius: calc(var(--radius) * 0.8); background: transparent; color: var(--foreground); font-family: var(--font-sans); font-size: 0.875rem; line-height: 1.25rem; outline: none; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-input::placeholder { color: var(--muted-foreground); } .ds-input:hover { border-color: color-mix(in oklab, var(--input) 70%, var(--foreground)); } .ds-input:focus-visible { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Contenedor base de contenido: superficie --card, radio 14px, sombra card, padding 24px (16px en densidad compacta).",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-title\">Resumen del proyecto</div><p class=\"ds-card-desc\">Tareas activas, próximas entregas y horas planificadas.</p></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 8px; padding: 24px; border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.4); background: var(--card); color: var(--foreground); font-family: var(--font-sans); box-shadow: var(--shadow-card-color); } .ds-card-title { font-size: 1rem; font-weight: 600; line-height: 1.3; } .ds-card-desc { margin: 0; color: var(--muted-foreground); font-size: 0.875rem; line-height: 1.5; }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge-primary",
+      "description": "Etiqueta compacta de estado; radio 8px, texto 12px/500.",
+      "html": "<span class=\"ds-badge\">En curso</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: fit-content; padding: 2px 8px; border: 1px solid transparent; border-radius: calc(var(--radius) * 0.8); background: var(--primary); color: var(--primary-foreground); font-family: var(--font-sans); font-size: 0.75rem; font-weight: 500; line-height: 1.4; white-space: nowrap; }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Ítem de navegación lateral; activo con barra de 3px en --primary y peso 600, inactivo al 75% con hover de superficie.",
+      "html": "<nav class=\"ds-sidebar\"><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\">Tareas</a><a class=\"ds-nav-item\" href=\"#\">Calendario</a><a class=\"ds-nav-item\" href=\"#\">Colaboradores</a></nav>",
+      "css": ".ds-sidebar { display: flex; flex-direction: column; gap: 2px; width: 220px; padding: 8px; border: 1px solid var(--sidebar-border); border-radius: calc(var(--radius) * 1.4); background: var(--sidebar); font-family: var(--font-sans); } .ds-nav-item { position: relative; display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: var(--radius); color: color-mix(in oklab, var(--sidebar-foreground) 75%, transparent); font-size: 0.875rem; line-height: 1.25rem; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-item:hover { background: color-mix(in oklab, var(--sidebar-accent) 70%, transparent); color: var(--sidebar-foreground); } .ds-nav-item-active { color: var(--sidebar-foreground); font-weight: 600; } .ds-nav-item-active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; border-radius: 999px; background: var(--primary); }"
+    },
+    {
+      "name": "Mention Chip",
+      "kind": "custom",
+      "description": "Mención del editor de documentos; píldora con tinte de acento al 12% y borde al 35%. Por tipo usa colores literales (lista #6366f1, tarea #b45309, documento #047857, mapa #7c3aed, todo #0369a1).",
+      "html": "<span class=\"ds-mencion\">@laura</span>",
+      "css": ".ds-mencion { display: inline-flex; align-items: center; padding: 0 7px; border: 1px solid color-mix(in oklab, var(--primary) 35%, transparent); border-radius: 999px; background: color-mix(in oklab, var(--primary) 12%, transparent); color: var(--primary); font-family: var(--font-sans); font-size: 0.92em; font-weight: 500; line-height: 1.5; white-space: nowrap; cursor: pointer; }"
+    },
+    {
+      "name": "Semantic State Badge",
+      "kind": "chip",
+      "description": "Badges de estado con tokens semánticos: success (hecho/publicado/guardado), warning (atención/cerrado/pendiente) e info (programado/en curso). Tinte al 15-20% y texto del token; legibles en ambos modos.",
+      "html": "<div class=\"ds-states\"><span class=\"ds-state ds-state-success\">Publicado</span><span class=\"ds-state ds-state-warning\">Cerrado</span><span class=\"ds-state ds-state-info\">Programado</span></div>",
+      "css": ".ds-states { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--font-sans); } .ds-state { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border: 1px solid transparent; border-radius: calc(var(--radius) * 0.8); font-size: 0.75rem; font-weight: 500; line-height: 1.4; white-space: nowrap; } .ds-state-success { background: color-mix(in oklab, var(--success) 15%, transparent); color: var(--success); } .ds-state-warning { background: color-mix(in oklab, var(--warning) 15%, transparent); color: var(--warning); } .ds-state-info { background: color-mix(in oklab, var(--info) 15%, transparent); color: var(--info); }"
+    },
+    {
+      "name": "Tabs",
+      "kind": "custom",
+      "description": "Lista en --muted con radio 10px y padding 3px; trigger activo sobre --background con shadow-sm; scroll horizontal si no cabe.",
+      "html": "<div class=\"ds-tabs\"><button class=\"ds-tab ds-tab-active\" type=\"button\">Pendientes</button><button class=\"ds-tab\" type=\"button\">Completadas</button></div>",
+      "css": ".ds-tabs { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: calc(var(--radius) * 1.1); background: var(--muted); font-family: var(--font-sans); } .ds-tab { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 12px; border: 0; border-radius: calc(var(--radius) * 0.8); background: transparent; color: var(--muted-foreground); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-tab:hover { color: var(--foreground); } .ds-tab-active { background: var(--background); color: var(--foreground); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); } .ds-tab:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }"
+    },
+    {
+      "name": "Dialog",
+      "kind": "card",
+      "description": "Diálogo centrado: overlay black/50, fondo --background, radio 10px, padding 24px, shadow-lg y cierre de 36px (44px en puntero coarse).",
+      "html": "<div class=\"ds-dialog\"><div class=\"ds-dialog-title\">Renombrar lista</div><p class=\"ds-dialog-desc\">El nombre se actualiza para todo el equipo.</p></div>",
+      "css": ".ds-dialog { width: 100%; max-width: 32rem; padding: 24px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background); color: var(--foreground); font-family: var(--font-sans); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); } .ds-dialog-title { font-size: 1rem; font-weight: 600; line-height: 1.3; } .ds-dialog-desc { margin: 6px 0 0; color: var(--muted-foreground); font-size: 0.875rem; line-height: 1.5; }"
+    },
+    {
+      "name": "Empty State",
+      "kind": "custom",
+      "description": "Estado vacío centrado: icono en cuadro --primary-soft de 18px de radio con shadow-card, título 18px/600, descripción en --muted-foreground y acción outline sm.",
+      "html": "<div class=\"ds-empty\"><div class=\"ds-empty-icon\">◌</div><p class=\"ds-empty-title\">Sin tareas todavía</p><p class=\"ds-empty-desc\">Crea la primera tarea para empezar.</p></div>",
+      "css": ".ds-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 24px; text-align: center; font-family: var(--font-sans); } .ds-empty-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: calc(var(--radius) * 1.8); background: var(--primary-soft); color: var(--primary); font-size: 1.25rem; box-shadow: var(--shadow-card-color); } .ds-empty-title { margin: 0; font-size: 1.125rem; font-weight: 600; line-height: 1.3; } .ds-empty-desc { margin: 0; color: var(--muted-foreground); font-size: 0.875rem; line-height: 1.5; }"
+    },
+    {
+      "name": "Floating Save Bar",
+      "kind": "custom",
+      "description": "Barra de guardado sticky (bottom-4, alineada a la derecha): radio 14px, borde 1px, fondo --background/85, shadow-lg + backdrop-blur. Estados: Loader2 girando, Check en --success o AlertCircle en --destructive. Único uso permitido de backdrop-blur.",
+      "html": "<div class=\"ds-savebar\"><span class=\"ds-savebar-check\">✓</span> Guardado</div>",
+      "css": ".ds-savebar { position: sticky; bottom: 16px; margin-left: auto; display: inline-flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.4); background: color-mix(in oklab, var(--background) 85%, transparent); color: var(--foreground); font-family: var(--font-sans); font-size: 0.875rem; line-height: 1.25rem; box-shadow: var(--shadow-raised-color); backdrop-filter: blur(8px); } .ds-savebar-check { color: var(--success); font-weight: 700; }"
+    },
+    {
+      "name": "Drag Ghost",
+      "kind": "custom",
+      "description": "Copia flotante al arrastrar una tarea: entra en 300ms con cubic-bezier(0.34, 1.56, 0.64, 1), ligera rotación (0.5-1.5°) y shadow-raised. Único gesto con rebote del sistema.",
+      "html": "<div class=\"ds-ghost\">Diseñar onboarding</div>",
+      "css": ".ds-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: calc(var(--radius) * 0.8); background: var(--card); color: var(--foreground); font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; box-shadow: var(--shadow-raised-color); transform: rotate(1deg); }"
+    },
+    {
+      "name": "Brand Mark",
+      "kind": "custom",
+      "description": "Cuadro violeta (--primary, radio 14px, shadow-card, ring sutil) con la gata de Codixia; wordmark 15px/700/tracking-tight y tagline 'PLATAFORMA' 12px/500/uppercase/0.16em en --muted-foreground. Tamaño 36px (32px en sm).",
+      "html": "<div class=\"ds-brand\"><span class=\"ds-brand-mark\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20V9l4-3 4 3 4-3 4 3v11z\"/><circle cx=\"9\" cy=\"13\" r=\"0.6\" fill=\"#fff\"/><circle cx=\"15\" cy=\"13\" r=\"0.6\" fill=\"#fff\"/></svg></span><span class=\"ds-brand-text\"><span class=\"ds-brand-name\">ERP Codixia</span><span class=\"ds-brand-tag\">PLATAFORMA</span></span></div>",
+      "css": ".ds-brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-sans); } .ds-brand-mark { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: calc(var(--radius) * 1.4); background: var(--primary); box-shadow: var(--shadow-card-color), 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent); } .ds-brand-text { display: flex; flex-direction: column; line-height: 1.1; } .ds-brand-name { color: var(--foreground); font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; } .ds-brand-tag { color: var(--muted-foreground); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.16em; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Mesa de Trabajo",
+    "overview": "Un banco de trabajo ordenado: el contenido manda y el chrome desaparece. La interfaz es una herramienta de trabajo B2B para dueños de PyME que coordinan proyectos, tareas, documentos y turnos; cada píxel o sirve al dato o estorba. Nada de adornos: ni gradientes decorativos, ni glassmorphism, ni neumorfismo. La jerarquía nace de superficies apiladas en gris-azulado (hue 260) y de un único acento violeta por pantalla, no de la decoración.\n\nDark-first: el modo oscuro es el lienzo base y el claro es un re-mapeo de superficies y ramp de texto. La densidad es una decisión de primera clase: los controles miden 36px, las tablas aprietan a 40px, y el modo compacto reduce padding de cards, cabeceras y celdas sin colapsar la legibilidad. El resultado es sobrio, confiable y ligeramente técnico; la marca (la gata de Codixia) vive en un detalle: el cuadro violeta del wordmark.",
+    "keyCharacteristics": [
+      "Dark-first con modo claro completo (html[data-mode='light']).",
+      "Superficies en capas de grafito azulado (hue 260), sin negro puro.",
+      "Un acento dominante por pantalla; el resto en escala de grises.",
+      "Precisos y contenidos: controles de 36px, radios de 8/10/14px.",
+      "Ultra compacto: densidad compacta en cards, tablas y navegación.",
+      "Sombras negras suaves de baja opacidad; bordes hairline de 1px.",
+      "Foco visible obligatorio y alturas táctiles de 44px en puntero coarse.",
+      "Sin gradientes decorativos ni glassmorphism (blur solo en barras flotantes)."
+    ],
+    "rules": [
+      {
+        "name": "The One Voice Rule",
+        "body": "El acento ocupa ≤10% de la pantalla y hay un solo elemento dominante por vista (CTA primario, ítem activo de nav o foco). Su rareza es el punto.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Pure Rule",
+        "body": "Nunca negro puro ni blanco puro de fondo: el lienzo parte de oklch(0.13) y oklch(0.99).",
+        "section": "colors"
+      },
+      {
+        "name": "The Soft Tint Rule",
+        "body": "Los tintes de acento se construyen solo con --primary-soft (12%) y --primary-soft-2 (20%); los estados semánticos (--destructive) ocupan <5% de los píxeles.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Stack Rule",
+        "body": "No se introducen familias nuevas: display, body y UI comparten el stack system-ui; la mono queda reservada a código, atajos y datos tabulares.",
+        "section": "typography"
+      },
+      {
+        "name": "The Layered Gray Rule",
+        "body": "La elevación se comunica con superficies apiladas; si una jerarquía se puede resolver con --card vs --card-2, no se agrega una sombra nueva.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Fine Shadow Rule",
+        "body": "Solo existen tres sombras; se elige por capa, no por gusto. Cualquier sombra nueva debe reemplazar a una, no sumarse.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do diseñar en oscuro primero y verificar el claro después (html[data-mode='light']).",
+      "Do usar --primary-soft (12%) y --primary-soft-2 (20%) para cualquier tinte de acento; nunca opacidades ad hoc.",
+      "Do mantener un solo elemento acento dominante por pantalla; el resto en grafito (hue 260).",
+      "Do respetar los radios: 8px controles, 10px navegación y diálogos, 14px cards y menús.",
+      "Do construir la jerarquía con superficie (--card vs --card-2) antes de recurrir a una sombra.",
+      "Do usar --font-mono y tabular-nums para cifras alineadas y código.",
+      "Do respetar prefers-reduced-motion y la clase html.reduce-motion (anima 0.01ms, sin excepciones).",
+      "Do garantizar foco visible (--ring + anillo 3px) y áreas táctiles de 44px en puntero coarse.",
+      "Do escribir la UI en sentence case; uppercase solo en eyebrows y tagline."
+    ],
+    "donts": [
+      "Don't introducir negro (#000) ni blanco puro como fondo: el lienzo parte de oklch(0.13) y oklch(0.99).",
+      "Don't usar gradientes decorativos, glassmorphism ni neumorfismo; el único blur permitido es el de barras flotantes sobre contenido.",
+      "Don't inventar sombras duras ni de color: solo las tres sombras negras suaves del sistema.",
+      "Don't usar rounded-full en cards ni botones; la píldora es solo para chips, avatares, dots y el indicador de nav activo.",
+      "Don't agregar familias tipográficas, webfonts ni más de tres tamaños tipográficos por pantalla.",
+      "Don't anidar más de dos niveles de cards.",
+      "Don't romper la densidad compacta con paddings fijos; usar los tokens y dejar que html[data-density='compact'] apriete card, tabla y nav.",
+      "Don't usar spinners de pantalla completa: usar skeletons con shimmer.",
+      "Don't duplicar lógica de permisos o negocio en UI: el panel es un cliente delgado de la API."
+    ]
+  }
+}

@@ -217,12 +217,12 @@ export function MemberDetailCard({
                   Bloqueado
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-400 text-xs">
+                <Badge variant="secondary" className="bg-success/20 text-success text-xs">
                   Activo
                 </Badge>
               )}
               {member.access_mode === 'grants_only' && (
-                <Badge variant="outline" className="text-xs gap-1 text-amber-400" title="Invitado por link con acceso aislado: solo ve los archivos con permiso asignado">
+                <Badge variant="outline" className="text-xs gap-1 text-warning" title="Invitado por link con acceso aislado: solo ve los archivos con permiso asignado">
                   <Lock className="size-3" />
                   Acceso restringido
                 </Badge>
@@ -472,7 +472,7 @@ export function MemberDetailCard({
               >
                 {member.blocked ? (
                   <>
-                    <UserCheck className="text-emerald-400 size-4" />
+                    <UserCheck className="text-success size-4" />
                     Desbloquear
                   </>
                 ) : (

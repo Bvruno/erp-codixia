@@ -54,7 +54,7 @@ export function DayDialog({
             <p className="text-sm">
               <span
                 className={`font-semibold ${
-                  hours >= 8 ? "text-emerald-500" : "text-amber-500"
+                  hours >= 8 ? "text-success" : "text-warning"
                 }`}
               >
                 {hours}h

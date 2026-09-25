@@ -35,7 +35,11 @@
         --accent-soft-2: color-mix(in oklab, var(--accent), transparent 78%);
 
         --success: oklch(0.62 0.16 162);
+        --success-foreground: oklch(0.16 0.02 162);
         --warn: oklch(0.745 0.16 65);
+        --warn-foreground: oklch(0.18 0.03 65);
+        --info: oklch(0.65 0.19 254);
+        --info-foreground: oklch(0.16 0.02 254);
         --danger: oklch(0.577 0.245 27.325);
 
         --font-display: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -109,6 +113,12 @@
         --fg: oklch(0.21 0.01 260);
         --muted: oklch(0.52 0.015 260);
         --border: oklch(0.922 0.004 260);
+        --success: oklch(0.48 0.14 162);
+        --success-foreground: oklch(0.985 0 0);
+        --warn: oklch(0.5 0.13 65);
+        --warn-foreground: oklch(0.985 0 0);
+        --info: oklch(0.48 0.18 254);
+        --info-foreground: oklch(0.985 0 0);
         --elev-card: 0 1px 2px rgb(17 17 26 / 0.04), 0 1px 3px rgb(17 17 26 / 0.05);
         --elev-raised: 0 2px 4px rgb(17 17 26 / 0.06), 0 12px 28px -6px rgb(17 17 26 / 0.12);
         --elev-popover: 0 4px 14px -2px rgb(17 17 26 / 0.1), 0 14px 36px -6px rgb(17 17 26 / 0.14);
@@ -420,7 +430,7 @@
         padding: 0 var(--space-3);
         border: 1px solid var(--border);
         border-radius: var(--radius-md);
-        background: color-mix(in oklab, var(--surface), transparent 30%);
+        background: color-mix(in oklab, var(--border), transparent 70%);
         color: var(--fg);
         font: inherit;
         transition:
@@ -691,8 +701,8 @@
         max-width: 420px;
         padding: var(--space-6);
         border: 1px solid var(--border);
-        border-radius: var(--radius-xl);
-        background: var(--surface);
+        border-radius: var(--radius-lg);
+        background: var(--bg);
         box-shadow: var(--elev-popover);
       }
 
@@ -702,7 +712,7 @@
         max-width: 240px;
         padding: var(--space-2);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-md);
         background: var(--surface);
         box-shadow: var(--elev-raised);
       }

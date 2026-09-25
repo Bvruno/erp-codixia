@@ -106,7 +106,7 @@ export function PanelDistribucion({
               <div key={i} className="flex flex-1 flex-col items-center gap-1">
                 <span className="text-xs font-medium tabular-nums text-muted-foreground">{count}</span>
                 <div
-                  className="w-full rounded-sm bg-emerald-500/80"
+                  className="w-full rounded-sm bg-success/80"
                   style={{ height: `${Math.max(4, (count / Math.max(1, ...weeklyDone)) * 80)}px` }}
                 />
               </div>
@@ -283,7 +283,7 @@ export function PanelListas({
                   {listDone}/{listTasks.length}
                 </span>
                 <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
+                  <div className="h-full rounded-full bg-success" style={{ width: `${pct}%` }} />
                 </div>
               </Link>
             );

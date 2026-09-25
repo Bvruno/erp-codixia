@@ -1014,7 +1014,7 @@ export function DocumentView({ docId: paramDocId }: { docId: string }) {
                     <span className="flex-1 truncate">{page.title}</span>
                     {pendiente && (
                       <span
-                        className="size-1.5 shrink-0 rounded-full bg-amber-500"
+                        className="size-1.5 shrink-0 rounded-full bg-warning"
                         title="Cambios sin guardar"
                         aria-label="Cambios sin guardar"
                       />

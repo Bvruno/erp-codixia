@@ -43,9 +43,9 @@ interface Props {
 }
 
 const TYPE_BADGES: Record<string, string> = {
-  worked: "bg-blue-500/20 text-blue-400",
+  worked: "bg-info/20 text-info",
   overtime: "bg-purple-500/20 text-purple-400",
-  makeup: "bg-emerald-500/20 text-emerald-400",
+  makeup: "bg-success/20 text-success",
 };
 
 const TYPE_LABELS: Record<string, string> = {

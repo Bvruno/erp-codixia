@@ -686,7 +686,7 @@ export default function PerfilPage() {
               </div>
               <div className="space-y-4">
                 {hoursLocked() && (
-                  <p className="bg-amber-500/10 text-amber-400 text-xs rounded-md p-2">
+                  <p className="bg-warning/10 text-warning text-xs rounded-md p-2">
                     Tienes un horario asignado por la organización: tus límites
                     horarios los administra el equipo directivo.
                   </p>

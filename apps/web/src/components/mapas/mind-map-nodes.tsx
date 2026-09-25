@@ -479,7 +479,7 @@ export function TaskNode({ id, data, selected, width, height }: MindMapNodeProps
           className="nodrag nopan mt-0.5 shrink-0 text-black/50 hover:text-black"
           aria-label={data.done ? 'Marcar pendiente' : 'Marcar completada'}
         >
-          {data.done ? <CheckCircle2 className="size-4 text-emerald-600" /> : <Circle className="size-4" />}
+          {data.done ? <CheckCircle2 className="size-4 text-success" /> : <Circle className="size-4" />}
         </button>
         <div className="min-w-0 flex-1">
           <input

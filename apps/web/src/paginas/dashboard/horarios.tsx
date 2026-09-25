@@ -501,17 +501,18 @@ export default function HorariosPage() {
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <Clock className="size-4" />
-                  Solicitar Permiso
+                  Solicitar permiso
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Solicitar Permiso</DialogTitle>
+                  <DialogTitle>Solicitar permiso</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Motivo</Label>
+                    <Label htmlFor="permiso-motivo">Motivo</Label>
                     <Textarea
+                      id="permiso-motivo"
                       value={permissionForm.reason}
                       onChange={(e) =>
                         setPermissionForm({
@@ -525,8 +526,9 @@ export default function HorariosPage() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label>Fecha</Label>
+                      <Label htmlFor="permiso-fecha">Fecha</Label>
                       <Input
+                        id="permiso-fecha"
                         type="date"
                         value={permissionForm.date}
                         onChange={(e) =>
@@ -538,8 +540,9 @@ export default function HorariosPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Horas estimadas fuera</Label>
+                      <Label htmlFor="permiso-horas">Horas estimadas fuera</Label>
                       <Input
+                        id="permiso-horas"
                         type="number"
                         value={permissionForm.estimated_hours}
                         onChange={(e) =>
@@ -554,8 +557,9 @@ export default function HorariosPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Fecha de recuperación (opcional)</Label>
+                    <Label htmlFor="permiso-recuperacion">Fecha de recuperación (opcional)</Label>
                     <Input
+                      id="permiso-recuperacion"
                       type="date"
                       value={permissionForm.makeup_date}
                       onChange={(e) =>
@@ -573,7 +577,7 @@ export default function HorariosPage() {
                         Enviando…
                       </>
                     ) : (
-                      "Enviar Solicitud"
+                      "Enviar solicitud"
                     )}
                   </Button>
                 </div>
@@ -637,16 +641,16 @@ export default function HorariosPage() {
                       <div
                         className={`h-full rounded-full transition-all ${
                           weeklyPct >= 100
-                            ? "bg-emerald-500"
+                            ? "bg-success"
                             : weeklyPct >= 70
-                              ? "bg-blue-500"
+                              ? "bg-info"
                               : "bg-orange-500"
                         }`}
                         style={{ width: `${weeklyPct}%` }}
                       />
                     </div>
                     {weeklyPct < 70 && weeklyPct > 0 && (
-                      <p className="text-amber-500 mt-1 text-xs">
+                      <p className="text-warning mt-1 text-xs">
                         Bajo la meta semanal
                       </p>
                     )}
@@ -678,12 +682,12 @@ export default function HorariosPage() {
                     </div>
                   )}
                   {s.exempt > 0 && (
-                    <div className="text-emerald-400 text-xs">
+                    <div className="text-success text-xs">
                       Eximido por permisos: {s.exempt.toFixed(1)}h
                     </div>
                   )}
                   {s.pendingMakeup && (
-                    <div className="text-amber-400 text-xs flex items-center gap-1">
+                    <div className="text-warning text-xs flex items-center gap-1">
                       <AlertTriangle className="size-3" />
                       Recuperación pendiente: {s.pendingMakeupHours.toFixed(1)}h
                     </div>
@@ -694,7 +698,7 @@ export default function HorariosPage() {
                       Debe {s.owed.toFixed(1)}h en el período
                     </div>
                   ) : (
-                    <div className="text-emerald-400 text-xs">
+                    <div className="text-success text-xs">
                       Al día en el período
                     </div>
                   )}
@@ -757,7 +761,7 @@ export default function HorariosPage() {
                         {Math.round(h)}
                       </span>
                       <div
-                        className="w-full rounded-sm bg-blue-500/70"
+                        className="w-full rounded-sm bg-info/70"
                         style={{ height: `${Math.max(3, (h / trendMax) * 48)}px` }}
                       />
                     </div>
@@ -877,10 +881,10 @@ export default function HorariosPage() {
                       <Badge
                         className={
                           perm.status === "approved"
-                            ? "bg-emerald-500/20 text-emerald-400"
+                            ? "bg-success/20 text-success"
                             : perm.status === "rejected"
-                              ? "bg-red-500/20 text-red-400"
-                              : "bg-yellow-500/20 text-yellow-400"
+                              ? "bg-destructive/10 text-destructive"
+                              : "bg-warning/20 text-warning"
                         }
                       >
                         {perm.status === "approved"
@@ -896,7 +900,7 @@ export default function HorariosPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="text-emerald-400 h-8"
+                            className="text-success h-8"
                             onClick={() =>
                               updatePermissionStatus(perm.id, "approved")
                             }
@@ -906,7 +910,7 @@ export default function HorariosPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="text-red-400 h-8"
+                            className="text-destructive h-8"
                             onClick={() =>
                               updatePermissionStatus(perm.id, "rejected")
                             }
@@ -957,8 +961,8 @@ export default function HorariosPage() {
                   <Badge
                     className={
                       perm.status === "approved"
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-yellow-500/20 text-yellow-400"
+                        ? "bg-success/20 text-success"
+                        : "bg-warning/20 text-warning"
                     }
                   >
                     {perm.status === "approved" ? "Aprobado" : "Pendiente"}

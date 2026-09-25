@@ -95,7 +95,14 @@ export function TablaMiembros({
                 <TableRow
                   key={c.id}
                   data-state={c.id === seleccionadoId ? 'selected' : undefined}
-                  className="cursor-pointer"
+                  className="cursor-pointer focus-visible:bg-muted/50 focus-visible:outline-none"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSeleccionar(c.id);
+                    }
+                  }}
                   onClick={() => onSeleccionar(c.id)}
                 >
                   <TableCell>
@@ -153,13 +160,13 @@ export function TablaMiembros({
                       <Badge variant="destructive">Bloqueado</Badge>
                     ) : (
                       <>
-                        <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-400">
+                        <Badge variant="secondary" className="bg-success/20 text-success">
                           Activo
                         </Badge>
                         {c.access_mode === 'grants_only' && (
                           <Badge
                             variant="outline"
-                            className="text-xs gap-1 text-amber-400"
+                            className="text-xs gap-1 text-warning"
                             title="Invitado por link con acceso aislado: solo ve los archivos con permiso asignado"
                           >
                             <Lock className="size-3" />
@@ -193,7 +200,7 @@ export function TablaMiembros({
                           title={c.blocked ? 'Desbloquear' : 'Bloquear'}
                         >
                           {c.blocked ? (
-                            <CheckCircle className="size-4 text-emerald-400" />
+                            <CheckCircle className="size-4 text-success" />
                           ) : (
                             <Ban className="size-4 text-destructive" />
                           )}

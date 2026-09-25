@@ -135,7 +135,7 @@ export function ScheduleEditor({
       >
         {hasSchedule(schedules, user.id) ? (
           <span className="flex items-center gap-1.5 text-xs">
-            <CalendarDays className="size-3.5 text-emerald-400" />
+            <CalendarDays className="size-3.5 text-success" />
             {userSchedules.length} día(s)
           </span>
         ) : (

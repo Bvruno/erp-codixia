@@ -79,8 +79,8 @@ export function GrillaSemanal({
                       className={cn(
                         "px-1 py-2 text-center font-mono text-xs",
                         !esLaborable(d.getDay()) && "bg-muted/15",
-                        h >= dailyTarget && "text-emerald-500 font-semibold",
-                        h > 0 && h < dailyTarget && "text-amber-500",
+                        h >= dailyTarget && "text-success font-semibold",
+                        h > 0 && h < dailyTarget && "text-warning",
                       )}
                     >
                       {h > 0 ? `${h}h` : "—"}

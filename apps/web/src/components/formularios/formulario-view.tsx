@@ -240,9 +240,9 @@ export function FormularioView({ formularioId: paramId }: { formularioId: string
 
   const estadoBadge =
     estado === 'publicado'
-      ? { texto: 'Publicado', clase: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' }
+      ? { texto: 'Publicado', clase: 'bg-success/15 text-success' }
       : estado === 'cerrado'
-        ? { texto: 'Cerrado', clase: 'bg-amber-500/15 text-amber-600 dark:text-amber-400' }
+        ? { texto: 'Cerrado', clase: 'bg-warning/15 text-warning' }
         : { texto: 'Borrador', clase: 'bg-muted text-muted-foreground' };
 
   return (

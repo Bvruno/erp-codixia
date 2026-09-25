@@ -425,12 +425,12 @@ const router = useRouter();
                 }}
               >
                 <Plus className="size-4" />
-                Invitar Colaborador
+                Invitar colaborador
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Crear Link de Invitación</DialogTitle>
+                <DialogTitle>Crear link de invitación</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -439,7 +439,7 @@ const router = useRouter();
                     value={inviteRole}
                     onValueChange={(v) => setInviteRole(v as 'admin' | 'collaborator')}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Rol asignado">
                       <ShieldCheck className="size-4 text-muted-foreground" />
                       <SelectValue />
                     </SelectTrigger>
@@ -452,7 +452,7 @@ const router = useRouter();
                 <div className="space-y-2">
                   <Label>Tiempo de expiración</Label>
                   <Select value={expiryHours} onValueChange={setExpiryHours}>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Tiempo de expiración">
                       <Clock className="size-4 text-muted-foreground" />
                       <SelectValue />
                     </SelectTrigger>
@@ -476,7 +476,7 @@ const router = useRouter();
                           setInviteScope(null);
                         }}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger aria-label="Alcance del acceso">
                           <Layers className="size-4 text-muted-foreground" />
                           <SelectValue />
                         </SelectTrigger>
@@ -513,9 +513,9 @@ const router = useRouter();
                 )}
                 <Button onClick={acciones.createInviteLink} className="w-full" disabled={busy === 'invite'}>
                   <Link2 className="size-4" />
-                  {busy === 'invite' ? 'Generando...' : 'Generar y Copiar Link'}
+                  {busy === 'invite' ? 'Generando...' : 'Generar y copiar link'}
                 </Button>
-                <p className="bg-amber-500/10 text-amber-400 text-xs rounded-md p-2">
+                <p className="bg-warning/10 text-warning text-xs rounded-md p-2">
                   Todo miembro debe tener un horario: asígnalo desde la columna
                   Horario tras aceptar la invitación. Sin horario no podrá
                   registrar horas ni recibir tareas.

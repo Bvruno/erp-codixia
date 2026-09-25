@@ -161,7 +161,7 @@ export function ResponderPublico({
     return (
       <Marco>
         <div className="flex flex-col items-center gap-3 rounded-xl border bg-card p-8 text-center">
-          <ClipboardList className="size-7 text-emerald-500" />
+          <ClipboardList className="size-7 text-success" />
           <p className="font-medium">Ya registramos tu respuesta</p>
           <p className="text-sm text-muted-foreground">
             Cada link personal acepta una sola respuesta.

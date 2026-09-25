@@ -5,7 +5,9 @@ Design System 2.0 package guide for Open Design agents and reviewers.
 ## Read Order
 
 1. Read this file first to understand the package contract.
-2. Read `DESIGN.md` for visual intent, constraints, and anti-patterns.
+2. Read `DESIGN.md` for visual intent, constraints, and anti-patterns. The
+   app-side canonical spec is `apps/web/DESIGN.md` (+
+   `apps/web/.impeccable/design.json`) — keep both in sync when tokens change.
 3. Paste `tokens.css` (`:root` + `[data-mode='light']` + acento elegido)
    into the first artifact `<style>` block before writing component CSS.
 4. Open `components.html` when exact selectors or states matter; it is the

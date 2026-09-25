@@ -63,7 +63,7 @@ export function SignupForm({
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-2 text-center">
           <BrandWordmark />
-          <h1 className="mt-2 text-2xl font-bold">Crear Cuenta</h1>
+          <h1 className="mt-2 text-2xl font-bold">Crear cuenta</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Completa tus datos para unirte a la organización
           </p>
@@ -71,7 +71,7 @@ export function SignupForm({
         {inviteValid && (
           <p
             role="status"
-            className="text-primary text-sm rounded-md bg-primary/10 p-2 text-center"
+            className="text-primary text-sm rounded-md bg-primary-soft p-2 text-center"
           >
             Has sido invitado. Crea tu cuenta para aceptar la invitación.
           </p>
@@ -132,9 +132,8 @@ export function SignupForm({
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 flex size-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 flex size-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground pointer-coarse:size-11"
                       aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                      tabIndex={-1}
                     >
                       {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </button>
@@ -188,7 +187,7 @@ export function SignupForm({
                 {info && (
                   <p
                     role="status"
-                    className="text-emerald-400 text-sm rounded-md bg-emerald-400/10 p-2"
+                    className="text-success text-sm rounded-md bg-success/10 p-2"
                   >
                     {info}
                   </p>
