@@ -77,6 +77,9 @@ import {
   type PathLista,
 } from '@/lib/pipeline-filtros';
 import { rutaTarea, type ArbolTareas } from '@/lib/rutas-tareas';
+import { TaskDetailSheet } from '@/components/calendar/task-detail-sheet';
+import { usePilaTareas } from '@/lib/use-pila-tareas';
+import type { AccessTree } from '@/lib/access';
 
 type ListaContexto = {
   id: string;
@@ -144,6 +147,7 @@ export default function PipelinePage() {
   const [quickListId, setQuickListId] = useState('');
   const [quickPriority, setQuickPriority] = useState('');
   const [loading, setLoading] = useState(true);
+  const pilaTareas = usePilaTareas();
   const [nowTs, setNowTs] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
@@ -391,6 +395,21 @@ export default function PipelinePage() {
         workspace_id: l.workspace_id,
         folder_id: l.folder_id,
       })),
+    }),
+    [workspaces, folders, lists]
+  );
+
+  // Árbol mínimo para el detalle en sheet (el pipeline solo tiene contexto
+  // de workspace/carpeta/lista; documentos y demás no aplican aquí).
+  const arbolCompleto: AccessTree = useMemo(
+    () => ({
+      workspaces: workspaces as unknown as AccessTree['workspaces'],
+      folders: folders as unknown as AccessTree['folders'],
+      lists: lists as unknown as AccessTree['lists'],
+      documents: [],
+      mindmaps: [],
+      todos: [],
+      formularios: [],
     }),
     [workspaces, folders, lists]
   );
@@ -1074,6 +1093,10 @@ export default function PipelinePage() {
                                 <div className="flex items-start justify-between gap-2">
                                   <Link
                                     href={rutaTarea(task, arbolTareas)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      pilaTareas.abrir(task.id);
+                                    }}
                                     className="font-medium text-sm hover:underline line-clamp-2"
                                   >
                                     {task.title}
@@ -1222,6 +1245,26 @@ export default function PipelinePage() {
           </div>
         </div>
       )}
+      <TaskDetailSheet
+        noModal
+        taskId={pilaTareas.actual}
+        open={!!pilaTareas.actual}
+        onClose={pilaTareas.cerrar}
+        onDeleted={pilaTareas.cerrar}
+        onOpenTask={pilaTareas.abrirSub}
+        onBack={pilaTareas.puedeVolver ? pilaTareas.volver : undefined}
+        arbol={arbolCompleto}
+        colaboradores={collaborators}
+        esAdmin={canVerAsignado}
+        listasEscribibles={null}
+        rutaCompleta={(() => {
+          const t = tasks.find((x) => x.id === pilaTareas.actual);
+          return t ? rutaTarea(t, arbolTareas) : null;
+        })()}
+        onChanged={() => {
+          void pipelineQuery.refetch();
+        }}
+      />
     </div>
   );
 }

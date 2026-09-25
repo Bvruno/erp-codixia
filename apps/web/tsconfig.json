@@ -31,6 +31,7 @@
       "@/lib/use-perfil": ["./src/lib/use-perfil.ts"],
       "@/lib/use-autoguardado": ["./src/lib/use-autoguardado.ts"],
       "@/lib/use-formato-hora": ["./src/lib/use-formato-hora.ts"],
+      "@/lib/use-pila-tareas": ["./src/lib/use-pila-tareas.ts"],
       "@/lib/use-preferencias-trabajo": [
         "./src/lib/use-preferencias-trabajo.ts"
       ],

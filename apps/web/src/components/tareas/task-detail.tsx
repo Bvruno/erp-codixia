@@ -79,6 +79,9 @@ export type TaskDetailProps = {
   colaboradores?: Profile[];
   esAdmin?: boolean;
   listasEscribibles?: string[] | null;
+  /** Presente cuando el detalle vive en un offcanvas: al pulsar una
+   *  sub-tarea se cambia el contenido del panel en vez de navegar. */
+  onOpenTask?: (id: string) => void;
 };
 
 export function TaskDetail({
@@ -90,6 +93,7 @@ export function TaskDetail({
   colaboradores,
   esAdmin,
   listasEscribibles,
+  onOpenTask,
 }: TaskDetailProps) {
   const ctx = useTareasOpcional();
   const enModal = !!onClose;
@@ -613,11 +617,118 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
         }
       />
 
+      <PanelEntidad contenidoClassName="flex flex-wrap items-end gap-x-4 gap-y-3">
+        <div className="flex w-36 flex-col gap-1.5">
+          <label className="text-xs text-muted-foreground">Estado</label>
+          <Select defaultValue={task.status} onValueChange={(v) => updateField('status', v)} disabled={!canEdit}>
+            <SelectTrigger className="h-8 text-xs">
+              <span className="flex min-w-0 items-center gap-2">
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: statuses.find((s) => s.key === task.status)?.color ?? 'var(--muted-foreground)' }}
+                  aria-hidden
+                />
+                <SelectValue />
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              {statuses.map((s) => (<SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex w-32 flex-col gap-1.5">
+          <label className="text-xs text-muted-foreground">Prioridad</label>
+          <Select defaultValue={task.priority} onValueChange={(v) => updateField('priority', v)} disabled={!canEdit}>
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {priorities.map((p) => (<SelectItem key={p.key} value={p.key}>{p.label}</SelectItem>))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex w-44 flex-col gap-1.5">
+          <label className="text-xs text-muted-foreground">Asignado</label>
+          <Select
+            defaultValue={task.assigned_to || ''}
+            onValueChange={(v) => {
+              if (v === '') {
+                updateField('assigned_to', null);
+                return;
+              }
+              const assignee = collaborators.find((c) => c.id === v);
+              if (!assignee) {
+                updateField('assigned_to', v);
+                return;
+              }
+              openAssignAccess(assignee, task.list_id, (grants) => {
+                updateField('assigned_to', v);
+                void saveGrants(v, grants);
+              });
+            }}
+            disabled={!canEdit}
+          >
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue placeholder="Sin asignar" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Sin asignar</SelectItem>
+              {collaborators.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="size-5"><AvatarFallback className="text-xs">{initials(c.full_name)}</AvatarFallback></Avatar>
+                    {c.full_name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex w-36 flex-col gap-1.5">
+          <label className="text-xs text-muted-foreground">Fecha límite</label>
+          <Input
+            type="date"
+            defaultValue={task.due_date || ''}
+            onBlur={(e) => updateField('due_date', e.target.value || null)}
+            readOnly={!canEdit}
+            className="h-8 text-xs"
+          />
+        </div>
+
+        <div className="flex w-24 flex-col gap-1.5">
+          <label className="text-xs text-muted-foreground">Horas est.</label>
+          <Input
+            type="number"
+            defaultValue={task.estimated_hours || ''}
+            onBlur={(e) => updateField('estimated_hours', e.target.value || null)}
+            readOnly={!canEdit}
+            className="h-8 text-xs"
+            step="0.5"
+          />
+        </div>
+
+        <div className="flex w-36 flex-col gap-1.5">
+          <label className="text-xs text-muted-foreground">Turno</label>
+          <Select defaultValue={task.shift_id || ''} onValueChange={(v) => updateField('shift_id', v || null)} disabled={!canEdit}>
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue placeholder="Sin turno" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Sin turno</SelectItem>
+              {shifts.map((s) => (<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>))}
+            </SelectContent>
+          </Select>
+        </div>
+      </PanelEntidad>
+
       <div className="@container">
         <div className="grid gap-6 @4xl:grid-cols-3">
-          {/* Left: Task Info + Sub-tasks */}
+          {/* Left: Descripción + Sub-tareas */}
           <div className="@4xl:col-span-1 space-y-4">
-          <PanelEntidad contenidoClassName="space-y-4">
+            <PanelEntidad>
               <div className="space-y-2">
                 <label className="text-xs text-muted-foreground">Descripción</label>
                 <Textarea
@@ -625,117 +736,11 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                   onBlur={(e) => updateField('description', e.target.value || null)}
                   readOnly={!canEdit}
                   placeholder="Sin descripción. Click para agregar..."
-                  className="text-xs border-0 bg-transparent focus-visible:ring-1 resize-none min-h-[60px] px-1 -mx-1"
-                  rows={3}
+                  className="text-xs border-0 bg-transparent focus-visible:ring-1 resize-none min-h-[44px] px-1 -mx-1"
+                  rows={2}
                 />
               </div>
-
-              <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">Estado</label>
-                <Select defaultValue={task.status} onValueChange={(v) => updateField('status', v)} disabled={!canEdit}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span
-                        className="size-2 shrink-0 rounded-full"
-                        style={{ backgroundColor: statuses.find((s) => s.key === task.status)?.color ?? 'var(--muted-foreground)' }}
-                        aria-hidden
-                      />
-                      <SelectValue />
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((s) => (<SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">Prioridad</label>
-                <Select defaultValue={task.priority} onValueChange={(v) => updateField('priority', v)} disabled={!canEdit}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {priorities.map((p) => (<SelectItem key={p.key} value={p.key}>{p.label}</SelectItem>))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">Asignado</label>
-                <Select
-                  defaultValue={task.assigned_to || ''}
-                  onValueChange={(v) => {
-                    if (v === '') {
-                      updateField('assigned_to', null);
-                      return;
-                    }
-                    const assignee = collaborators.find((c) => c.id === v);
-                    if (!assignee) {
-                      updateField('assigned_to', v);
-                      return;
-                    }
-                    openAssignAccess(assignee, task.list_id, (grants) => {
-                      updateField('assigned_to', v);
-                      void saveGrants(v, grants);
-                    });
-                  }}
-                  disabled={!canEdit}
-                >
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="Sin asignar" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Sin asignar</SelectItem>
-                    {collaborators.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        <div className="flex items-center gap-2">
-                          <Avatar className="size-5"><AvatarFallback className="text-xs">{initials(c.full_name)}</AvatarFallback></Avatar>
-                          {c.full_name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground">Fecha límite</label>
-                  <Input
-                    type="date"
-                    defaultValue={task.due_date || ''}
-                    onBlur={(e) => updateField('due_date', e.target.value || null)}
-                    readOnly={!canEdit}
-                    className="h-8 text-xs"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground">Horas est.</label>
-                  <Input
-                    type="number"
-                    defaultValue={task.estimated_hours || ''}
-                    onBlur={(e) => updateField('estimated_hours', e.target.value || null)}
-                    readOnly={!canEdit}
-                    className="h-8 text-xs"
-                    step="0.5"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs text-muted-foreground">Turno</label>
-                <Select defaultValue={task.shift_id || ''} onValueChange={(v) => updateField('shift_id', v || null)} disabled={!canEdit}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="Sin turno" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Sin turno</SelectItem>
-                    {shifts.map((s) => (<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>))}
-                  </SelectContent>
-                </Select>
-              </div>
-          </PanelEntidad>
+            </PanelEntidad>
 
           <ConfirmDialog
             open={deleteOpen}
@@ -759,6 +764,11 @@ const fullTaskId = needsResolution ? resolvedTaskId : taskId;
                     <Link
                       key={st.id}
                       href={taskLink(st.id)}
+                      onClick={(e) => {
+                        if (!onOpenTask) return;
+                        e.preventDefault();
+                        onOpenTask(st.id);
+                      }}
                       className="flex items-center gap-2 rounded px-2 py-1.5 text-xs transition-colors hover:bg-accent"
                     >
                       <div

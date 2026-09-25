@@ -6,7 +6,7 @@ import { canalRealtime, removerCanal } from '@/lib/realtime';
 import { api, apiFetch } from '@/lib/api/cliente';
 import { Eye, EyeOff, CheckCircle2, XCircle, Users, Settings2, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
-import { TaskList } from '@/components/tareas/task-list';
+import { TaskList, AperturaTareaContext } from '@/components/tareas/task-list';
 import { StatusConfigDialog } from '@/components/tareas/status-config-dialog';
 import { FiltroPopover, BarraFiltrosEntidad, BuscadorEntidad } from '@/components/entidad/filtro-popover';
 import { AccionEntidad } from '@/components/entidad/accion-entidad';
@@ -22,6 +22,9 @@ import { saveAssignmentGrants } from '@/lib/auth/actions';
 import { cacheGet, cacheSet } from '@/lib/cache';
 import { aplicarEventoLista, leerEvento, parchearQuery } from '@/lib/realtime-cache';
 import { useAssignAccess, type GrantDraft } from '@/components/tareas/assign-access-dialog';
+import { TaskDetailSheet } from '@/components/calendar/task-detail-sheet';
+import { usePilaTareas } from '@/lib/use-pila-tareas';
+import { shortUid } from '@/lib/slugs';
 import type { AccessTree } from '@/lib/access';
 import type { Task, ProfilePreferences } from '@/types';
 import type { QuickAddInput, SortKey, TaskDropTarget } from '@/components/tareas/task-list';
@@ -44,6 +47,7 @@ export function TaskBoard() {
   const [filterAssignee, setFilterAssignee] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
   const [loading, setLoading] = useState(true);
+  const pilaTareas = usePilaTareas();
   const [sortBy, setSortBy] = useState<SortKey>('position');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -748,8 +752,9 @@ export function TaskBoard() {
         )}
       </BarraFiltrosEntidad>
 
-      <TaskList
-        tasks={filteredRootTasks}
+      <AperturaTareaContext.Provider value={pilaTareas.abrir}>
+        <TaskList
+          tasks={filteredRootTasks}
         childTasksByParent={childTasksByParent}
         notesCount={notesCount}
         collaborators={collaborators}
@@ -782,6 +787,21 @@ export function TaskBoard() {
         onTaskFocus={(id) => {
           setFocusedTaskId(id);
         }}
+        />
+      </AperturaTareaContext.Provider>
+      <TaskDetailSheet
+        noModal
+        taskId={pilaTareas.actual}
+        open={!!pilaTareas.actual}
+        onClose={pilaTareas.cerrar}
+        onDeleted={pilaTareas.cerrar}
+        onOpenTask={pilaTareas.abrirSub}
+        onBack={pilaTareas.puedeVolver ? pilaTareas.volver : undefined}
+        rutaCompleta={
+          pilaTareas.actual && ctx.listPath
+            ? `${ctx.listPath}/tarea/${shortUid(pilaTareas.actual)}`
+            : null
+        }
       />
       {selectedList && canEditList && (
         <StatusConfigDialog

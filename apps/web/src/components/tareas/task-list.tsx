@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useMemo, useState, useEffect, useRef, useLayoutEffect, createContext, useContext } from 'react';
 import { shortUid } from '@/lib/slugs';
 import { useFormatoHora } from '@/lib/use-formato-hora';
 import { useRouter } from 'next/navigation';
@@ -86,6 +86,9 @@ export type TaskDropTarget =
   | { kind: 'nest'; targetId: string };
 
 type EditableField = 'title' | 'assigned_to' | 'due_date' | 'priority' | 'status';
+
+/** Abre el detalle de una tarea en el offcanvas no modal de la lista. */
+export const AperturaTareaContext = createContext<((id: string) => void) | null>(null);
 
 const STATUS_ICONS: Record<string, React.ElementType> = {
   backlog: Clock,
@@ -461,6 +464,7 @@ function TaskNode({
   const [deleting, setDeleting] = useState(false);
   const router = useRouter();
   const titleClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abrirTarea = useContext(AperturaTareaContext);
   const { formatHora } = useFormatoHora();
 
   useEffect(() => () => {
@@ -693,7 +697,10 @@ function TaskNode({
       onClick={(e) => {
         e.preventDefault();
         if (titleClickTimer.current) clearTimeout(titleClickTimer.current);
-        titleClickTimer.current = setTimeout(() => router.push(href), 250);
+        titleClickTimer.current = setTimeout(() => {
+          if (abrirTarea) abrirTarea(task.id);
+          else router.push(href);
+        }, 250);
       }}
       onDoubleClick={(e) => {
         e.preventDefault();

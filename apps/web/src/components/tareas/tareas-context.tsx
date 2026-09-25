@@ -108,6 +108,15 @@ const TareasContext = createContext<TareasCtxValue | null>(null);
  * datos innecesario).
  */
 function refreshTareasPath(
+  prev: {
+    workspaces: Workspace[];
+    folders: WorkspaceFolder[];
+    lists: TaskListEntry[];
+    documents: TaskDocument[];
+    mindmaps: MindMap[];
+    todos: Todo[];
+    formularios: Formulario[];
+  },
   next: {
     nextWorkspaces: Workspace[];
     nextFolders: WorkspaceFolder[];
@@ -120,12 +129,25 @@ function refreshTareasPath(
   pathname: string,
   router: ReturnType<typeof useRouter>
 ) {
+  // El segmento actual apunta al slug VIEJO: se resuelve contra la
+  // estructura previa (por slug/uuid) y se emite el slug nuevo de la
+  // estructura actualizada.
+  const slugTrasCambio = <T extends { id: string; name: string; position?: number | null }>(
+    param: string,
+    prevPool: T[],
+    nextPool: T[]
+  ): string | null => {
+    const antes = findEntityByParam(param, prevPool);
+    if (!antes) return null;
+    const despues = nextPool.find((x) => x.id === antes.id);
+    return despues ? entitySlug(despues, nextPool) : null;
+  };
+
   const segs = pathname.split('/').filter(Boolean);
   if (segs[0] !== 'proyectos' || segs.length < 2) return;
-  const ws = findEntityByParam(segs[1], next.nextWorkspaces);
-  if (!ws) return;
-  const wsSlg = entitySlug(ws, next.nextWorkspaces);
-  let newPath = `/proyectos/${wsSlg}`;
+  const wsSlug = slugTrasCambio(segs[1], prev.workspaces, next.nextWorkspaces);
+  if (!wsSlug) return;
+  let newPath = `/proyectos/${wsSlug}`;
 
   if (segs[2]) {
     // '/dashboard' legacy → la ruta terminal del workspace ya es el dashboard.
@@ -136,8 +158,8 @@ function refreshTareasPath(
     if (segs[2] === 'raiz') {
       newPath += '/raiz';
     } else {
-      const folder = findEntityByParam(segs[2], next.nextFolders);
-      newPath += `/${folder ? entitySlug(folder, next.nextFolders) : segs[2]}`;
+      const folderSlug = slugTrasCambio(segs[2], prev.folders, next.nextFolders);
+      newPath += `/${folderSlug ?? segs[2]}`;
     }
   }
   if (segs[3]) {
@@ -146,22 +168,22 @@ function refreshTareasPath(
       if (newPath !== pathname) router.replace(newPath);
       return;
     } else if (segs[3] === 'documento' || segs[3] === 'mapa' || segs[3] === 'todo' || segs[3] === 'formulario') {
-      const pool =
+      const [prevPool, nextPool] =
         segs[3] === 'documento'
-          ? next.nextDocuments
+          ? [prev.documents, next.nextDocuments]
           : segs[3] === 'mapa'
-            ? next.nextMindmaps
+            ? [prev.mindmaps, next.nextMindmaps]
             : segs[3] === 'todo'
-              ? next.nextTodos
-              : next.nextFormularios;
-      const ent = findEntityByParam(segs[4], pool);
-      newPath += `/${segs[3]}/${ent ? entitySlug(ent, pool) : segs[4]}`;
+              ? [prev.todos, next.nextTodos]
+              : [prev.formularios, next.nextFormularios];
+      const entSlug = slugTrasCambio(segs[4], prevPool, nextPool);
+      newPath += `/${segs[3]}/${entSlug ?? segs[4]}`;
       if (segs[3] === 'formulario' && segs[5]) {
         newPath += `/${segs.slice(5).join('/')}`;
       }
     } else {
-      const list = findEntityByParam(segs[3], next.nextLists);
-      newPath += `/${list ? entitySlug(list, next.nextLists) : segs[3]}`;
+      const listSlug = slugTrasCambio(segs[3], prev.lists, next.nextLists);
+      newPath += `/${listSlug ?? segs[3]}`;
       if (segs[4]) newPath += `/${segs.slice(4).join('/')}`;
     }
   }
@@ -954,6 +976,7 @@ export function TareasProvider({ children }: { children: React.ReactNode }) {
       input.type === 'formulario' && f.id === input.id ? { ...f, name: input.name } : f
     );
     refreshTareasPath(
+      { workspaces, folders, lists, documents, mindmaps, todos, formularios },
       { nextWorkspaces, nextFolders, nextLists, nextDocuments, nextMindmaps, nextTodos, nextFormularios },
       pathname,
       router

@@ -130,7 +130,7 @@ export function EntityDashboard({ scope }: { scope: Scope }) {
       : findEntityByParam(scope.wsId, workspaces) || null;
   const dashboardWsSlug = wsForSlug ? entitySlug(wsForSlug, workspaces) : '';
 
-  if (notFound || (!workspace && !folder)) {
+  if (notFound || !workspace || (scope.type === 'folder' && !folder)) {
     return (
       <div className="space-y-4">
         <Link href="/proyectos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">

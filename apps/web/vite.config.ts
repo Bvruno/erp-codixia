@@ -33,6 +33,9 @@ export default defineConfig({
       '@/lib/use-formato-hora': fileURLToPath(
         new URL('./src/lib/use-formato-hora.ts', import.meta.url)
       ),
+      '@/lib/use-pila-tareas': fileURLToPath(
+        new URL('./src/lib/use-pila-tareas.ts', import.meta.url)
+      ),
       '@/lib/use-preferencias-trabajo': fileURLToPath(
         new URL('./src/lib/use-preferencias-trabajo.ts', import.meta.url)
       ),

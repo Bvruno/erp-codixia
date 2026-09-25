@@ -28,6 +28,7 @@ import { usePerfil } from '@/lib/use-perfil';
 import { usePreferenciasTrabajo } from '@/lib/use-preferencias-trabajo';
 import { DEFAULT_PREFERENCES } from '@/types';
 import { aplicarEventoLista, leerEvento, parchearQuery } from '@/lib/realtime-cache';
+import { usePilaTareas } from '@/lib/use-pila-tareas';
 
 export type ViewMode = 'day' | 'week' | 'month' | 'year';
 
@@ -97,7 +98,9 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [modal, setModal] = useState<Note | 'new' | null>(null);
   const [notaPendienteId, setNotaPendienteId] = useState<string | null>(initialNoteId ?? null);
-  const [taskDetailId, setTaskDetailId] = useState<string | null>(initialTaskId ?? null);
+  const pilaTareas = usePilaTareas();
+  const reemplazarPila = pilaTareas.reemplazar;
+  const taskDetailId = pilaTareas.actual;
   const [deleteOpen, setDeleteOpen] = useState(false);
   const notasRef = useRef<Note[]>([]);
   const pushedTareaRef = useRef(false);
@@ -238,6 +241,12 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
     notasRef.current = notes;
   }, [notes]);
 
+  // Deep link inicial `?tarea=`: siembra la pila.
+  useEffect(() => {
+    if (initialTaskId) pilaTareas.reemplazar([initialTaskId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const pushParam = (key: string, value: string) => {
     const p = new URLSearchParams(window.location.search);
     p.set(key, value);
@@ -254,13 +263,24 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
   };
 
   const abrirTarea = (id: string) => {
-    setTaskDetailId(id);
+    pilaTareas.abrir(id);
     pushedTareaRef.current = true;
     pushParam('tarea', id);
   };
 
+  const abrirSubTarea = (id: string) => {
+    pilaTareas.abrirSub(id);
+    replaceParam('tarea', id);
+  };
+
+  const volverTarea = () => {
+    const previo = pilaTareas.pila[pilaTareas.pila.length - 2] ?? null;
+    pilaTareas.volver();
+    replaceParam('tarea', previo);
+  };
+
   const cerrarTarea = () => {
-    setTaskDetailId(null);
+    pilaTareas.cerrar();
     if (pushedTareaRef.current) {
       pushedTareaRef.current = false;
       window.history.back();
@@ -319,7 +339,8 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
   useEffect(() => {
     const onPop = () => {
       const p = new URLSearchParams(window.location.search);
-      setTaskDetailId(p.get('tarea'));
+      const tareaId = p.get('tarea');
+      reemplazarPila(tareaId ? [tareaId] : []);
       const notaId = p.get('nota');
       if (!notaId) {
         setModal(null);
@@ -337,7 +358,7 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
-  }, []);
+  }, [reemplazarPila]);
 
   const activeFilterCount =
     (filters.ws !== 'all' ? 1 : 0) +
@@ -1003,6 +1024,8 @@ export default function CalendarioView({ initialView: _initialView, initialFilte
         esAdmin={isAdmin}
         listasEscribibles={writableListIds}
         onChanged={invalidarCalendario}
+        onOpenTask={abrirSubTarea}
+        onBack={pilaTareas.puedeVolver ? volverTarea : undefined}
       />
     </div>
   );
