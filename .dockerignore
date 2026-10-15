@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/build
+**/.git
+**/.env
+**/.env.*
+!**/.env.docker.example
+!**/.env.example
+supabase/.temp
+supabase/.branches
+**/playwright-report
+**/test-results
+docs
+design-system
+capturas
+screenshots
