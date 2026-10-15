@@ -332,7 +332,7 @@ services:
       kong:
         condition: service_healthy
     ports:
-      - "127.0.0.1:8401:8787"
+      - "8401:8787"
     environment:
       NODE_ENV: production
       PORT: "8787"
@@ -360,7 +360,7 @@ services:
         VITE_WS_URL: ${API_WS_URL}
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8400:4173"
+      - "8400:4173"
 
 volumes:
   db-data:
